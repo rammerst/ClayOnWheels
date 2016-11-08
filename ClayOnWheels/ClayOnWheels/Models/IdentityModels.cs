@@ -21,7 +21,7 @@ namespace ClayOnWheels.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
+            : base("SQLSERVER_CONNECTION_STRING", throwIfV1Schema: false)
         {
         }
 
