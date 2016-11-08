@@ -1,4 +1,8 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Configuration;
+using System.Data.Entity;
+using System.Data.SqlClient;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
@@ -21,7 +25,7 @@ namespace ClayOnWheels.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
-            : base("SQLSERVER_CONNECTION_STRING", throwIfV1Schema: false)
+            : base("SQLSERVER_CONNECTION_STRING_ALIAS", throwIfV1Schema: false)
         {
         }
 
