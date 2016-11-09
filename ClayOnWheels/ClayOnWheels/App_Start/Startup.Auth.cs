@@ -6,6 +6,7 @@ using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
 using Owin;
 using ClayOnWheels.Models;
+using Microsoft.Owin.Security.Facebook;
 
 namespace ClayOnWheels
 {
@@ -54,9 +55,14 @@ namespace ClayOnWheels
             //   consumerKey: "",
             //   consumerSecret: "");
 
-            app.UseFacebookAuthentication(
-               appId: "318088221907523",
-               appSecret: "1ff722cddf38c7f51341ea6797549f2c");
+            var facebookAuthenticationOptions = new FacebookAuthenticationOptions()
+            {
+                AppId = "318088221907523",
+                AppSecret = "1ff722cddf38c7f51341ea6797549f2c"
+            };
+            facebookAuthenticationOptions.Scope.Add("email");
+            app.UseFacebookAuthentication(facebookAuthenticationOptions);
+
 
             //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             //{
@@ -64,5 +70,6 @@ namespace ClayOnWheels
             //    ClientSecret = ""
             //});
         }
+
     }
 }
