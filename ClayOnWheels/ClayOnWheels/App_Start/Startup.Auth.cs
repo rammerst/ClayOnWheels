@@ -55,8 +55,8 @@ namespace ClayOnWheels
             //   consumerSecret: "");
 
             app.UseFacebookAuthentication(
-               appId: "",
-               appSecret: "");
+               appId: "318088221907523",
+               appSecret: "1ff722cddf38c7f51341ea6797549f2c");
 
             //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             //{
