@@ -2,30 +2,209 @@
     ViewBag.Title = "Home Page";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+@section scripts{
+
+    <script>
+    $(document).ready(function () {
+
+        var sourceFullView = { url: '/Home/GetDiaryEvents/' };
+        var sourceSummaryView = { url: '/Home/GetDiarySummary/' };
+        var CalLoading = true;
+
+        $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay'
+            },
+            defaultView: 'agendaDay',
+            editable: true,
+            allDaySlot: false,
+            selectable: true,
+            slotMinutes: 15,
+            events: '/Home/GetDiaryEvents/',
+            eventClick: function (calEvent, jsEvent, view) {
+                alert('You clicked on event id: ' + calEvent.id
+                    + "\nSpecial ID: " + calEvent.someKey
+                    + "\nAnd the title is: " + calEvent.title);
+
+            },
+
+            eventDrop: function (event, dayDelta, minuteDelta, allDay, revertFunc) {
+                if (confirm("Confirm move?")) {
+                    UpdateEvent(event.id, event.start);
+                }
+                else {
+                    revertFunc();
+                }
+            },
+
+            eventResize: function (event, dayDelta, minuteDelta, revertFunc) {
+
+                if (confirm("Confirm change appointment length?")) {
+                    UpdateEvent(event.id, event.start, event.end);
+                }
+                else {
+                    revertFunc();
+                }
+            },
+
+
+
+            dayClick: function (date, allDay, jsEvent, view) {
+                $('#eventTitle').val("");
+                $('#eventDate').val($.fullCalendar.formatDate(date, 'dd/MM/yyyy'));
+                $('#eventTime').val($.fullCalendar.formatDate(date, 'HH:mm'));
+                ShowEventPopup(date);
+            },
+
+            viewRender: function (view, element) {
+
+                if (!CalLoading) {
+                    if (view.name == 'month') {
+                        $('#calendar').fullCalendar('removeEventSource', sourceFullView);
+                        $('#calendar').fullCalendar('removeEvents');
+                        $('#calendar').fullCalendar('addEventSource', sourceSummaryView);
+                    }
+                    else {
+                        $('#calendar').fullCalendar('removeEventSource', sourceSummaryView);
+                        $('#calendar').fullCalendar('removeEvents');
+                        $('#calendar').fullCalendar('addEventSource', sourceFullView);
+                    }
+                }
+            }
+
+        });
+
+        CalLoading = false;
+
+
+    });
+
+    $('#btnInit').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: "/Home/Init",
+            success: function (response) {
+                if (response == 'True') {
+                    $('#calendar').fullCalendar('refetchEvents');
+                    alert('Database populated! ');
+                }
+                else {
+                    alert('Error, could not populate database!');
+                }
+            }
+        });
+    });
+
+    $('#btnPopupCancel').click(function () {
+        ClearPopupFormValues();
+        $('#popupEventForm').hide();
+    });
+
+    $('#btnPopupSave').click(function () {
+
+        $('#popupEventForm').hide();
+
+        var dataRow = {
+            'Title': $('#eventTitle').val(),
+            'NewEventDate': $('#eventDate').val(),
+            'NewEventTime': $('#eventTime').val(),
+            'NewEventDuration': $('#eventDuration').val()
+        }
+
+        ClearPopupFormValues();
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/SaveEvent",
+            data: dataRow,
+            success: function (response) {
+                if (response == 'True') {
+                    $('#calendar').fullCalendar('refetchEvents');
+                    alert('New event saved!');
+                }
+                else {
+                    alert('Error, could not save event!');
+                }
+            }
+        });
+    });
+
+    function ShowEventPopup(date) {
+        ClearPopupFormValues();
+        $('#popupEventForm').show();
+        $('#eventTitle').focus();
+    }
+
+    function ClearPopupFormValues() {
+        $('#eventID').val("");
+        $('#eventTitle').val("");
+        $('#eventDateTime').val("");
+        $('#eventDuration').val("");
+    }
+
+    function UpdateEvent(EventID, EventStart, EventEnd) {
+
+        var dataRow = {
+            'ID': EventID,
+            'NewEventStart': EventStart,
+            'NewEventEnd': EventEnd
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/UpdateEvent",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify(dataRow)
+        });
+    }
+
+    </script>
+
+
+}
+
+
+<div class="container">
+
+    <div>
+        <a href="#" id="btnInit" class="btn btn-secondary">Initialise database!</a>
+    </div>
+
+    <div id='calendar' style="width:65%"></div>
+
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+
+<div id="popupEventForm" class="modal hide" style="display: none;">
+    <div class="modal-header"><h3>Add new event</h3></div>
+    <div class="modal-body">
+        <form id="EventForm" class="well">
+            <input type="hidden" id="eventID">
+            <label>Event title</label>
+            <input type="text" id="eventTitle" placeholder="Title here"><br />
+            <label>Scheduled date</label>
+            <input type="text" id="eventDate"><br />
+            <label>Scheduled time</label>
+            <input type="text" id="eventTime"><br />
+            <label>Appointment length (minutes)</label>
+            <input type="text" id="eventDuration" placeholder="15"><br />
+        </form>
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+    <div class="modal-footer">
+        <button type="button" id="btnPopupCancel" data-dismiss="modal" class="btn">Cancel</button>
+        <button type="button" id="btnPopupSave" data-dismiss="modal" class="btn btn-primary">Save event</button>
     </div>
 </div>
+
+
+
+
+
+
+
+
+
+
