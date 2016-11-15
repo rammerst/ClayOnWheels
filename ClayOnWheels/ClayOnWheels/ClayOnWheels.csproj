@@ -78,6 +78,7 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
@@ -200,36 +201,18 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Models\EF\Dairy.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Dairy.tt</DependentUpon>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\AppointmentDiary.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Diary.Context.cs" />
-    <Compile Include="Models\Diary.cs" />
-    <Compile Include="Models\Diary.Designer.cs">
-      <DependentUpon>Diary.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Diary1.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Diary.edmx</DependentUpon>
-    </Compile>
-    <Compile Include="Models\DiaryEvents.cs" />
+    <Compile Include="Models\EF\DairyEvents.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
-    <Compile Include="Models\Model1.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Model1.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Model1.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\Shared.cs" />
     <Compile Include="Models\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -285,21 +268,14 @@
     <Content Include="Content\themes\base\tabs.css" />
     <Content Include="Content\themes\base\theme.css" />
     <Content Include="Content\themes\base\tooltip.css" />
+    <Content Include="Models\EF\Dairy.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Dairy.cs</LastGenOutput>
+    </Content>
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Models\Diary.edmx.sql" />
-    <Content Include="Models\Model1.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Model1.Context.cs</LastGenOutput>
-      <DependentUpon>Diary.edmx</DependentUpon>
-    </Content>
-    <Content Include="Models\Model1.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Model1.cs</LastGenOutput>
-      <DependentUpon>Diary.edmx</DependentUpon>
-    </Content>
     <Content Include="Scripts\bootstrap-modal.js" />
     <Content Include="Scripts\bootstrap-popover.js" />
     <Content Include="Scripts\bootstrap-tooltip.js" />
@@ -308,13 +284,8 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <EntityDeploy Include="Models\Diary.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>Diary1.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <Content Include="Models\Diary.edmx.diagram">
-      <DependentUpon>Diary.edmx</DependentUpon>
-    </Content>
+    <Content Include="Models\EF\EF.Reverse.POCO.Core.ttinclude" />
+    <Content Include="Models\EF\EF.Reverse.POCO.ttinclude" />
     <None Include="Scripts\jquery-1.12.4.intellisense.js" />
     <Content Include="Scripts\fullcalendar.js" />
     <Content Include="Scripts\fullcalendar.min.js" />
