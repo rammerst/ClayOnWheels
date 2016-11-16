@@ -56,7 +56,7 @@ namespace ClayOnWheels.Models.EF
 
             var fromDate = ConvertFromUnixTimestamp(start);
             var toDate = ConvertFromUnixTimestamp(end);
-            using (var ent = new FakeMyDbContext())
+            using (var ent = new MyDbContext())
             {
                 var rslt = ent.AppointmentDiaries.Where(s => s.DateTimeScheduled >= fromDate && EntityFunctions.AddMinutes(s.DateTimeScheduled, s.AppointmentLength) <= toDate)
                                                         .GroupBy(s => EntityFunctions.TruncateTime(s.DateTimeScheduled))
