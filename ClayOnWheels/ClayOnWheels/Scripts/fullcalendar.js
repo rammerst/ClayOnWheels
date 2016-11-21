@@ -61,19 +61,19 @@ var defaults = {
 	// locale
 	isRTL: false,
 	firstDay: 0,
-	monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December'],
-	monthNamesShort: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-	dayNames: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
-	dayNamesShort: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+	monthNames: ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'],
+	monthNamesShort: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'],
+	dayNames: ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'],
+	dayNamesShort: ['Zon','Mon','Din','Woe','Don','Vri','Zat'],
 	buttonText: {
 		prev: "<span class='fc-text-arrow'>&lsaquo;</span>",
 		next: "<span class='fc-text-arrow'>&rsaquo;</span>",
 		prevYear: "<span class='fc-text-arrow'>&laquo;</span>",
 		nextYear: "<span class='fc-text-arrow'>&raquo;</span>",
-		today: 'today',
-		month: 'month',
+		today: 'vandaag',
+		month: 'maand',
 		week: 'week',
-		day: 'day'
+		day: 'dag'
 	},
 	
 	// jquery-ui theming
