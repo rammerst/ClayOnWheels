@@ -14,12 +14,15 @@
             $('#calendar').fullCalendar({
                 format: 'DD/MM/YYYY HH:mm',
                 firstDay: 1,
+                hiddenDays: [0],
+                minTime: '10:00:00',
+                maxTime: '22:00:00',
                 header: {
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'month,agendaWeek,agendaDay'
+                    right: 'month,agendaWeek'
                 },
-                defaultView: 'agendaDay',
+                defaultView: 'agendaWeek',
                 editable: true,
                 allDaySlot: false,
                 selectable: true,

@@ -64,7 +64,7 @@ var defaults = {
 	monthNames: ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'],
 	monthNamesShort: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'],
 	dayNames: ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'],
-	dayNamesShort: ['Zon','Mon','Din','Woe','Don','Vri','Zat'],
+	dayNamesShort: ['Zon','Maa','Din','Woe','Don','Vri','Zat'],
 	buttonText: {
 		prev: "<span class='fc-text-arrow'>&lsaquo;</span>",
 		next: "<span class='fc-text-arrow'>&rsaquo;</span>",
