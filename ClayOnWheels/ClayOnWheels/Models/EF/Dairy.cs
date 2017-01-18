@@ -26,6 +26,7 @@
 // TargetFrameworkVersion = 4.51
 #pragma warning disable 1591    //  Ignore "Missing XML Comment" warning
 
+
 namespace ClayOnWheels.Models.EF
 {
     using System.Linq;
@@ -39,17 +40,28 @@ namespace ClayOnWheels.Models.EF
         System.Data.Entity.DbSet<AspNetUser> AspNetUsers { get; set; } // AspNetUsers
         System.Data.Entity.DbSet<AspNetUserClaim> AspNetUserClaims { get; set; } // AspNetUserClaims
         System.Data.Entity.DbSet<AspNetUserLogin> AspNetUserLogins { get; set; } // AspNetUserLogins
+        System.Data.Entity.DbSet<Subscription> Subscriptions { get; set; } // Subscriptions
+        System.Data.Entity.DbSet<UserSubscription> UserSubscriptions { get; set; } // UserSubscriptions
 
         int SaveChanges();
         System.Threading.Tasks.Task<int> SaveChangesAsync();
         System.Threading.Tasks.Task<int> SaveChangesAsync(System.Threading.CancellationToken cancellationToken);
+        System.Data.Entity.Infrastructure.DbChangeTracker ChangeTracker { get; }
+        System.Data.Entity.Infrastructure.DbContextConfiguration Configuration { get; }
+        System.Data.Entity.Database Database { get; }
+        System.Data.Entity.Infrastructure.DbEntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
+        System.Data.Entity.Infrastructure.DbEntityEntry Entry(object entity);
+        System.Collections.Generic.IEnumerable<System.Data.Entity.Validation.DbEntityValidationResult> GetValidationErrors();
+        System.Data.Entity.DbSet Set(System.Type entityType);
+        System.Data.Entity.DbSet<TEntity> Set<TEntity>() where TEntity : class;
+        string ToString();
     }
 
     #endregion
 
     #region Database context
 
-    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.24.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class MyDbContext : System.Data.Entity.DbContext, IMyDbContext
     {
         public System.Data.Entity.DbSet<AppointmentDiary> AppointmentDiaries { get; set; } // AppointmentDiary
@@ -57,6 +69,8 @@ namespace ClayOnWheels.Models.EF
         public System.Data.Entity.DbSet<AspNetUser> AspNetUsers { get; set; } // AspNetUsers
         public System.Data.Entity.DbSet<AspNetUserClaim> AspNetUserClaims { get; set; } // AspNetUserClaims
         public System.Data.Entity.DbSet<AspNetUserLogin> AspNetUserLogins { get; set; } // AspNetUserLogins
+        public System.Data.Entity.DbSet<Subscription> Subscriptions { get; set; } // Subscriptions
+        public System.Data.Entity.DbSet<UserSubscription> UserSubscriptions { get; set; } // UserSubscriptions
 
         static MyDbContext()
         {
@@ -111,6 +125,8 @@ namespace ClayOnWheels.Models.EF
             modelBuilder.Configurations.Add(new AspNetUserConfiguration());
             modelBuilder.Configurations.Add(new AspNetUserClaimConfiguration());
             modelBuilder.Configurations.Add(new AspNetUserLoginConfiguration());
+            modelBuilder.Configurations.Add(new SubscriptionConfiguration());
+            modelBuilder.Configurations.Add(new UserSubscriptionConfiguration());
         }
 
         public static System.Data.Entity.DbModelBuilder CreateModel(System.Data.Entity.DbModelBuilder modelBuilder, string schema)
@@ -120,6 +136,8 @@ namespace ClayOnWheels.Models.EF
             modelBuilder.Configurations.Add(new AspNetUserConfiguration(schema));
             modelBuilder.Configurations.Add(new AspNetUserClaimConfiguration(schema));
             modelBuilder.Configurations.Add(new AspNetUserLoginConfiguration(schema));
+            modelBuilder.Configurations.Add(new SubscriptionConfiguration(schema));
+            modelBuilder.Configurations.Add(new UserSubscriptionConfiguration(schema));
             return modelBuilder;
         }
     }
@@ -127,7 +145,7 @@ namespace ClayOnWheels.Models.EF
 
     #region Fake Database context
 
-    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.24.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class FakeMyDbContext : IMyDbContext
     {
         public System.Data.Entity.DbSet<AppointmentDiary> AppointmentDiaries { get; set; }
@@ -135,6 +153,8 @@ namespace ClayOnWheels.Models.EF
         public System.Data.Entity.DbSet<AspNetUser> AspNetUsers { get; set; }
         public System.Data.Entity.DbSet<AspNetUserClaim> AspNetUserClaims { get; set; }
         public System.Data.Entity.DbSet<AspNetUserLogin> AspNetUserLogins { get; set; }
+        public System.Data.Entity.DbSet<Subscription> Subscriptions { get; set; }
+        public System.Data.Entity.DbSet<UserSubscription> UserSubscriptions { get; set; }
 
         public FakeMyDbContext()
         {
@@ -143,6 +163,8 @@ namespace ClayOnWheels.Models.EF
             AspNetUsers = new FakeDbSet<AspNetUser>("Id");
             AspNetUserClaims = new FakeDbSet<AspNetUserClaim>("Id");
             AspNetUserLogins = new FakeDbSet<AspNetUserLogin>("LoginProvider", "ProviderKey", "UserId");
+            Subscriptions = new FakeDbSet<Subscription>("Id");
+            UserSubscriptions = new FakeDbSet<UserSubscription>("Id");
         }
 
         public int SaveChangesCount { get; private set; }
@@ -172,6 +194,35 @@ namespace ClayOnWheels.Models.EF
         {
             Dispose(true);
         }
+
+        public System.Data.Entity.Infrastructure.DbChangeTracker ChangeTracker { get; }
+        public System.Data.Entity.Infrastructure.DbContextConfiguration Configuration { get; }
+        public System.Data.Entity.Database Database { get; }
+        public System.Data.Entity.Infrastructure.DbEntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class
+        {
+            throw new System.NotImplementedException();
+        }
+        public System.Data.Entity.Infrastructure.DbEntityEntry Entry(object entity)
+        {
+            throw new System.NotImplementedException();
+        }
+        public System.Collections.Generic.IEnumerable<System.Data.Entity.Validation.DbEntityValidationResult> GetValidationErrors()
+        {
+            throw new System.NotImplementedException();
+        }
+        public System.Data.Entity.DbSet Set(System.Type entityType)
+        {
+            throw new System.NotImplementedException();
+        }
+        public System.Data.Entity.DbSet<TEntity> Set<TEntity>() where TEntity : class
+        {
+            throw new System.NotImplementedException();
+        }
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
+        }
+
     }
 
     // ************************************************************************
@@ -191,7 +242,7 @@ namespace ClayOnWheels.Models.EF
     //          }
     //      }
     //      Read more about it here: https://msdn.microsoft.com/en-us/data/dn314431.aspx
-    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.24.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class FakeDbSet<TEntity> : System.Data.Entity.DbSet<TEntity>, IQueryable, System.Collections.Generic.IEnumerable<TEntity>, System.Data.Entity.Infrastructure.IDbAsyncEnumerable<TEntity> where TEntity : class
     {
         private readonly System.Reflection.PropertyInfo[] _primaryKeys;
@@ -327,7 +378,7 @@ namespace ClayOnWheels.Models.EF
         }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.24.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class FakeDbAsyncQueryProvider<TEntity> : System.Data.Entity.Infrastructure.IDbAsyncQueryProvider
     {
         private readonly IQueryProvider _inner;
@@ -368,7 +419,7 @@ namespace ClayOnWheels.Models.EF
         }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.24.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class FakeDbAsyncEnumerable<T> : EnumerableQuery<T>, System.Data.Entity.Infrastructure.IDbAsyncEnumerable<T>, IQueryable<T>
     {
         public FakeDbAsyncEnumerable(System.Collections.Generic.IEnumerable<T> enumerable)
@@ -395,7 +446,7 @@ namespace ClayOnWheels.Models.EF
         }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.24.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class FakeDbAsyncEnumerator<T> : System.Data.Entity.Infrastructure.IDbAsyncEnumerator<T>
     {
         private readonly System.Collections.Generic.IEnumerator<T> _inner;
@@ -431,7 +482,7 @@ namespace ClayOnWheels.Models.EF
     #region POCO classes
 
     // AppointmentDiary
-    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.24.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class AppointmentDiary
     {
         public int Id { get; set; } // ID (Primary key)
@@ -448,7 +499,7 @@ namespace ClayOnWheels.Models.EF
     }
 
     // AspNetRoles
-    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.24.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class AspNetRole
     {
         public string Id { get; set; } // Id (Primary key) (length: 128)
@@ -464,7 +515,7 @@ namespace ClayOnWheels.Models.EF
     }
 
     // AspNetUsers
-    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.24.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class AspNetUser
     {
         public string Id { get; set; } // Id (Primary key) (length: 128)
@@ -484,17 +535,21 @@ namespace ClayOnWheels.Models.EF
         public virtual System.Collections.Generic.ICollection<AspNetRole> AspNetRoles { get; set; } // Many to many mapping
         public virtual System.Collections.Generic.ICollection<AspNetUserClaim> AspNetUserClaims { get; set; } // AspNetUserClaims.FK_dbo.AspNetUserClaims_dbo.AspNetUsers_UserId
         public virtual System.Collections.Generic.ICollection<AspNetUserLogin> AspNetUserLogins { get; set; } // Many to many mapping
+        public virtual System.Collections.Generic.ICollection<Subscription> Subscriptions { get; set; } // Subscriptions.FK_dbo.Subscriptions_dbo.AspNetUsers_UserId
+        public virtual System.Collections.Generic.ICollection<UserSubscription> UserSubscriptions { get; set; } // UserSubscriptions.FK_dbo.UserSubscriptions.AspNetUsers_UserId
 
         public AspNetUser()
         {
             AspNetUserClaims = new System.Collections.Generic.List<AspNetUserClaim>();
             AspNetUserLogins = new System.Collections.Generic.List<AspNetUserLogin>();
+            Subscriptions = new System.Collections.Generic.List<Subscription>();
+            UserSubscriptions = new System.Collections.Generic.List<UserSubscription>();
             AspNetRoles = new System.Collections.Generic.List<AspNetRole>();
         }
     }
 
     // AspNetUserClaims
-    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.24.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class AspNetUserClaim
     {
         public int Id { get; set; } // Id (Primary key)
@@ -507,7 +562,7 @@ namespace ClayOnWheels.Models.EF
     }
 
     // AspNetUserLogins
-    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.24.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class AspNetUserLogin
     {
         public string LoginProvider { get; set; } // LoginProvider (Primary key) (length: 128)
@@ -518,12 +573,41 @@ namespace ClayOnWheels.Models.EF
         public virtual AspNetUser AspNetUser { get; set; } // FK_dbo.AspNetUserLogins_dbo.AspNetUsers_UserId
     }
 
+    // Subscriptions
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
+    public class Subscription
+    {
+        public int Id { get; set; } // Id (Primary key)
+        public string UserId { get; set; } // UserId (length: 128)
+        public System.DateTime DatePurchased { get; set; } // DatePurchased
+        public int Number { get; set; } // Number
+
+        // Reverse navigation
+       // public virtual Subscription Subscription1 { get; set; } // Subscriptions.FK_Subscriptions_Subscriptions
+
+        // Foreign keys
+        public virtual AspNetUser AspNetUser { get; set; } // FK_dbo.Subscriptions_dbo.AspNetUsers_UserId
+        public virtual Subscription Subscription_Id { get; set; } // FK_Subscriptions_Subscriptions
+    }
+
+    // UserSubscriptions
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
+    public class UserSubscription
+    {
+        public int Id { get; set; } // Id (Primary key)
+        public string UserId { get; set; } // UserId (length: 128)
+        public int AppointmentDairyId { get; set; } // AppointmentDairyId
+
+        // Foreign keys
+        public virtual AspNetUser AspNetUser { get; set; } // FK_dbo.UserSubscriptions.AspNetUsers_UserId
+    }
+
     #endregion
 
     #region POCO Configuration
 
     // AppointmentDiary
-    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.24.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class AppointmentDiaryConfiguration : System.Data.Entity.ModelConfiguration.EntityTypeConfiguration<AppointmentDiary>
     {
         public AppointmentDiaryConfiguration()
@@ -536,17 +620,17 @@ namespace ClayOnWheels.Models.EF
             ToTable("AppointmentDiary", schema);
             HasKey(x => x.Id);
 
-            Property(x => x.Id).HasColumnName(@"ID").IsRequired().HasColumnType("int").HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity);
-            Property(x => x.Title).HasColumnName(@"Title").IsRequired().HasColumnType("nvarchar").HasMaxLength(100);
-            Property(x => x.SomeImportantKey).HasColumnName(@"SomeImportantKey").IsRequired().HasColumnType("int");
-            Property(x => x.DateTimeScheduled).HasColumnName(@"DateTimeScheduled").IsRequired().HasColumnType("datetime");
-            Property(x => x.AppointmentLength).HasColumnName(@"AppointmentLength").IsRequired().HasColumnType("int");
-            Property(x => x.StatusEnum).HasColumnName(@"StatusENUM").IsRequired().HasColumnType("int");
+            Property(x => x.Id).HasColumnName(@"ID").HasColumnType("int").IsRequired().HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity);
+            Property(x => x.Title).HasColumnName(@"Title").HasColumnType("nvarchar").IsRequired().HasMaxLength(100);
+            Property(x => x.SomeImportantKey).HasColumnName(@"SomeImportantKey").HasColumnType("int").IsRequired();
+            Property(x => x.DateTimeScheduled).HasColumnName(@"DateTimeScheduled").HasColumnType("datetime").IsRequired();
+            Property(x => x.AppointmentLength).HasColumnName(@"AppointmentLength").HasColumnType("int").IsRequired();
+            Property(x => x.StatusEnum).HasColumnName(@"StatusENUM").HasColumnType("int").IsRequired();
         }
     }
 
     // AspNetRoles
-    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.24.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class AspNetRoleConfiguration : System.Data.Entity.ModelConfiguration.EntityTypeConfiguration<AspNetRole>
     {
         public AspNetRoleConfiguration()
@@ -559,8 +643,8 @@ namespace ClayOnWheels.Models.EF
             ToTable("AspNetRoles", schema);
             HasKey(x => x.Id);
 
-            Property(x => x.Id).HasColumnName(@"Id").IsRequired().HasColumnType("nvarchar").HasMaxLength(128).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
-            Property(x => x.Name).HasColumnName(@"Name").IsRequired().HasColumnType("nvarchar").HasMaxLength(256);
+            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("nvarchar").IsRequired().HasMaxLength(128).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
+            Property(x => x.Name).HasColumnName(@"Name").HasColumnType("nvarchar").IsRequired().HasMaxLength(256);
             HasMany(t => t.AspNetUsers).WithMany(t => t.AspNetRoles).Map(m =>
             {
                 m.ToTable("AspNetUserRoles", "dbo");
@@ -571,7 +655,7 @@ namespace ClayOnWheels.Models.EF
     }
 
     // AspNetUsers
-    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.24.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class AspNetUserConfiguration : System.Data.Entity.ModelConfiguration.EntityTypeConfiguration<AspNetUser>
     {
         public AspNetUserConfiguration()
@@ -584,23 +668,23 @@ namespace ClayOnWheels.Models.EF
             ToTable("AspNetUsers", schema);
             HasKey(x => x.Id);
 
-            Property(x => x.Id).HasColumnName(@"Id").IsRequired().HasColumnType("nvarchar").HasMaxLength(128).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
-            Property(x => x.Email).HasColumnName(@"Email").IsOptional().HasColumnType("nvarchar").HasMaxLength(256);
-            Property(x => x.EmailConfirmed).HasColumnName(@"EmailConfirmed").IsRequired().HasColumnType("bit");
-            Property(x => x.PasswordHash).HasColumnName(@"PasswordHash").IsOptional().HasColumnType("nvarchar(max)");
-            Property(x => x.SecurityStamp).HasColumnName(@"SecurityStamp").IsOptional().HasColumnType("nvarchar(max)");
-            Property(x => x.PhoneNumber).HasColumnName(@"PhoneNumber").IsOptional().HasColumnType("nvarchar(max)");
-            Property(x => x.PhoneNumberConfirmed).HasColumnName(@"PhoneNumberConfirmed").IsRequired().HasColumnType("bit");
-            Property(x => x.TwoFactorEnabled).HasColumnName(@"TwoFactorEnabled").IsRequired().HasColumnType("bit");
-            Property(x => x.LockoutEndDateUtc).HasColumnName(@"LockoutEndDateUtc").IsOptional().HasColumnType("datetime");
-            Property(x => x.LockoutEnabled).HasColumnName(@"LockoutEnabled").IsRequired().HasColumnType("bit");
-            Property(x => x.AccessFailedCount).HasColumnName(@"AccessFailedCount").IsRequired().HasColumnType("int");
-            Property(x => x.UserName).HasColumnName(@"UserName").IsRequired().HasColumnType("nvarchar").HasMaxLength(256);
+            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("nvarchar").IsRequired().HasMaxLength(128).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
+            Property(x => x.Email).HasColumnName(@"Email").HasColumnType("nvarchar").IsOptional().HasMaxLength(256);
+            Property(x => x.EmailConfirmed).HasColumnName(@"EmailConfirmed").HasColumnType("bit").IsRequired();
+            Property(x => x.PasswordHash).HasColumnName(@"PasswordHash").HasColumnType("nvarchar(max)").IsOptional();
+            Property(x => x.SecurityStamp).HasColumnName(@"SecurityStamp").HasColumnType("nvarchar(max)").IsOptional();
+            Property(x => x.PhoneNumber).HasColumnName(@"PhoneNumber").HasColumnType("nvarchar(max)").IsOptional();
+            Property(x => x.PhoneNumberConfirmed).HasColumnName(@"PhoneNumberConfirmed").HasColumnType("bit").IsRequired();
+            Property(x => x.TwoFactorEnabled).HasColumnName(@"TwoFactorEnabled").HasColumnType("bit").IsRequired();
+            Property(x => x.LockoutEndDateUtc).HasColumnName(@"LockoutEndDateUtc").HasColumnType("datetime").IsOptional();
+            Property(x => x.LockoutEnabled).HasColumnName(@"LockoutEnabled").HasColumnType("bit").IsRequired();
+            Property(x => x.AccessFailedCount).HasColumnName(@"AccessFailedCount").HasColumnType("int").IsRequired();
+            Property(x => x.UserName).HasColumnName(@"UserName").HasColumnType("nvarchar").IsRequired().HasMaxLength(256);
         }
     }
 
     // AspNetUserClaims
-    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.24.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class AspNetUserClaimConfiguration : System.Data.Entity.ModelConfiguration.EntityTypeConfiguration<AspNetUserClaim>
     {
         public AspNetUserClaimConfiguration()
@@ -613,10 +697,10 @@ namespace ClayOnWheels.Models.EF
             ToTable("AspNetUserClaims", schema);
             HasKey(x => x.Id);
 
-            Property(x => x.Id).HasColumnName(@"Id").IsRequired().HasColumnType("int").HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity);
-            Property(x => x.UserId).HasColumnName(@"UserId").IsRequired().HasColumnType("nvarchar").HasMaxLength(128);
-            Property(x => x.ClaimType).HasColumnName(@"ClaimType").IsOptional().HasColumnType("nvarchar(max)");
-            Property(x => x.ClaimValue).HasColumnName(@"ClaimValue").IsOptional().HasColumnType("nvarchar(max)");
+            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("int").IsRequired().HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity);
+            Property(x => x.UserId).HasColumnName(@"UserId").HasColumnType("nvarchar").IsRequired().HasMaxLength(128);
+            Property(x => x.ClaimType).HasColumnName(@"ClaimType").HasColumnType("nvarchar(max)").IsOptional();
+            Property(x => x.ClaimValue).HasColumnName(@"ClaimValue").HasColumnType("nvarchar(max)").IsOptional();
 
             // Foreign keys
             HasRequired(a => a.AspNetUser).WithMany(b => b.AspNetUserClaims).HasForeignKey(c => c.UserId); // FK_dbo.AspNetUserClaims_dbo.AspNetUsers_UserId
@@ -624,7 +708,7 @@ namespace ClayOnWheels.Models.EF
     }
 
     // AspNetUserLogins
-    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.24.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class AspNetUserLoginConfiguration : System.Data.Entity.ModelConfiguration.EntityTypeConfiguration<AspNetUserLogin>
     {
         public AspNetUserLoginConfiguration()
@@ -637,12 +721,60 @@ namespace ClayOnWheels.Models.EF
             ToTable("AspNetUserLogins", schema);
             HasKey(x => new { x.LoginProvider, x.ProviderKey, x.UserId });
 
-            Property(x => x.LoginProvider).HasColumnName(@"LoginProvider").IsRequired().HasColumnType("nvarchar").HasMaxLength(128).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
-            Property(x => x.ProviderKey).HasColumnName(@"ProviderKey").IsRequired().HasColumnType("nvarchar").HasMaxLength(128).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
-            Property(x => x.UserId).HasColumnName(@"UserId").IsRequired().HasColumnType("nvarchar").HasMaxLength(128).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
+            Property(x => x.LoginProvider).HasColumnName(@"LoginProvider").HasColumnType("nvarchar").IsRequired().HasMaxLength(128).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
+            Property(x => x.ProviderKey).HasColumnName(@"ProviderKey").HasColumnType("nvarchar").IsRequired().HasMaxLength(128).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
+            Property(x => x.UserId).HasColumnName(@"UserId").HasColumnType("nvarchar").IsRequired().HasMaxLength(128).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
 
             // Foreign keys
             HasRequired(a => a.AspNetUser).WithMany(b => b.AspNetUserLogins).HasForeignKey(c => c.UserId); // FK_dbo.AspNetUserLogins_dbo.AspNetUsers_UserId
+        }
+    }
+
+    // Subscriptions
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
+    public class SubscriptionConfiguration : System.Data.Entity.ModelConfiguration.EntityTypeConfiguration<Subscription>
+    {
+        public SubscriptionConfiguration()
+            : this("dbo")
+        {
+        }
+
+        public SubscriptionConfiguration(string schema)
+        {
+            ToTable("Subscriptions", schema);
+            HasKey(x => x.Id);
+
+            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("int").IsRequired().HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity);
+            Property(x => x.UserId).HasColumnName(@"UserId").HasColumnType("nvarchar").IsRequired().HasMaxLength(128);
+            Property(x => x.DatePurchased).HasColumnName(@"DatePurchased").HasColumnType("datetime").IsRequired();
+            Property(x => x.Number).HasColumnName(@"Number").HasColumnType("int").IsRequired();
+
+            // Foreign keys
+            HasRequired(a => a.AspNetUser).WithMany(b => b.Subscriptions).HasForeignKey(c => c.UserId); // FK_dbo.Subscriptions_dbo.AspNetUsers_UserId
+           // HasRequired(a => a.Subscription_Id).WithOptional(b => b.Subscription1).WillCascadeOnDelete(false); // FK_Subscriptions_Subscriptions
+        }
+    }
+
+    // UserSubscriptions
+    [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
+    public class UserSubscriptionConfiguration : System.Data.Entity.ModelConfiguration.EntityTypeConfiguration<UserSubscription>
+    {
+        public UserSubscriptionConfiguration()
+            : this("dbo")
+        {
+        }
+
+        public UserSubscriptionConfiguration(string schema)
+        {
+            ToTable("UserSubscriptions", schema);
+            HasKey(x => x.Id);
+
+            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("int").IsRequired().HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity);
+            Property(x => x.UserId).HasColumnName(@"UserId").HasColumnType("nvarchar").IsRequired().HasMaxLength(128);
+            Property(x => x.AppointmentDairyId).HasColumnName(@"AppointmentDairyId").HasColumnType("int").IsRequired();
+
+            // Foreign keys
+            HasRequired(a => a.AspNetUser).WithMany(b => b.UserSubscriptions).HasForeignKey(c => c.UserId); // FK_dbo.UserSubscriptions.AspNetUsers_UserId
         }
     }
 

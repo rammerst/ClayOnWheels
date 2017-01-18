@@ -22,6 +22,11 @@
                     center: 'title',
                     right: 'month,agendaWeek'
                 },
+                views: {
+                    listDay: { buttonText: 'list day' },
+                    listWeek: { buttonText: 'list week' }
+                },
+
                 defaultView: 'agendaWeek',
                 editable: true,
                 allDaySlot: false,
@@ -177,7 +182,7 @@
 <div class="container">
 
     <div>
-        <a href="#" id="btnInit" class="btn btn-secondary">Initialise database!</a>
+        <a href="#" id="btnInit" class="btn btn-secondary">Is administrator: @ViewBag.isAdmin</a>
     </div>
 
     <div id='calendar' style="width:65%"></div>

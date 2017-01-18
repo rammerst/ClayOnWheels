@@ -1,6 +1,6 @@
 <#
 // Copyright (C) Simon Hughes 2012
-// v2.24.0
+// v2.25.0
 #>
 <#@ template debug="true" hostspecific="true" language="C#" #>
 <#@ include file="EF6.Utility.CS.ttinclude"#>
@@ -49,13 +49,15 @@
         string ConfigurationClassName = "Configuration";
         string CollectionType = "System.Collections.Generic.List";
         static bool NullableShortHand = true;
+        bool UseDataAnnotations = false;
+        bool UseDataAnnotationsSchema = false;
         bool MakeClassesPartial = true;
         bool MakeDbContextInterfacePartial = false;
         bool GenerateSeparateFiles = false;
         bool UseMappingTables = true;
         bool IsSqlCe = false;
         string FileExtension = ".cs";
-        bool UseCamelCase = true;
+        bool UsePascalCase = true;
         bool UsePrivateSetterForComputedColumns = true;
         CommentsStyle IncludeComments = CommentsStyle.AtEndOfField;
         bool IncludeQueryTraceOn9481Flag = false;
@@ -84,6 +86,7 @@
         private string _configFilePath = "";
         Func<string, string, string> TableRename;
         Func<string, string, string> StoredProcedureRename;
+        static Func<string, StoredProcedure, string> StoredProcedureReturnModelRename;
         Func<Column, Table, Column> UpdateColumn;
         Func<ForeignKey, ForeignKey> ForeignKeyFilter;
         Func<string, string, short, string> ForeignKeyName;
@@ -94,7 +97,8 @@
         bool AutomaticMigrationDataLossAllowed = true;
         List<EnumDefinition> EnumsDefinitions = new List<EnumDefinition>();
 
-        string CodeGeneratedAttribute = "[System.CodeDom.Compiler.GeneratedCode(\"EF.Reverse.POCO.Generator\", \"2.24.0.0\")]";
+        public static string CodeGeneratedAttribute = "[System.CodeDom.Compiler.GeneratedCode(\"EF.Reverse.POCO.Generator\", \"2.25.0.0\")]";
+        bool IncludeCodeGeneratedAttribute = true;
 
         // Settings to allow selective code generation
         [Flags]
@@ -182,6 +186,56 @@
             if(char.IsDigit(str[0]))
                 str = "C" + str;
 
+            return str;
+        };
+
+        private static readonly Func<string, string> ToDisplayName = (str) =>
+        {
+            if (string.IsNullOrEmpty(str))
+                return string.Empty;
+
+            var sb = new StringBuilder();
+            str = Regex.Replace(str, @"[^a-zA-Z0-9]", " "); // Anything that is not a letter or digit, convert to a space
+            str = Regex.Replace(str, @"[A-Z]{2,}", " $+ "); // Any word that is upper case
+
+            var hasUpperCased = false;
+            var lastChar = '\0';
+            foreach (var original in str.Trim())
+            {
+                var c = original;
+                if (lastChar == '\0')
+                {
+                    c = char.ToUpperInvariant(original);
+                }
+                else
+                {
+                    var isLetter = char.IsLetter(original);
+                    var isDigit = char.IsDigit(original);
+                    var isWhiteSpace = !isLetter && !isDigit;
+
+                    // Is this char is different to last time
+                    var isDifferent = false;
+                    if (isLetter && !char.IsLetter(lastChar))
+                        isDifferent = true;
+                    else if (isDigit && !char.IsDigit(lastChar))
+                        isDifferent = true;
+                    else if (char.IsUpper(original) && !char.IsUpper(lastChar))
+                        isDifferent = true;
+
+                    if (isDifferent || isWhiteSpace)
+                        sb.Append(' '); // Add a space
+
+                    if (hasUpperCased && isLetter)
+                        c = char.ToLowerInvariant(original);
+                }
+                lastChar = original;
+                if (!hasUpperCased && char.IsUpper(c))
+                    hasUpperCased = true;
+                sb.Append(c);
+            }
+            str = sb.ToString();
+            str = Regex.Replace(str, @"\s+", " ").Trim(); // Multiple white space to one space
+            str = Regex.Replace(str, @"\bid\b", "ID"); //  Make ID word uppercase
             return str;
         };
 
@@ -532,25 +586,28 @@
                         PrependSchemaName = false;
 
                     var reader = new SqlServerSchemaReader(conn, factory, IncludeQueryTraceOn9481Flag) { Outer = this };
-                    var tables = reader.ReadSchema(SchemaFilterExclude, SchemaFilterInclude, TableFilterExclude, TableFilterInclude, ColumnFilterExclude, TableFilter, UseCamelCase, PrependSchemaName, IncludeComments, IncludeViews, IncludeExtendedPropertyComments, TableRename, UpdateColumn, UsePrivateSetterForComputedColumns, IncludeSynonyms);
-                    tables.SetPrimaryKeys();
-
-                    // Must be done in this order
+                    var tables = reader.ReadSchema(SchemaFilterExclude, SchemaFilterInclude, TableFilterExclude, TableFilterInclude, ColumnFilterExclude, TableFilter, UsePascalCase, PrependSchemaName, IncludeComments, IncludeViews, IncludeExtendedPropertyComments, TableRename, UpdateColumn, UsePrivateSetterForComputedColumns, IncludeSynonyms, UseDataAnnotations, UseDataAnnotationsSchema);
                     var fkList = reader.ReadForeignKeys(TableRename, ForeignKeyFilter);
                     reader.IdentifyForeignKeys(fkList, tables);
-                    reader.ProcessForeignKeys(fkList, tables, UseCamelCase, PrependSchemaName, CollectionType, true, IncludeComments, ForeignKeyName);
 
+                    foreach (var t in tables)
+                    {
+                        if(UseDataAnnotationsSchema)
+                            t.SetupDataAnnotations();
+                    }
+
+                    // Work out if there are any foreign key relationship naming clashes
+                    reader.ProcessForeignKeys(fkList, tables, UsePascalCase, PrependSchemaName, CollectionType, true, IncludeComments, ForeignKeyName, UseDataAnnotationsSchema);
                     if(UseMappingTables)
-                        tables.IdentifyMappingTables(fkList, UseCamelCase, CollectionType, true, IncludeComments, IsSqlCe, ForeignKeyName);
+                        tables.IdentifyMappingTables(fkList, UsePascalCase, CollectionType, true, IncludeComments, IsSqlCe, ForeignKeyName);
 
+                    // Now we know our foreign key relationships and have worked out if there are any name clashes,
+                    // re-map again with intelligently named relationships.
                     tables.ResetNavigationProperties();
 
-                    reader.ProcessForeignKeys(fkList, tables, UseCamelCase, PrependSchemaName, CollectionType, false, IncludeComments, ForeignKeyName);
+                    reader.ProcessForeignKeys(fkList, tables, UsePascalCase, PrependSchemaName, CollectionType, false, IncludeComments, ForeignKeyName, UseDataAnnotationsSchema);
                     if(UseMappingTables)
-                        tables.IdentifyMappingTables(fkList, UseCamelCase, CollectionType, false, IncludeComments, IsSqlCe, ForeignKeyName);
-
-                    foreach(var t in tables)
-                        t.SetHasPrimaryKey();
+                        tables.IdentifyMappingTables(fkList, UsePascalCase, CollectionType, false, IncludeComments, IsSqlCe, ForeignKeyName);
 
                     conn.Close();
                     return tables;
@@ -586,7 +643,7 @@
                        return new List<StoredProcedure>();
 
                     var reader = new SqlServerSchemaReader(conn, factory, IncludeQueryTraceOn9481Flag) { Outer = this };
-                    var storedProcs = reader.ReadStoredProcs(SchemaFilterExclude, StoredProcedureFilterExclude, UseCamelCase, PrependSchemaName, StoredProcedureRename, IncludeTableValuedFunctions);
+                    var storedProcs = reader.ReadStoredProcs(SchemaFilterExclude, StoredProcedureFilterExclude, UsePascalCase, PrependSchemaName, StoredProcedureRename, IncludeTableValuedFunctions);
                     conn.Close();
 
                     // Remove unrequired stored procs
@@ -710,6 +767,7 @@
         {
             public string Name; // Raw name of the column as obtained from the database
             public string NameHumanCase; // Name adjusted for C# output
+            public string DisplayName;  // Name used in the data annotation [Display(Name = "<DisplayName> goes here")]
 
             public int DateTimePrecision;
             public string Default;
@@ -741,6 +799,9 @@
             public List<string> ConfigFk = new List<string>();
             public string Entity;
             public List<string> EntityFk = new List<string>();
+
+            public List<string> DataAnnotations;
+            public List<Index> Indexes = new List<Index>();
 
             public Table ParentTable;
 
@@ -794,7 +855,8 @@
                 Entity = string.Format("public {0} {1} {{ get; {2}set; }}{3}", WrapIfNullable(PropertyType, this), NameHumanCase, usePrivateSetterForComputedColumns && IsComputed() ? "private " : string.Empty, inlineComments);
             }
 
-            private string WrapIfNullable(string propType, Column col) {
+            private string WrapIfNullable(string propType, Column col)
+            {
                 if(!IsNullable(col))
                     return propType;
                 return String.Format(NullableShortHand ? "{0}?" : "System.Nullable<{0}>",propType);
@@ -805,33 +867,164 @@
                 return IsStoreGenerated && !IsIdentity;
             }
 
-            private void SetupConfig()
+            private void SetupConfig(bool dataAnnotations, bool dataAnnotationsSchema)
             {
-                string databaseGeneratedOption = string.Empty;
-                if(IsIdentity)
-                    databaseGeneratedOption = ".HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity)";
-                if(IsComputed())
-                    databaseGeneratedOption = ".HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Computed)";
-                if(IsPrimaryKey && !IsIdentity && !IsStoreGenerated)
-                    databaseGeneratedOption = ".HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None)";
+                DataAnnotations = new List<string>();
+                string databaseGeneratedOption = null;
 
-                Config = string.Format("Property(x => x.{0}).HasColumnName(@\"{1}\"){2}{3}{4}{5}{6}{7}{8}{9}{10}{11};", NameHumanCase, Name,
-                                            (IsNullable) ? ".IsOptional()" : ".IsRequired()",
-                                            (IsFixedLength || IsRowVersion) ? ".IsFixedLength()" : "",
-                                            (IsUnicode) ? string.Empty : ".IsUnicode(false)",
-                                            ".HasColumnType(\"" + SqlPropertyType + "\")",
-                                            (!IsMaxLength && MaxLength > 0) ? ".HasMaxLength(" + MaxLength + ")" : string.Empty,
-                                            (IsMaxLength) ? ".IsMaxLength()" : string.Empty,
-                                            (Scale > 0) ? ".HasPrecision(" + Precision + "," + Scale + ")" : string.Empty,
-                                            (IsRowVersion) ? ".IsRowVersion()" : string.Empty,
-                                            (IsConcurrencyToken) ? ".IsConcurrencyToken()" : string.Empty,
-                                            databaseGeneratedOption);
+                if (IsIdentity)
+                {
+                    if(dataAnnotationsSchema)
+                        DataAnnotations.Add("DatabaseGenerated(DatabaseGeneratedOption.Identity)");
+                    else
+                        databaseGeneratedOption = ".HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity)";
+                }
+
+                if(IsComputed())
+                {
+                    if(dataAnnotationsSchema)
+                        DataAnnotations.Add("DatabaseGenerated(DatabaseGeneratedOption.Computed)");
+                    else
+                        databaseGeneratedOption = ".HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Computed)";
+                }
+
+                if (IsPrimaryKey && !IsIdentity && !IsStoreGenerated)
+                {
+                    if(dataAnnotationsSchema)
+                        DataAnnotations.Add("DatabaseGenerated(DatabaseGeneratedOption.None)");
+                    else
+                        databaseGeneratedOption = ".HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None)";
+                }
+
+                var sb = new StringBuilder();
+
+                if(dataAnnotationsSchema)
+                    DataAnnotations.Add(string.Format("Column(@\"{0}\", Order = {1}, TypeName = \"{2}\")", Name, Ordinal, SqlPropertyType));
+                else
+                    sb.AppendFormat(".HasColumnName(@\"{0}\").HasColumnType(\"{1}\")", Name, SqlPropertyType);
+
+                if (dataAnnotationsSchema && Indexes.Any())
+                {
+                    foreach (var index in Indexes)
+                    {
+                        DataAnnotations.Add(string.Format("Index(@\"{0}\", {1}, IsUnique = {2}, IsClustered = {3})",
+                            index.IndexName,
+                            index.KeyOrdinal,
+                            index.IsUnique ? "true" : "false",
+                            index.IsClustered ? "true" : "false"));
+                    }
+                }
+
+                if (IsNullable)
+                {
+                    sb.Append(".IsOptional()");
+                }
+                else
+                {
+                    if(dataAnnotations)
+                        DataAnnotations.Add("Required");
+                    else
+                        sb.Append(".IsRequired()");
+                }
+
+                if (IsFixedLength || IsRowVersion)
+                {
+                    sb.Append(".IsFixedLength()");
+                    // DataAnnotations.Add("????");
+                }
+
+                if (!IsUnicode)
+                {
+                    sb.Append(".IsUnicode(false)");
+                    // DataAnnotations.Add("????");
+                }
+
+                if (!IsMaxLength && MaxLength > 0)
+                {
+                    if (dataAnnotations)
+                    {
+                        DataAnnotations.Add(string.Format("MaxLength({0})", MaxLength));
+
+                        if (PropertyType.Equals("string", StringComparison.InvariantCultureIgnoreCase))
+                            DataAnnotations.Add(string.Format("StringLength({0})", MaxLength));
+                    } else
+                        sb.AppendFormat(".HasMaxLength({0})", MaxLength);
+                }
+
+                if (IsMaxLength)
+                {
+                    if (dataAnnotations)
+                        DataAnnotations.Add("MaxLength");
+                    else
+                        sb.Append(".IsMaxLength()");
+                }
+
+                if ((Precision > 0 || Scale > 0) && PropertyType == "decimal")
+                {
+                    sb.AppendFormat(".HasPrecision({0},{1})", Precision, Scale);
+                    // DataAnnotations.Add("????");
+                }
+
+                if (IsRowVersion)
+                {
+                    if (dataAnnotations)
+                        DataAnnotations.Add("Timestamp");
+                    else
+                        sb.Append(".IsRowVersion()");
+                }
+
+                if (IsConcurrencyToken)
+                {
+                    sb.Append(".IsConcurrencyToken()");
+                    // DataAnnotations.Add("????");
+                }
+
+                if(databaseGeneratedOption != null)
+                    sb.Append(databaseGeneratedOption);
+
+                var config = sb.ToString();
+                if(!string.IsNullOrEmpty(config))
+                    Config = string.Format("Property(x => x.{0}){1};", NameHumanCase, config);
+
+                if (!dataAnnotations)
+                    return; // Only data annotations below this point
+
+                if (IsPrimaryKey)
+                    DataAnnotations.Add("Key");
+
+                if(NameHumanCase.Equals("CreditCard", StringComparison.InvariantCultureIgnoreCase))
+                    DataAnnotations.Add("CreditCard");
+
+                if (NameHumanCase.Equals("Email", StringComparison.InvariantCultureIgnoreCase) ||
+                    NameHumanCase.Equals("EmailAddress", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    DataAnnotations.Add("EmailAddress");
+                }
+
+                if(NameHumanCase.Equals("Url", StringComparison.InvariantCultureIgnoreCase))
+                    DataAnnotations.Add("Url");
+
+                if(NameHumanCase.Equals("Phone", StringComparison.InvariantCultureIgnoreCase) ||
+                   NameHumanCase.Equals("PhoneNumber", StringComparison.InvariantCultureIgnoreCase) ||
+                   NameHumanCase.Equals("Mobile", StringComparison.InvariantCultureIgnoreCase) ||
+                   NameHumanCase.Equals("MobileNumber", StringComparison.InvariantCultureIgnoreCase) ||
+                   NameHumanCase.Equals("Telephone", StringComparison.InvariantCultureIgnoreCase) ||
+                   NameHumanCase.Equals("TelephoneNumber", StringComparison.InvariantCultureIgnoreCase))
+                    DataAnnotations.Add("Phone");
+
+                if(Name.ToLowerInvariant().Contains("password"))
+                    DataAnnotations.Add("DataType(DataType.Password)");
+
+                if(Name.Equals("Username", StringComparison.InvariantCultureIgnoreCase))
+                    DataAnnotations.Add("DataType(DataType.Text)");
+
+                DataAnnotations.Add(string.Format("Display(Name = \"{0}\")", DisplayName));
             }
 
-            public void SetupEntityAndConfig(CommentsStyle includeComments, CommentsStyle includeExtendedPropertyComments, bool usePrivateSetterForComputedColumns)
+            public void SetupEntityAndConfig(CommentsStyle includeComments, CommentsStyle includeExtendedPropertyComments, bool usePrivateSetterForComputedColumns, bool dataAnnotations, bool dataAnnotationsSchema)
             {
                 SetupEntity(includeComments, includeExtendedPropertyComments, usePrivateSetterForComputedColumns);
-                SetupConfig();
+                SetupConfig(dataAnnotations, dataAnnotationsSchema);
             }
 
             public void CleanUpDefault()
@@ -849,7 +1042,7 @@
                 }
 
                 // Remove unicode prefix
-                if (IsUnicode && Default.StartsWith("N"))
+                if (IsUnicode && Default.StartsWith("N") && !Default.Equals("NULL", StringComparison.InvariantCultureIgnoreCase))
                     Default = Default.Substring(1, Default.Length - 1);
 
                 if(Default.First() == '\'' && Default.Last() == '\'' && Default.Length >= 2)
@@ -1076,7 +1269,7 @@
         /// </summary>
         public static class Inflector
         {
-            static public IPluralizationService PluralizationService = null;
+            public static IPluralizationService PluralizationService = null;
 
             /// <summary>
             /// Makes the plural.
@@ -1087,6 +1280,8 @@
             {
                 try
                 {
+                    if (string.IsNullOrEmpty(word))
+                        return string.Empty;
                     if(PluralizationService == null)
                         return word;
 
@@ -1104,6 +1299,8 @@
 
             private static string MakePluralHelper(string word, char split)
             {
+                if (string.IsNullOrEmpty(word))
+                    return string.Empty;
                 var parts = word.Split(split);
                 parts[parts.Length - 1] = PluralizationService.Pluralize(parts[parts.Length - 1]); // Pluralize just the last word
                 return string.Join(split.ToString(), parts);
@@ -1118,6 +1315,9 @@
             {
                 try
                 {
+                    if (string.IsNullOrEmpty(word))
+                        return string.Empty;
+
                     if(PluralizationService == null)
                         return word;
 
@@ -1135,6 +1335,8 @@
 
             private static string MakeSingularHelper(string word, char split)
             {
+                if (string.IsNullOrEmpty(word))
+                    return string.Empty;
                 var parts = word.Split(split);
                 parts[parts.Length - 1] = PluralizationService.Singularize(parts[parts.Length - 1]); // Pluralize just the last word
                 return string.Join(split.ToString(), parts);
@@ -1147,6 +1349,9 @@
             /// <returns></returns>
             public static string ToTitleCase(string word)
             {
+                if (string.IsNullOrEmpty(word))
+                    return string.Empty;
+
                 var s = Regex.Replace(ToHumanCase(AddUnderscores(word)), @"\b([a-z])", match => match.Captures[0].Value.ToUpperInvariant());
                 var digit = false;
                 var sb = new StringBuilder();
@@ -1176,6 +1381,8 @@
             /// <returns></returns>
             public static string ToHumanCase(string lowercaseAndUnderscoredWord)
             {
+                if (string.IsNullOrEmpty(lowercaseAndUnderscoredWord))
+                    return string.Empty;
                 return MakeInitialCaps(Regex.Replace(lowercaseAndUnderscoredWord, @"_", " "));
             }
 
@@ -1187,6 +1394,8 @@
             /// <returns></returns>
             public static string AddUnderscores(string pascalCasedWord)
             {
+                if (string.IsNullOrEmpty(pascalCasedWord))
+                    return string.Empty;
                 return Regex.Replace(Regex.Replace(Regex.Replace(pascalCasedWord, @"([A-Z]+)([A-Z][a-z])", "$1_$2"), @"([a-z\d])([A-Z])", "$1_$2"), @"[-\s]", "_").ToLowerInvariant();
             }
 
@@ -1197,6 +1406,8 @@
             /// <returns></returns>
             public static string MakeInitialCaps(string word)
             {
+                if (string.IsNullOrEmpty(word))
+                    return string.Empty;
                 return string.Concat(word.Substring(0, 1).ToUpperInvariant(), word.Substring(1).ToLowerInvariant());
             }
 
@@ -1207,16 +1418,22 @@
             /// <returns></returns>
             public static string MakeInitialLower(string word)
             {
+                if (string.IsNullOrEmpty(word))
+                    return string.Empty;
                 return string.Concat(word.Substring(0, 1).ToLowerInvariant(), word.Substring(1));
             }
 
             public static string MakeLowerIfAllCaps(string word)
             {
+                if (string.IsNullOrEmpty(word))
+                    return string.Empty;
                 return IsAllCaps(word) ? word.ToLowerInvariant() : word;
             }
 
             public static bool IsAllCaps(string word)
             {
+                if (string.IsNullOrEmpty(word))
+                    return false;
                 return word.All(char.IsUpper);
             }
         }
@@ -1237,12 +1454,12 @@
             }
 
             public GeneratedTextTransformation Outer;
-            public abstract Tables ReadSchema(Regex schemaFilterExclude, Regex schemaFilterInclude, Regex tableFilterExclude, Regex tableFilterInclude, Regex columnFilterExclude, Func<Table, bool> tableFilter, bool useCamelCase, bool prependSchemaName, CommentsStyle includeComments, bool includeViews, CommentsStyle includeExtendedPropertyComments, Func<string, string, string> tableRename, Func<Column, Table, Column> updateColumn, bool usePrivateSetterForComputedColumns, bool includeSynonyms);
-            public abstract List<StoredProcedure> ReadStoredProcs(Regex SchemaFilterExclude, Regex storedProcedureFilterExclude, bool useCamelCase, bool prependSchemaName , Func<string, string, string> StoredProcedureRename, bool includeTableValuedFunctions);
+            public abstract Tables ReadSchema(Regex schemaFilterExclude, Regex schemaFilterInclude, Regex tableFilterExclude, Regex tableFilterInclude, Regex columnFilterExclude, Func<Table, bool> tableFilter, bool usePascalCase, bool prependSchemaName, CommentsStyle includeComments, bool includeViews, CommentsStyle includeExtendedPropertyComments, Func<string, string, string> tableRename, Func<Column, Table, Column> updateColumn, bool usePrivateSetterForComputedColumns, bool includeSynonyms, bool dataAnnotations, bool dataAnnotationsSchema);
+            public abstract List<StoredProcedure> ReadStoredProcs(Regex SchemaFilterExclude, Regex storedProcedureFilterExclude, bool usePascalCase, bool prependSchemaName , Func<string, string, string> StoredProcedureRename, bool includeTableValuedFunctions);
             public abstract List<ForeignKey> ReadForeignKeys(Func<string, string, string> tableRename, Func<ForeignKey, ForeignKey> foreignKeyFilter);
-            public abstract void ProcessForeignKeys(List<ForeignKey> fkList, Tables tables, bool useCamelCase, bool prependSchemaName, string collectionType, bool checkForFkNameClashes, CommentsStyle includeComments, Func<string, string, short, string> ForeignKeyName);
+            public abstract void ProcessForeignKeys(List<ForeignKey> fkList, Tables tables, bool usePascalCase, bool prependSchemaName, string collectionType, bool checkForFkNameClashes, CommentsStyle includeComments, Func<string, string, short, string> ForeignKeyName, bool dataAnnotationsSchema);
             public abstract void IdentifyForeignKeys(List<ForeignKey> fkList, Tables tables);
-            public abstract void ReadUniqueIndexes(Tables tables);
+            public abstract void ReadIndexes(Tables tables);
             public abstract void ReadExtendedProperties(Tables tables);
 
             protected void WriteLine(string o)
@@ -1327,7 +1544,8 @@ FROM    INFORMATION_SCHEMA.COLUMNS c
         INNER JOIN INFORMATION_SCHEMA.TABLES t
             ON c.TABLE_SCHEMA = t.TABLE_SCHEMA
                AND c.TABLE_NAME = t.TABLE_NAME
-WHERE c.TABLE_NAME NOT IN ('EdmMetadata', '__MigrationHistory')";
+WHERE c.TABLE_NAME NOT IN ('EdmMetadata', '__MigrationHistory')
+      AND c.TABLE_NAME NOT LIKE 'sysdiagram%'";
 
             private const string SynonymTableSQLSetup = @"
 SET NOCOUNT ON;
@@ -1771,16 +1989,22 @@ ORDER BY R.SPECIFIC_SCHEMA,
         R.SPECIFIC_NAME,
         P.ORDINAL_POSITION";
 
-            private const string UniqueIndexSQL = @"
+            private const string IndexSQL = @"
 SELECT  SCHEMA_NAME(t.schema_id) AS TableSchema,
         t.name AS TableName,
         ind.name AS IndexName,
         ic.key_ordinal AS KeyOrdinal,
         col.name AS ColumnName,
-        (SELECT COUNT(1)
+        ind.is_unique AS IsUnique,
+        ind.is_primary_key AS IsPrimaryKey,
+        ind.is_unique_constraint AS IsUniqueConstraint,
+        CASE WHEN ind.[type] = 1 AND ind.is_primary_key = 1 THEN 1 ELSE 0 END AS IsClustered,
+        (
+         SELECT COUNT(1)
          FROM   sys.index_columns i
          WHERE  i.object_id = ind.object_id
-                AND i.index_id = ind.index_id) AS ColumnCount
+                AND i.index_id = ind.index_id
+        ) AS ColumnCount
 FROM    sys.tables t
         INNER JOIN sys.indexes ind
             ON ind.object_id = t.object_id
@@ -1791,12 +2015,9 @@ FROM    sys.tables t
             ON ic.object_id = col.object_id
                AND ic.column_id = col.column_id
 WHERE   t.is_ms_shipped = 0
-        AND (
-             ind.is_unique = 1
-             OR ind.is_primary_key = 1
-             OR ind.is_unique_constraint = 1
-            )
-        AND ind.ignore_dup_key = 0";
+        AND ind.ignore_dup_key = 0
+        AND ic.key_ordinal > 0
+        AND t.name NOT LIKE 'sysdiagram%'";
 
             private bool IncludeQueryTraceOn9481Flag;
 
@@ -1850,7 +2071,7 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                 return SqlDatabaseEngineEdition == "Azure";
             }
 
-            public override Tables ReadSchema(Regex schemaFilterExclude, Regex schemaFilterInclude, Regex tableFilterExclude, Regex tableFilterInclude, Regex columnFilterExclude, Func<Table, bool> tableFilter, bool useCamelCase, bool prependSchemaName, CommentsStyle includeComments, bool includeViews, CommentsStyle includeExtendedPropertyComments, Func<string, string, string> tableRename, Func<Column, Table, Column> updateColumn, bool usePrivateSetterForComputedColumns, bool includeSynonyms)
+            public override Tables ReadSchema(Regex schemaFilterExclude, Regex schemaFilterInclude, Regex tableFilterExclude, Regex tableFilterInclude, Regex columnFilterExclude, Func<Table, bool> tableFilter, bool usePascalCase, bool prependSchemaName, CommentsStyle includeComments, bool includeViews, CommentsStyle includeExtendedPropertyComments, Func<string, string, string> tableRename, Func<Column, Table, Column> updateColumn, bool usePrivateSetterForComputedColumns, bool includeSynonyms, bool dataAnnotations, bool dataAnnotationsSchema)
             {
                 var result = new Tables();
                 if(Cmd == null)
@@ -1907,16 +2128,15 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
 
                                 // Handle table names with underscores - singularise just the last word
                                 table.ClassName = Inflector.MakeSingular(CleanUp(tableName));
-                                var titleCase = (useCamelCase ? Inflector.ToTitleCase(table.ClassName) : table.ClassName).Replace(" ", "").Replace("$", "").Replace(".", "");
+                                var titleCase = (usePascalCase ? Inflector.ToTitleCase(table.ClassName) : table.ClassName).Replace(" ", "").Replace("$", "").Replace(".", "");
                                 table.NameHumanCase = titleCase;
-
 
                                 if((string.Compare(table.Schema, "dbo", StringComparison.OrdinalIgnoreCase) != 0) && prependSchemaName)
                                     table.NameHumanCase = table.Schema + "_" + table.NameHumanCase;
 
                                 // Check for table or C# name clashes
                                 if (ReservedKeywords.Contains(table.NameHumanCase) ||
-                                    (useCamelCase && result.Find(x => x.NameHumanCase == table.NameHumanCase) != null))
+                                    (usePascalCase && result.Find(x => x.NameHumanCase == table.NameHumanCase) != null))
                                 {
                                     table.NameHumanCase += "1";
                                 }
@@ -1928,7 +2148,7 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                             }
                         }
 
-                        var col = CreateColumn(rdr, rxClean, table, useCamelCase, columnFilterExclude, updateColumn);
+                        var col = CreateColumn(rdr, rxClean, table, usePascalCase, columnFilterExclude, updateColumn);
                         if(col != null)
                             table.Columns.Add(col);
                     }
@@ -1949,11 +2169,12 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                 if (includeExtendedPropertyComments != CommentsStyle.None)
                     ReadExtendedProperties(result);
 
-                ReadUniqueIndexes(result);
+                ReadIndexes(result);
 
                 foreach(Table tbl in result)
                 {
-                    tbl.Columns.ForEach(x => x.SetupEntityAndConfig(includeComments, includeExtendedPropertyComments, usePrivateSetterForComputedColumns));
+                    tbl.SetPrimaryKeys();
+                    tbl.Columns.ForEach(x => x.SetupEntityAndConfig(includeComments, includeExtendedPropertyComments, usePrivateSetterForComputedColumns, dataAnnotations, dataAnnotationsSchema));
                 }
 
                 return result;
@@ -2002,7 +2223,7 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
 
             // When a table has no primary keys, all the NOT NULL columns are set as being the primary key.
             // This function reads the unique indexes for a table, and correctly sets the columns being used as primary keys.
-            public override void ReadUniqueIndexes(Tables tables)
+            public override void ReadIndexes(Tables tables)
             {
                 if (Cmd == null)
                     return;
@@ -2010,24 +2231,28 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                 if (Cmd.GetType().Name == "SqlCeCommand")
                     return;
 
-                Cmd.CommandText = UniqueIndexSQL + IncludeQueryTraceOn9481();
+                Cmd.CommandText = IndexSQL + IncludeQueryTraceOn9481();
                 Cmd.CommandTimeout = 600;
 
-                var list = new List<UniqueIndex>();
+                var list = new List<Index>();
                 using (DbDataReader rdr = Cmd.ExecuteReader())
                 {
                     while (rdr.Read())
                     {
-                        var uniqueIndex = new UniqueIndex();
+                        var index = new Index();
 
-                        uniqueIndex.Schema      = rdr["TableSchema"].ToString().Trim();
-                        uniqueIndex.TableName   = rdr["TableName"].ToString().Trim();
-                        uniqueIndex.IndexName   = rdr["IndexName"].ToString().Trim();
-                        uniqueIndex.KeyOrdinal  = (byte) rdr["KeyOrdinal"];
-                        uniqueIndex.Column      = rdr["ColumnName"].ToString().Trim();
-                        uniqueIndex.ColumnCount = (int) rdr["ColumnCount"];
+                        index.Schema             = rdr["TableSchema"].ToString().Trim();
+                        index.TableName          = rdr["TableName"].ToString().Trim();
+                        index.IndexName          = rdr["IndexName"].ToString().Trim();
+                        index.KeyOrdinal         = (byte) rdr["KeyOrdinal"];
+                        index.ColumnName         = rdr["ColumnName"].ToString().Trim();
+                        index.ColumnCount        = (int) rdr["ColumnCount"];
+                        index.IsUnique           = (bool) rdr["IsUnique"];
+                        index.IsPrimaryKey       = (bool) rdr["IsPrimaryKey"];
+                        index.IsUniqueConstraint = (bool) rdr["IsUniqueConstraint"];
+                        index.IsClustered        = ((int) rdr["IsClustered"]) == 1;
 
-                        list.Add(uniqueIndex);
+                        list.Add(index);
                     }
                 }
 
@@ -2042,14 +2267,34 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                     if (t == null || t.Name != indexTable.TableName || t.Schema != indexTable.Schema)
                         t = tables.Find(x => x.Name == indexTable.TableName && x.Schema == indexTable.Schema);
 
-                    // Check if table has no primary keys
-                    if (t == null || t.PrimaryKeys.Any())
-                        continue; // Already has a primary key, ignore this unique constraint
+                    if (t == null)
+                        continue;
+
+                    // Find indexes for table
+                    var indexes =
+                        list.Where(x => x.Schema == indexTable.Schema && x.TableName == indexTable.TableName)
+                            .OrderBy(o => o.ColumnCount)
+                            .ThenBy(o => o.KeyOrdinal);
+
+                    // Set index on column
+                    foreach (var index in indexes)
+                    {
+                        var col = t.Columns.Find(x => x.Name == index.ColumnName);
+                        if (col != null && !col.Hidden)
+                        {
+                            col.Indexes.Add(index);
+                            if (!col.IsPrimaryKey && index.IsPrimaryKey)
+                                col.IsPrimaryKey = true;
+                        }
+                    }
+
+                    // Check if table has any primary keys
+                    if (t.PrimaryKeys.Any())
+                        continue; // Already has a primary key, ignore this unique index / constraint
 
                     // Find unique indexes for table
                     var uniqueIndexKeys =
-                        list.Where(x => x.Schema == indexTable.Schema && x.TableName == indexTable.TableName)
-                            .Select(x => new { x.IndexName, x.KeyOrdinal, x.Column, x.ColumnCount })
+                        indexes.Where(x => x.IsUnique || x.IsPrimaryKey || x.IsUniqueConstraint)
                             .OrderBy(o => o.ColumnCount)
                             .ThenBy(o => o.KeyOrdinal);
 
@@ -2063,8 +2308,8 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                         if (indexName != key.IndexName)
                             break; // First unique index with lowest column count has been processed, exit.
 
-                        var col = t.Columns.Find(x => x.Name == key.Column);
-                        if (col != null && !col.IsNullable && !col.Hidden)
+                        var col = t.Columns.Find(x => x.Name == key.ColumnName);
+                        if (col != null && !col.IsNullable && !col.Hidden && !col.IsPrimaryKey)
                         {
                             col.IsPrimaryKey = true;
                             col.IsPrimaryKeyViaUniqueIndex = true;
@@ -2126,7 +2371,7 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                 }
             }
 
-            public override List<StoredProcedure> ReadStoredProcs(Regex schemaFilterExclude, Regex storedProcedureFilterExclude, bool useCamelCase, bool prependSchemaName , Func<string, string, string> StoredProcedureRename, bool includeTableValuedFunctions)
+            public override List<StoredProcedure> ReadStoredProcs(Regex schemaFilterExclude, Regex storedProcedureFilterExclude, bool usePascalCase, bool prependSchemaName , Func<string, string, string> StoredProcedureRename, bool includeTableValuedFunctions)
             {
                 var result = new List<StoredProcedure>();
                 if(Cmd == null)
@@ -2169,14 +2414,14 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                             {
                                 IsTVF = isTVF,
                                 Name = spName,
-                                NameHumanCase = (useCamelCase ? Inflector.ToTitleCase(spName) : spName).Replace(" ", "").Replace("$", ""),
+                                NameHumanCase = (usePascalCase ? Inflector.ToTitleCase(spName) : spName).Replace(" ", "").Replace("$", ""),
                                 Schema = schema
                             };
                             if((string.Compare(schema, "dbo", StringComparison.OrdinalIgnoreCase) != 0) && prependSchemaName)
                                 sp.NameHumanCase = schema + "_" + sp.NameHumanCase;
 
                             sp.NameHumanCase = StoredProcedureRename(sp.NameHumanCase, schema);
-                            if(storedProcedureFilterExclude != null && storedProcedureFilterExclude.IsMatch(sp.NameHumanCase))
+                            if(storedProcedureFilterExclude != null && (storedProcedureFilterExclude.IsMatch(sp.NameHumanCase) || storedProcedureFilterExclude.IsMatch(schema + "." + sp.NameHumanCase)))
                                 continue;
 
                             result.Add(sp);
@@ -2204,14 +2449,15 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                             };
 
                             var clean = CleanUp(param.Name.Replace("@", ""));
-                            param.NameHumanCase =
-                                Inflector.MakeInitialLower(
-                                    (useCamelCase ? Inflector.ToTitleCase(clean) : clean).Replace(" ", ""));
+                            if (!string.IsNullOrEmpty(clean))
+                            {
+                                param.NameHumanCase = Inflector.MakeInitialLower((usePascalCase ? Inflector.ToTitleCase(clean) : clean).Replace(" ", ""));
 
-                            if (ReservedKeywords.Contains(param.NameHumanCase))
-                                param.NameHumanCase = "@" + param.NameHumanCase;
+                                if (ReservedKeywords.Contains(param.NameHumanCase))
+                                    param.NameHumanCase = "@" + param.NameHumanCase;
 
-                            sp.Parameters.Add(param);
+                                sp.Parameters.Add(param);
+                            }
                         }
                     }
                 }
@@ -2281,7 +2527,7 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                 }
             }
 
-            public override void ProcessForeignKeys(List<ForeignKey> fkList, Tables tables, bool useCamelCase, bool prependSchemaName, string collectionType, bool checkForFkNameClashes, CommentsStyle includeComments, Func<string, string, short, string> ForeignKeyName)
+            public override void ProcessForeignKeys(List<ForeignKey> fkList, Tables tables, bool usePascalCase, bool prependSchemaName, string collectionType, bool checkForFkNameClashes, CommentsStyle includeComments, Func<string, string, short, string> ForeignKeyName, bool dataAnnotationsSchema)
             {
                 var constraints = fkList.Select(x => x.FkSchema + "." + x.ConstraintName).Distinct();
                 foreach (var constraint in constraints)
@@ -2327,12 +2573,16 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                     if (relationship == Relationship.DoNotUse)
                         continue;
 
-                    string pkTableHumanCase = foreignKey.PkTableHumanCase(useCamelCase, prependSchemaName);
-                    string pkPropName = fkTable.GetUniqueColumnName(pkTableHumanCase, foreignKey, useCamelCase, checkForFkNameClashes, true, ForeignKeyName);
+                    string pkTableHumanCase = foreignKey.PkTableHumanCase(usePascalCase, prependSchemaName);
+                    string pkPropName = fkTable.GetUniqueColumnName(pkTableHumanCase, foreignKey, usePascalCase, checkForFkNameClashes, true, ForeignKeyName);
                     bool fkMakePropNameSingular = (relationship == Relationship.OneToOne);
-                    string fkPropName = pkTable.GetUniqueColumnName(fkTable.NameHumanCase, foreignKey, useCamelCase, checkForFkNameClashes, fkMakePropNameSingular, ForeignKeyName);
+                    string fkPropName = pkTable.GetUniqueColumnName(fkTable.NameHumanCase, foreignKey, usePascalCase, checkForFkNameClashes, fkMakePropNameSingular, ForeignKeyName);
 
-                    fkCol.col.EntityFk.Add(string.Format("public virtual {0} {1} {2}{3}", pkTableHumanCase, pkPropName, "{ get; set; }", includeComments != CommentsStyle.None ? " // " + foreignKey.ConstraintName : string.Empty));
+                    var dataAnnotation = string.Empty;
+                    if (dataAnnotationsSchema)
+                        dataAnnotation = string.Format("[ForeignKey(\"{0}\")] ", string.Join(", ", fkCols.Select(x => x.col.NameHumanCase).Distinct().ToArray()));
+
+                    fkCol.col.EntityFk.Add(string.Format("{0}public virtual {1} {2} {3}{4}", dataAnnotation, pkTableHumanCase, pkPropName, "{ get; set; }", includeComments != CommentsStyle.None ? " // " + foreignKey.ConstraintName : string.Empty));
 
                     string manyToManyMapping, mapKey;
                     if(foreignKeys.Count > 1)
@@ -2344,8 +2594,14 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                         mapKey = string.Format("\"{0}\"", fkCol.col.Name);
                     }
 
-                    fkCol.col.ConfigFk.Add(string.Format("{0};{1}", GetRelationship(relationship, fkCol.col, pkCol, pkPropName, fkPropName, manyToManyMapping, mapKey, foreignKey.CascadeOnDelete), includeComments != CommentsStyle.None ? " // " + foreignKey.ConstraintName : string.Empty));
-                    pkTable.AddReverseNavigation(relationship, pkTableHumanCase, fkTable, fkPropName, string.Format("{0}.{1}", fkTable.Name, foreignKey.ConstraintName), collectionType, includeComments);
+                    if (!dataAnnotationsSchema)
+                    {
+                        fkCol.col.ConfigFk.Add(string.Format("{0};{1}", GetRelationship(relationship, fkCol.col, pkCol, pkPropName, fkPropName, manyToManyMapping, mapKey, foreignKey.CascadeOnDelete, foreignKey.IncludeReverseNavigation),
+                                                                        includeComments != CommentsStyle.None ? " // " + foreignKey.ConstraintName : string.Empty));
+                    }
+
+                    if(foreignKey.IncludeReverseNavigation)
+                        pkTable.AddReverseNavigation(relationship, pkTableHumanCase, fkTable, fkPropName, string.Format("{0}.{1}", fkTable.Name, foreignKey.ConstraintName), collectionType, includeComments);
                 }
             }
 
@@ -2373,12 +2629,12 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                 }
             }
 
-            private static string GetRelationship(Relationship relationship, Column fkCol, Column pkCol, string pkPropName, string fkPropName, string manyToManyMapping, string mapKey, bool cascadeOnDelete)
+            private static string GetRelationship(Relationship relationship, Column fkCol, Column pkCol, string pkPropName, string fkPropName, string manyToManyMapping, string mapKey, bool cascadeOnDelete, bool includeReverseNavigation)
             {
                 return string.Format("Has{0}(a => a.{1}){2}{3}",
                     GetHasMethod(relationship, fkCol, pkCol),
                     pkPropName,
-                    GetWithMethod(relationship, fkCol, fkPropName, manyToManyMapping, mapKey),
+                    GetWithMethod(relationship, fkCol, fkPropName, manyToManyMapping, mapKey, includeReverseNavigation),
                     cascadeOnDelete ? string.Empty: ".WillCascadeOnDelete(false)");
             }
 
@@ -2407,30 +2663,31 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
             // WithMany
             // WithRequiredPrincipal
             // WithRequiredDependent
-            private static string GetWithMethod(Relationship relationship, Column fkCol, string fkPropName, string manyToManyMapping, string mapKey)
+            private static string GetWithMethod(Relationship relationship, Column fkCol, string fkPropName, string manyToManyMapping, string mapKey, bool includeReverseNavigation)
             {
+                string withParam = includeReverseNavigation ? string.Format("b => b.{0}", fkPropName) : string.Empty;
                 switch (relationship)
                 {
                     case Relationship.OneToOne:
-                        return string.Format(".WithOptional(b => b.{0})", fkPropName);
+                        return string.Format(".WithOptional({0})", withParam);
 
                     case Relationship.OneToMany:
-                        return string.Format(".WithRequiredDependent(b => b.{0})", fkPropName);
+                        return string.Format(".WithRequiredDependent({0})", withParam);
 
                     case Relationship.ManyToOne:
                         if (!fkCol.Hidden)
-                            return string.Format(".WithMany(b => b.{0}).HasForeignKey({1})", fkPropName, manyToManyMapping);   // Foreign Key Association
-                        return string.Format(".WithMany(b => b.{0}).Map(c => c.MapKey({1}))", fkPropName, mapKey);  // Independent Association
+                            return string.Format(".WithMany({0}).HasForeignKey({1})", withParam, manyToManyMapping);   // Foreign Key Association
+                        return string.Format(".WithMany({0}).Map(c => c.MapKey({1}))", withParam, mapKey);  // Independent Association
 
                     case Relationship.ManyToMany:
-                        return string.Format(".WithMany(b => b.{0}).HasForeignKey({1})", fkPropName, manyToManyMapping);
+                        return string.Format(".WithMany({0}).HasForeignKey({1})", withParam, manyToManyMapping);
 
                     default:
                         throw new ArgumentOutOfRangeException("relationship");
                 }
             }
 
-            private static Column CreateColumn(IDataRecord rdr, Regex rxClean, Table table, bool useCamelCase, Regex columnFilterExclude, Func<Column, Table, Column> updateColumn)
+            private static Column CreateColumn(IDataRecord rdr, Regex rxClean, Table table, bool usePascalCase, Regex columnFilterExclude, Func<Column, Table, Column> updateColumn)
             {
                 if(rdr == null)
                     throw new ArgumentNullException("rdr");
@@ -2490,7 +2747,9 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                 if (ReservedKeywords.Contains(col.NameHumanCase))
                     col.NameHumanCase = "@" + col.NameHumanCase;
 
-                var titleCase = (useCamelCase ? Inflector.ToTitleCase(col.NameHumanCase) : col.NameHumanCase).Replace(" ", "");
+                col.DisplayName = ToDisplayName(col.Name);
+
+                var titleCase = (usePascalCase ? Inflector.ToTitleCase(col.NameHumanCase) : col.NameHumanCase).Replace(" ", "");
                 if (titleCase != string.Empty)
                     col.NameHumanCase = titleCase;
 
@@ -2740,6 +2999,9 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
             public int Ordinal { get; private set; }
             public bool CascadeOnDelete { get; private set; }
 
+            // User settable via ForeignKeyFilter callback
+            public bool IncludeReverseNavigation { get; set; }
+
             public ForeignKey(string fkTableName, string fkSchema, string pkTableName, string pkSchema, string fkColumn, string pkColumn, string constraintName, string fkTableNameFiltered, string pkTableNameFiltered, int ordinal, bool cascadeOnDelete)
             {
                 ConstraintName = constraintName;
@@ -2753,26 +3015,32 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                 PkTableNameFiltered = pkTableNameFiltered;
                 Ordinal = ordinal;
                 CascadeOnDelete = cascadeOnDelete;
+
+                IncludeReverseNavigation = true;
             }
 
-            public string PkTableHumanCase(bool useCamelCase, bool prependSchemaName)
+            public string PkTableHumanCase(bool usePascalCase, bool prependSchemaName)
             {
                 string singular = Inflector.MakeSingular(PkTableNameFiltered);
-                string pkTableHumanCase = (useCamelCase ? Inflector.ToTitleCase(singular) : singular).Replace(" ", "").Replace("$", "");
+                string pkTableHumanCase = (usePascalCase ? Inflector.ToTitleCase(singular) : singular).Replace(" ", "").Replace("$", "");
                 if (string.Compare(PkSchema, "dbo", StringComparison.OrdinalIgnoreCase) != 0 && prependSchemaName)
                     pkTableHumanCase = PkSchema + "_" + pkTableHumanCase;
                 return pkTableHumanCase;
             }
         }
 
-        public class UniqueIndex
+        public class Index
         {
             public string Schema;
             public string TableName;
             public string IndexName;
             public byte KeyOrdinal;
-            public string Column;
+            public string ColumnName;
             public int ColumnCount;
+            public bool IsUnique;
+            public bool IsPrimaryKey;
+            public bool IsUniqueConstraint;
+            public bool IsClustered;
         }
 
         public class Table
@@ -2794,12 +3062,14 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
             public List<string> ReverseNavigationCtor;
             public List<string> ReverseNavigationUniquePropName;
             public List<string> ReverseNavigationUniquePropNameClashes;
+            public List<string> DataAnnotations;
 
             public Table()
             {
                 Columns = new List<Column>();
                 ResetNavigationProperties();
                 ReverseNavigationUniquePropNameClashes = new List<string>();
+                DataAnnotations = new List<string>();
             }
 
             public void ResetNavigationProperties()
@@ -2812,16 +3082,11 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                     col.ResetNavigationProperties();
             }
 
-            public void SetHasPrimaryKey()
-            {
-                HasPrimaryKey = Columns.Any(x => x.IsPrimaryKey);
-            }
-
             public IEnumerable<Column> PrimaryKeys
             {
                 get
                 {
-                    return Columns.Where(x => x.IsPrimaryKey)
+                    return Columns.Where(x => x.IsPrimaryKey && !x.Hidden)
                                   .OrderBy(x => x.PrimaryKeyOrdinal)
                                   .ThenBy(x => x.Ordinal)
                                   .ToList();
@@ -2850,7 +3115,7 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                 return Columns.SingleOrDefault(x => String.Compare(x.Name, columnName, StringComparison.OrdinalIgnoreCase) == 0);
             }
 
-            public string GetUniqueColumnName(string tableNameHumanCase, ForeignKey foreignKey, bool useCamelCase, bool checkForFkNameClashes, bool makeSingular, Func<string, string, short, string> ForeignKeyName)
+            public string GetUniqueColumnName(string tableNameHumanCase, ForeignKey foreignKey, bool usePascalCase, bool checkForFkNameClashes, bool makeSingular, Func<string, string, short, string> ForeignKeyName)
             {
                 if (ReverseNavigationUniquePropName.Count == 0)
                 {
@@ -2865,7 +3130,7 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                     ReverseNavigationUniquePropNameClashes.Add(tableNameHumanCase); // Name clash
 
                 // Attempt 1
-                string fkName = (useCamelCase ? Inflector.ToTitleCase(foreignKey.FkColumn) : foreignKey.FkColumn).Replace(" ", "").Replace("$", "");
+                string fkName = (usePascalCase ? Inflector.ToTitleCase(foreignKey.FkColumn) : foreignKey.FkColumn).Replace(" ", "").Replace("$", "");
                 string name = ForeignKeyName(tableNameHumanCase, fkName, 1);
                 string col;
                 if (!ReverseNavigationUniquePropNameClashes.Contains(name) && !ReverseNavigationUniquePropName.Contains(name))
@@ -2957,7 +3222,7 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                 }
             }
 
-            public void AddMappingConfiguration(ForeignKey left, ForeignKey right, bool useCamelCase, string leftPropName, string rightPropName, bool isSqlCE)
+            public void AddMappingConfiguration(ForeignKey left, ForeignKey right, bool usePascalCase, string leftPropName, string rightPropName, bool isSqlCE)
             {
                 MappingConfiguration.Add(string.Format(@"HasMany(t => t.{0}).WithMany(t => t.{1}).Map(m =>
             {{
@@ -2969,7 +3234,8 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
 
             public void SetPrimaryKeys()
             {
-                if(PrimaryKeys.Any())
+                HasPrimaryKey = Columns.Any(x => x.IsPrimaryKey && !x.Hidden);
+                if(HasPrimaryKey)
                     return; // Table has at least one primary key
 
                 // This table is not allowed in EntityFramework as it does not have a primary key.
@@ -2977,10 +3243,11 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                 foreach(var col in Columns.Where(x => !x.IsNullable && !x.Hidden))
                 {
                     col.IsPrimaryKey = true;
+                    HasPrimaryKey = true;
                 }
             }
 
-            public void IdentifyMappingTable(List<ForeignKey> fkList, Tables tables, bool useCamelCase, string collectionType, bool checkForFkNameClashes, CommentsStyle includeComments, bool isSqlCE, Func<string, string, short, string> ForeignKeyName)
+            public void IdentifyMappingTable(List<ForeignKey> fkList, Tables tables, bool usePascalCase, string collectionType, bool checkForFkNameClashes, CommentsStyle includeComments, bool isSqlCE, Func<string, string, short, string> ForeignKeyName)
             {
                 IsMapping = false;
 
@@ -3010,6 +3277,8 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
 
                 ForeignKey left  = foreignKeys[0];
                 ForeignKey right = foreignKeys[1];
+                if (!left.IncludeReverseNavigation || !right.IncludeReverseNavigation)
+                    return;
 
                 Table leftTable = tables.GetTable(left.PkTableName, left.PkSchema);
                 if (leftTable == null)
@@ -3019,13 +3288,24 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                 if (rightTable == null)
                     return;
 
-                var leftPropName  = leftTable.GetUniqueColumnName(rightTable.NameHumanCase, right, useCamelCase, checkForFkNameClashes, false, ForeignKeyName);
-                var rightPropName = rightTable.GetUniqueColumnName(leftTable.NameHumanCase, left, useCamelCase, checkForFkNameClashes, false, ForeignKeyName);
-                leftTable.AddMappingConfiguration(left, right, useCamelCase, leftPropName, rightPropName, isSqlCE);
+                var leftPropName  = leftTable.GetUniqueColumnName(rightTable.NameHumanCase, right, usePascalCase, checkForFkNameClashes, false, ForeignKeyName);
+                var rightPropName = rightTable.GetUniqueColumnName(leftTable.NameHumanCase, left, usePascalCase, checkForFkNameClashes, false, ForeignKeyName);
+                leftTable.AddMappingConfiguration(left, right, usePascalCase, leftPropName, rightPropName, isSqlCE);
 
                 IsMapping = true;
                 rightTable.AddReverseNavigation(Relationship.ManyToMany, rightTable.NameHumanCase, leftTable, rightPropName, null, collectionType, includeComments);
                 leftTable .AddReverseNavigation(Relationship.ManyToMany, leftTable.NameHumanCase, rightTable, leftPropName, null, collectionType, includeComments);
+            }
+
+            public void SetupDataAnnotations()
+            {
+                DataAnnotations = new List<string>
+                {
+                    HasPrimaryKey
+                        ? string.Format("Table(\"{0}\", Schema = \"{1}\")", Name, Schema)
+                        : "NotMapped"
+                };
+
             }
         }
 
@@ -3046,11 +3326,11 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
                 }
             }
 
-            public void IdentifyMappingTables(List<ForeignKey> fkList, bool useCamelCase, string collectionType, bool checkForFkNameClashes, CommentsStyle includeComments, bool isSqlCE, Func<string, string, short, string> ForeignKeyName)
+            public void IdentifyMappingTables(List<ForeignKey> fkList, bool usePascalCase, string collectionType, bool checkForFkNameClashes, CommentsStyle includeComments, bool isSqlCE, Func<string, string, short, string> ForeignKeyName)
             {
                 foreach(var tbl in this.Where(x => x.HasForeignKey))
                 {
-                    tbl.IdentifyMappingTable(fkList, this, useCamelCase, collectionType, checkForFkNameClashes, includeComments, isSqlCE, ForeignKeyName);
+                    tbl.IdentifyMappingTable(fkList, this, usePascalCase, collectionType, checkForFkNameClashes, includeComments, isSqlCE, ForeignKeyName);
                 }
             }
 
@@ -3218,11 +3498,22 @@ SELECT  SERVERPROPERTY('Edition') AS Edition,
         };
 
         public static readonly Func<StoredProcedure, string> WriteStoredProcReturnModelName = sp =>
-            StoredProcedureReturnTypes.ContainsKey(sp.NameHumanCase)
-                ? StoredProcedureReturnTypes[sp.NameHumanCase]
-                : StoredProcedureReturnTypes.ContainsKey(sp.Name)
-                    ? StoredProcedureReturnTypes[sp.Name]
-                    : string.Format("{0}ReturnModel", sp.NameHumanCase);
+        {
+            if (StoredProcedureReturnTypes.ContainsKey(sp.NameHumanCase))
+                return StoredProcedureReturnTypes[sp.NameHumanCase];
+            if (StoredProcedureReturnTypes.ContainsKey(sp.Name))
+                return StoredProcedureReturnTypes[sp.Name];
+
+            var name = string.Format("{0}ReturnModel", sp.NameHumanCase);
+            if (StoredProcedureReturnModelRename != null)
+            {
+                var customName = StoredProcedureReturnModelRename(name, sp);
+                if (!string.IsNullOrEmpty(customName))
+                    name = customName;
+            }
+
+            return name;
+        };
 
         public static readonly Func<DataColumn, string> WriteStoredProcReturnColumn = col =>
             string.Format("public {0} {1} {{ get; set; }}",

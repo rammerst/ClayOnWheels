@@ -1,6 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims
+<!DOCTYPE html>
 <html>
-<head>
+<head>@{
+          bool IsAdmin = false;
+      }
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - My ASP.NET Application</title>
@@ -10,6 +13,10 @@
 
     <link href="~/Content/fullcalendar.css" rel="stylesheet" />
     <script src="~/Scripts/fullcalendar.js"></script>
+    @if (ClaimsPrincipal.Current != null)
+    {
+        IsAdmin = ClaimsPrincipal.Current.IsInRole("Admin");
+    }
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -25,8 +32,12 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Calendar", "Index", "Home")</li>
-                    @*<li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>*@
+                    @if (IsAdmin)
+                    {<text>
+                      <li>@Html.ActionLink("Beheer abonnementen", "About", "Home")</li>
+                     </text>
+                    }
+                   
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
 using ClayOnWheels.Models.EF;
@@ -10,8 +11,17 @@ namespace ClayOnWheels.Controllers
 {
     public class HomeController : Controller
     {
+        private bool _isAdmin;
+
+        [Authorize]
         public ActionResult Index()
         {
+
+            if (ClaimsPrincipal.Current != null)
+            {
+                _isAdmin = ClaimsPrincipal.Current.IsInRole("Admin");
+            }
+            ViewBag.isAdmin = _isAdmin;
             return View();
         }
         public string Init()

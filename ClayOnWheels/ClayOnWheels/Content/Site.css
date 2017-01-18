@@ -59,3 +59,11 @@ textarea {
 h2 {
 font-size: 20px !important;  /* !important added to force override of any other h2 in CSS*/
 }
+.navbar-inverse {
+    background-color: #e94d0a;
+    border-color: #e94d0a;
+}
+.navbar {
+    background-color: #e94d0a;
+    border-color: #e94d0a;
+}
