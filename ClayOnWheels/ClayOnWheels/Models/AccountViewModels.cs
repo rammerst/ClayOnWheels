@@ -79,6 +79,21 @@ namespace ClayOnWheels.Models
         [Display(Name = "Bevestig paswoord")]
         [Compare("Password", ErrorMessage = "Passwoord en bevestig passwoord moeten identiek zijn.")]
         public string ConfirmPassword { get; set; }
+
+        [Display(Name = "Straatnaam en nummer")]
+        public string Address { get; set; }
+        [Display(Name = "Gemeente")]
+        public string City { get; set; }
+
+        // Use a sensible display name for views:
+        [Display(Name = "Postal Code")]
+        public string PostalCode { get; set; }
+
+        [Display(Name = "Voornaam")]
+        public string FirstName { get; set; }
+
+        [Display(Name = "Achternaam")]
+        public string LastName { get; set; }
     }
 
     public class ResetPasswordViewModel

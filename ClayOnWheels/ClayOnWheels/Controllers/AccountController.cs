@@ -86,7 +86,7 @@ namespace ClayOnWheels.Controllers
                     return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
                 case SignInStatus.Failure:
                 default:
-                    ModelState.AddModelError("", "Invalid login attempt.");
+                    ModelState.AddModelError("", "Gebruikersnaam en/of paswoord zijn niet correct.");
                     return View(model);
             }
         }
@@ -152,6 +152,12 @@ namespace ClayOnWheels.Controllers
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                // Add the Address properties:
+                user.Address = model.Address;
+                user.City = model.City;
+                user.FirstName  = model.FirstName;
+                user.LastName = model.LastName;
+                user.PostalCode = model.PostalCode;
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
