@@ -13,6 +13,18 @@
 
     <link href="~/Content/fullcalendar.css" rel="stylesheet" />
     <script src="~/Scripts/fullcalendar.js"></script>
+    <style>
+        .navbar-inverse {
+  background-color:  #e94d0a !important;
+  border-color: #080808;
+}
+        .navbar-inverse .navbar-nav > li > a {
+            color: white !important;
+}
+        .navbar-inverse .navbar-brand {
+  color: white !important;
+}
+    </style>
     @if (ClaimsPrincipal.Current != null)
     {
         IsAdmin = ClaimsPrincipal.Current.IsInRole("Admin");
