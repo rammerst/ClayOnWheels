@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
@@ -9,6 +10,8 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using ClayOnWheels.Models;
+using RestSharp;
+using RestSharp.Authenticators;
 
 namespace ClayOnWheels.Controllers
 {
@@ -22,7 +25,7 @@ namespace ClayOnWheels.Controllers
         {
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -34,9 +37,9 @@ namespace ClayOnWheels.Controllers
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
-            private set 
-            { 
-                _signInManager = value; 
+            private set
+            {
+                _signInManager = value;
             }
         }
 
@@ -120,7 +123,7 @@ namespace ClayOnWheels.Controllers
             // If a user enters incorrect codes for a specified amount of time then the user account 
             // will be locked out for a specified amount of time. 
             // You can configure the account lockout settings in IdentityConfig
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
+            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -151,23 +154,27 @@ namespace ClayOnWheels.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    Address = model.Address,
+                    City = model.City,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    PostalCode = model.PostalCode
+                };
                 // Add the Address properties:
-                user.Address = model.Address;
-                user.City = model.City;
-                user.FirstName  = model.FirstName;
-                user.LastName = model.LastName;
-                user.PostalCode = model.PostalCode;
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    SendEmailAsync(user.Id, "Bevstig uw account bij Clay on Wheels", "Gelieve op deze link te klikken om uw account te bevestigen <a href=\"" + callbackUrl + "\">here</a>");
                     return RedirectToAction("Index", "Home");
                 }
                 AddErrors(result);
@@ -177,6 +184,24 @@ namespace ClayOnWheels.Controllers
             return View(model);
         }
 
+        private void SendEmailAsync(string userID, string subject, string body)
+        {
+            var client = new RestClient
+            {
+                BaseUrl = new Uri("https://api.mailgun.net/v3"),
+                Authenticator = new HttpBasicAuthenticator("api",
+                   ReadSetting("MAILGUN_API_KEY"))
+            };
+            var request = new RestRequest();
+            request.AddParameter("domain", ReadSetting("MAILGUN_DOMAIN"), ParameterType.UrlSegment);
+            request.Resource = "{domain}/messages";
+            request.AddParameter("from", "Myriam Thas <mailgun@" + ReadSetting("MAILGUN_DOMAIN") + ">");
+            request.AddParameter("to", "rammerst@gmail.com");
+            request.AddParameter("subject", subject);
+            request.AddParameter("text", body);
+            request.Method = Method.POST;
+            client.Execute(request);
+        }
         //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
@@ -486,5 +511,20 @@ namespace ClayOnWheels.Controllers
             }
         }
         #endregion
+
+        private static string ReadSetting(string key)
+        {
+            try
+            {
+                var appSettings = ConfigurationManager.AppSettings;
+                var result = appSettings[key] ?? "Not Found";
+                return result;
+            }
+            catch (ConfigurationErrorsException)
+            {
+               //Tracing.("Error reading app settings");
+            }
+            return "";
+        }
     }
 }

@@ -1,11 +1,14 @@
 ﻿using ClayOnWheels.Models;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
 using ClayOnWheels.Models.EF;
+using RestSharp;
+using RestSharp.Authenticators;
 
 namespace ClayOnWheels.Controllers
 {
@@ -76,8 +79,8 @@ namespace ClayOnWheels.Controllers
             var rows = eventList.ToArray();
             return Json(rows, JsonRequestBehavior.AllowGet);
         }
-    
-    public ActionResult About()
+
+        public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
 
@@ -89,6 +92,41 @@ namespace ClayOnWheels.Controllers
             ViewBag.Message = "Your contact page.";
 
             return View();
+        }
+
+        public ActionResult ContactPost()
+        {
+            var client = new RestClient
+            {
+                BaseUrl = new Uri("https://api.mailgun.net/v3"),
+                Authenticator = new HttpBasicAuthenticator("api",
+                   ReadSetting("MAILGUN_API_KEY"))
+            };
+            var request = new RestRequest();
+            request.AddParameter("domain", ReadSetting("MAILGUN_DOMAIN"), ParameterType.UrlSegment);
+            request.Resource = "{domain}/messages";
+            request.AddParameter("from", "Myriam Thas <mailgun@" + ReadSetting("MAILGUN_DOMAIN") + ">");
+            request.AddParameter("to", "rammerst@gmail.com");
+            request.AddParameter("subject", "Hello");
+            request.AddParameter("text", "Testing some Mailgun awesomness!");
+            request.Method = Method.POST;
+            var x = client.Execute(request);
+
+            return View("Contact");
+        }
+        static string ReadSetting(string key)
+        {
+            try
+            {
+                var appSettings = ConfigurationManager.AppSettings;
+                string result = appSettings[key] ?? "Not Found";
+                return result;
+            }
+            catch (ConfigurationErrorsException)
+            {
+                Console.WriteLine("Error reading app settings");
+            }
+            return "";
         }
     }
 }

@@ -14,7 +14,7 @@
             $('#calendar').fullCalendar({
                 format: 'DD/MM/YYYY HH:mm',
                 firstDay: 1,
-                hiddenDays: [0,6],
+                hiddenDays: [0, 6],
                 minTime: '13:00:00',
                 maxTime: '22:00:00',
                 header: {
@@ -93,21 +93,21 @@
 
         });
 
-        $('#btnInit').click(function () {
-            $.ajax({
-                type: 'POST',
-                url: "/Home/Init",
-                success: function (response) {
-                    if (response == 'True') {
-                        $('#calendar').fullCalendar('refetchEvents');
-                        alert('Database populated! ');
-                    }
-                    else {
-                        alert('Error, could not populate database!');
-                    }
-                }
-            });
-        });
+        //$('#btnInit').click(function () {
+        //    $.ajax({
+        //        type: 'POST',
+        //        url: "/Home/Init",
+        //        success: function (response) {
+        //            if (response == 'True') {
+        //                $('#calendar').fullCalendar('refetchEvents');
+        //                alert('Database populated! ');
+        //            }
+        //            else {
+        //                alert('Error, could not populate database!');
+        //            }
+        //        }
+        //    });
+        //});
 
         $('#btnPopupCancel').click(function () {
             ClearPopupFormValues();
@@ -134,9 +134,10 @@
                 success: function (response) {
                     if (response == 'True') {
                         $('#calendar').fullCalendar('refetchEvents');
-                        alert('New event saved!');
+                        alert('Uw workshop is succesvol toegevoegd, goed bezig m');
                     }
                     else {
+                        console.log(response);
                         alert('Error, could not save event!');
                     }
                 }
@@ -198,12 +199,13 @@
                     <div class="col-md-12">
                         <input type="hidden" id="eventID">
                         <div class="col-md-4">Titel</div>
-                        <div class="col-md-8"><input id="eventTitle" type="text" placeholder="Geef een title"/>
+                        <div class="col-md-8">
+                            <input id="eventTitle" type="text" placeholder="Geef een title (optioneel)" />
                         </div>
                     </div>
                 </div>
                 <p>&nbsp;</p>
-                 
+
                 <div class="row">
                     <div class="col-md-12">
                         <div class="col-md-4">Datum</div>
@@ -223,14 +225,14 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="col-md-4">Lengte in minuten</div>
-                        <div class="col-md-8"><input id="eventDuration" type="text" placeholder="15" /></div>
+                        <div class="col-md-8"><input id="eventDuration" type="text" value="180" /></div>
                     </div>
                 </div>
                 <p>&nbsp;</p>
             </div>
             <div class="modal-footer">
                 <button type="button" id="btnPopupCancel" data-dismiss="modal" class="btn">Cancel</button>
-                <button type="button" id="btnPopupSave" data-dismiss="modal" class="btn btn-primary">Save event</button>
+                <button type="button" id="btnPopupSave" data-dismiss="modal" class="btn btn-primary">Bewaar workshop</button>
             </div>
         </div>
     </div>

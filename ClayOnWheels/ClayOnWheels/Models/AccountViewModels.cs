@@ -80,18 +80,23 @@ namespace ClayOnWheels.Models
         [Compare("Password", ErrorMessage = "Passwoord en bevestig passwoord moeten identiek zijn.")]
         public string ConfirmPassword { get; set; }
 
+        [Required]
         [Display(Name = "Straatnaam en nummer")]
         public string Address { get; set; }
+
+        [Required]
         [Display(Name = "Gemeente")]
         public string City { get; set; }
 
-        // Use a sensible display name for views:
-        [Display(Name = "Postal Code")]
+        [Required]
+        [Display(Name = "Postcode")]
         public string PostalCode { get; set; }
 
+        [Required]
         [Display(Name = "Voornaam")]
         public string FirstName { get; set; }
 
+        [Required]
         [Display(Name = "Achternaam")]
         public string LastName { get; set; }
     }
