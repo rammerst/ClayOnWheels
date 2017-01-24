@@ -62,9 +62,10 @@
 
 
                 dayClick: function (date, allDay, jsEvent, view) {
-                    $('#eventTitle').val("");
+                    $('#eventTitle').val("Workshop keramiek");
                     $('#eventDate').val($.fullCalendar.formatDate(date, 'dd/MM/yyyy'));
                     $('#eventTime').val($.fullCalendar.formatDate(date, 'HH:mm'));
+                    $('#eventDuration').val('180');
                     ShowEventPopup(date);
                 },
 
@@ -72,8 +73,7 @@
 
                     if (!CalLoading) {
 
-                        if (view.name == 'month') {
-                            console.log(view.name);
+                        if (view.name === 'month') {
                             $('#calendar').fullCalendar('removeEventSource', sourceFullView);
                             $('#calendar').fullCalendar('removeEvents');
                             $('#calendar').fullCalendar('addEventSource', sourceSummaryView);
@@ -108,7 +108,6 @@
         //        }
         //    });
         //});
-
         $('#btnPopupCancel').click(function () {
             ClearPopupFormValues();
             $('#popupEventForm').modal('hide');
@@ -132,12 +131,11 @@
                 url: "/Home/SaveEvent",
                 data: dataRow,
                 success: function (response) {
-                    if (response == 'True') {
+                    if (response === 'True') {
                         $('#calendar').fullCalendar('refetchEvents');
-                        alert('Uw workshop is succesvol toegevoegd, goed bezig m');
+                        alert('Uw workshop is succesvol toegevoegd, goed bezig myriam');
                     }
                     else {
-                        console.log(response);
                         alert('Error, could not save event!');
                     }
                 }
@@ -145,7 +143,7 @@
         });
 
         function ShowEventPopup(date) {
-            ClearPopupFormValues();
+           // ClearPopupFormValues();
             $('#popupEventForm').modal();
             $('#eventTitle').focus();
         }
@@ -186,7 +184,7 @@
         <a href="#" id="btnInit" class="btn btn-secondary">Is administrator: @ViewBag.isAdmin</a>
     </div>
 
-    <div id='calendar' style="width:65%"></div>
+    <div id='calendar' style="width:90%"></div>
 
 </div>
 
@@ -194,13 +192,16 @@
 <div class="modal" id="popupEventForm">
     <div class="modal-dialog">
         <div class="modal-content">
+            <div class="modal-header">
+                <h2>Voeg een workshop toe:</h2>
+            </div>
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
                         <input type="hidden" id="eventID">
                         <div class="col-md-4">Titel</div>
                         <div class="col-md-8">
-                            <input id="eventTitle" type="text" placeholder="Geef een title (optioneel)" />
+                            <input id="eventTitle" type="text" placeholder="Geef een title (optioneel)"/>
                         </div>
                     </div>
                 </div>
@@ -209,7 +210,8 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="col-md-4">Datum</div>
-                        <div class="col-md-8"><input id="eventDate" type="text" /></div>
+                        <div class="col-md-8"><input id="eventDate" type="text"/>
+                        </div>
                     </div>
                 </div>
                 <p>&nbsp;</p>
@@ -217,7 +219,8 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="col-md-4">Tijdstip</div>
-                        <div class="col-md-8"><input id="eventTime" type="text" /></div>
+                        <div class="col-md-8"><input id="eventTime" type="text"/>
+                        </div>
                     </div>
                 </div>
                 <p>&nbsp;</p>
@@ -225,7 +228,8 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="col-md-4">Lengte in minuten</div>
-                        <div class="col-md-8"><input id="eventDuration" type="text" value="180" /></div>
+                        <div class="col-md-8"><input id="eventDuration" type="text" value="180"/>
+                        </div>
                     </div>
                 </div>
                 <p>&nbsp;</p>

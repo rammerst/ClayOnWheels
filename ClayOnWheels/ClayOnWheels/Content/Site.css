@@ -32,7 +32,7 @@ textarea {
     color: White;
     background-position: 1px 1px;
     background-repeat: no-repeat;
-    background-image: url('Bubble.png');
+    background-image: url('ok.png');
     padding-left: 50px;
 }
 
@@ -43,13 +43,23 @@ textarea {
     background-position: 1px 1px;
     background-repeat: no-repeat;
     background-image: url('ok.png');
-    padding-left: 50px;
+    padding-left: 0px;
 }
 
 .CONFIRMED {
     background-color: #33CC33;
     border-color: #C0C0C0;
     color: White; /* text color */
+    background-position: 1px 1px;
+    background-repeat: no-repeat;
+    background-image: url('Money.png');
+    padding-left: 50px;
+}
+
+.HOLIDAYS {
+    background-color: Gray;
+    border-color: #C0C0C0;
+    color: black; /* text color */
     background-position: 1px 1px;
     background-repeat: no-repeat;
     background-image: url('Money.png');
