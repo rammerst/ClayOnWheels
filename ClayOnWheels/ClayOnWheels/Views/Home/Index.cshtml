@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Calender";
 }
 
 @section scripts{
@@ -28,15 +28,20 @@
                 },
 
                 defaultView: 'agendaWeek',
-                editable: true,
+                editable: @ViewBag.isAdmin.ToString().ToLower(),
                 allDaySlot: false,
                 selectable: true,
                 slotMinutes: 30,
                 events: '/Home/GetDiaryEvents/',
                 eventClick: function (calEvent, jsEvent, view) {
-                    alert('You clicked on event id: ' + calEvent.id
-                        + "\nSpecial ID: " + calEvent.someKey
-                        + "\nAnd the title is: " + calEvent.title);
+                    console.log(calEvent);
+                    //console.log(jsEvent);
+                    console.log($.fullCalendar.formatDate(calEvent.start, 'dd/MM/yyyy HH:mm'));
+                    $('#bookDate').text($.fullCalendar.formatDate(calEvent.start, 'dd/MM/yyyy HH:mm'));
+                    BookEvent(calEvent.id,calEvent.someKey);
+                    //alert('You clicked on event id: ' + calEvent.id
+                    //    + "\nSpecial ID: " + calEvent.someKey
+                    //    + "\nAnd the title is: " + calEvent.title);
 
                 },
 
@@ -60,14 +65,18 @@
                 },
 
 
-
-                dayClick: function (date, allDay, jsEvent, view) {
+                @if (ViewBag.isAdmin)
+                {
+                    <text>
+                dayClick: function(date, allDay, jsEvent, view) {
                     $('#eventTitle').val("Workshop keramiek");
                     $('#eventDate').val($.fullCalendar.formatDate(date, 'dd/MM/yyyy'));
                     $('#eventTime').val($.fullCalendar.formatDate(date, 'HH:mm'));
                     $('#eventDuration').val('180');
                     ShowEventPopup(date);
                 },
+                </text>
+                }
 
                 viewRender: function (view, element) {
 
@@ -142,8 +151,12 @@
             });
         });
 
+        function BookEvent(Id,SpecialId) {
+            $('#popupEventFormBook').modal();
+        }
+
         function ShowEventPopup(date) {
-           // ClearPopupFormValues();
+            // ClearPopupFormValues();
             $('#popupEventForm').modal();
             $('#eventTitle').focus();
         }
@@ -184,7 +197,7 @@
         <a href="#" id="btnInit" class="btn btn-secondary">Is administrator: @ViewBag.isAdmin</a>
     </div>
 
-    <div id='calendar' style="width:90%"></div>
+    <div id='calendar' style="width:100%"></div>
 
 </div>
 
@@ -201,7 +214,7 @@
                         <input type="hidden" id="eventID">
                         <div class="col-md-4">Titel</div>
                         <div class="col-md-8">
-                            <input id="eventTitle" type="text" placeholder="Geef een title (optioneel)"/>
+                            <input id="eventTitle" type="text" placeholder="Geef een title (optioneel)" />
                         </div>
                     </div>
                 </div>
@@ -210,7 +223,8 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="col-md-4">Datum</div>
-                        <div class="col-md-8"><input id="eventDate" type="text"/>
+                        <div class="col-md-8">
+                            <input id="eventDate" type="text" />
                         </div>
                     </div>
                 </div>
@@ -219,7 +233,8 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="col-md-4">Tijdstip</div>
-                        <div class="col-md-8"><input id="eventTime" type="text"/>
+                        <div class="col-md-8">
+                            <input id="eventTime" type="text" />
                         </div>
                     </div>
                 </div>
@@ -228,7 +243,8 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="col-md-4">Lengte in minuten</div>
-                        <div class="col-md-8"><input id="eventDuration" type="text" value="180"/>
+                        <div class="col-md-8">
+                            <input id="eventDuration" type="text" value="180" />
                         </div>
                     </div>
                 </div>
@@ -237,6 +253,32 @@
             <div class="modal-footer">
                 <button type="button" id="btnPopupCancel" data-dismiss="modal" class="btn">Cancel</button>
                 <button type="button" id="btnPopupSave" data-dismiss="modal" class="btn btn-primary">Bewaar workshop</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal popup to book a new event -->
+<div class="modal" id="popupEventFormBook">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Boek een workshop</h2>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <input type="hidden" id="bookEventID">
+                        <div class="col-md-4">Datum en uur</div>
+                        <div class="col-md-8">
+                            <span id="bookDate"></span>
+                        </div>
+                    </div>
+                    <p>&nbsp;</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnPopupCancelBook" data-dismiss="modal" class="btn">Annuleer workshop</button>
+                <button type="button" id="btnPopupSaveBook" data-dismiss="modal" class="btn btn-primary">Boek workshop</button>
             </div>
         </div>
     </div>

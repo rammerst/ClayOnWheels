@@ -116,10 +116,14 @@ namespace ClayOnWheels.Models.EF
             try
             {
                 var ent = new MyDbContext();
-                AppointmentDiary rec = new AppointmentDiary();
-                rec.Title = Title;
-                rec.DateTimeScheduled = DateTime.ParseExact(NewEventDate + " " + NewEventTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
-                rec.AppointmentLength = Int32.Parse(NewEventDuration);
+                var rec = new AppointmentDiary
+                {
+                    Title = Title,
+                    DateTimeScheduled =
+                        DateTime.ParseExact(NewEventDate + " " + NewEventTime, "dd/MM/yyyy HH:mm",
+                            CultureInfo.InvariantCulture),
+                    AppointmentLength = int.Parse(NewEventDuration)
+                };
                 ent.AppointmentDiaries.Add(rec);
                 ent.SaveChanges();
             }
