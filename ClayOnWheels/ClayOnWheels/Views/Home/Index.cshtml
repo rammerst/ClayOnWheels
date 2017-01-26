@@ -36,8 +36,8 @@
                 eventClick: function (calEvent, jsEvent, view) {
                     console.log(calEvent);
                     //console.log(jsEvent);
-                    console.log($.fullCalendar.formatDate(calEvent.start, 'dd/MM/yyyy HH:mm'));
-                    $('#bookDate').text($.fullCalendar.formatDate(calEvent.start, 'dd/MM/yyyy HH:mm'));
+                    $('#bookDateStart').text($.fullCalendar.formatDate(calEvent.start, 'dd/MM/yyyy HH:mm'));
+                    $('#bookDateEnd').text($.fullCalendar.formatDate(calEvent.end, 'dd/MM/yyyy HH:mm'));
                     BookEvent(calEvent.id,calEvent.someKey);
                     //alert('You clicked on event id: ' + calEvent.id
                     //    + "\nSpecial ID: " + calEvent.someKey
@@ -186,15 +186,20 @@
         }
 
     </script>
-
-
 }
 
-
 <div class="container">
-
     <div>
-        <a href="#" id="btnInit" class="btn btn-secondary">Is administrator: @ViewBag.isAdmin</a>
+        @if (ViewBag.isAdmin)
+        {
+            <text>U bent ingelogd als administrator!</text>
+        }
+        else
+        {
+            <text>
+                U hebt momenteel nog @ViewBag.TotalSubscriptions beurt(en).
+            </text>
+        }
     </div>
 
     <div id='calendar' style="width:100%"></div>
@@ -260,6 +265,7 @@
 <!-- Modal popup to book a new event -->
 <div class="modal" id="popupEventFormBook">
     <div class="modal-dialog">
+        <input type="hidden" id="bookEventID">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Boek een workshop</h2>
@@ -267,10 +273,18 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <input type="hidden" id="bookEventID">
-                        <div class="col-md-4">Datum en uur</div>
+                        <div class="col-md-4">Workshop start op:</div>
                         <div class="col-md-8">
-                            <span id="bookDate"></span>
+                            <span id="bookDateStart"></span>
+                        </div>
+                    </div>
+                    <p>&nbsp;</p>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="col-md-4">Workshop eindigt op:</div>
+                        <div class="col-md-8">
+                            <span id="bookDateEnd"></span>
                         </div>
                     </div>
                     <p>&nbsp;</p>

@@ -24,6 +24,9 @@
 // ReSharper disable RedundantOverridenMember
 // ReSharper disable UseNameofExpression
 // TargetFrameworkVersion = 4.51
+
+using System.ComponentModel.DataAnnotations;
+
 #pragma warning disable 1591    //  Ignore "Missing XML Comment" warning
 
 
@@ -579,6 +582,7 @@ namespace ClayOnWheels.Models.EF
     {
         public int Id { get; set; } // Id (Primary key)
         public string UserId { get; set; } // UserId (length: 128)
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
         public System.DateTime DatePurchased { get; set; } // DatePurchased
         public int Number { get; set; } // Number
 
@@ -587,7 +591,7 @@ namespace ClayOnWheels.Models.EF
 
         // Foreign keys
         public virtual AspNetUser AspNetUser { get; set; } // FK_dbo.Subscriptions_dbo.AspNetUsers_UserId
-        public virtual Subscription Subscription_Id { get; set; } // FK_Subscriptions_Subscriptions
+       // public virtual Subscription Subscription_Id { get; set; } // FK_Subscriptions_Subscriptions
     }
 
     // UserSubscriptions

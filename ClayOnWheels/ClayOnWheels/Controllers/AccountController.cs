@@ -174,7 +174,7 @@ namespace ClayOnWheels.Controllers
                     // Send an email with this link
                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    SendEmailAsync(user.Id, "Bevstig uw account bij Clay on Wheels", "Gelieve op deze link te klikken om uw account te bevestigen <a href=\"" + callbackUrl + "\">here</a>");
+                    SendEmailAsync(user.Email, "Bevstig uw account bij Clay on Wheels", "Gelieve op deze link te klikken om uw account te bevestigen <a href=\"" + callbackUrl + "\">here</a>");
                     return RedirectToAction("Index", "Home");
                 }
                 AddErrors(result);
@@ -184,7 +184,7 @@ namespace ClayOnWheels.Controllers
             return View(model);
         }
 
-        private void SendEmailAsync(string userID, string subject, string body)
+        private void SendEmailAsync(string email, string subject, string body)
         {
             var client = new RestClient
             {
@@ -195,11 +195,12 @@ namespace ClayOnWheels.Controllers
             var request = new RestRequest();
             request.AddParameter("domain", ReadSetting("MAILGUN_DOMAIN"), ParameterType.UrlSegment);
             request.Resource = "{domain}/messages";
-            request.AddParameter("from", "Myriam Thas <mailgun@" + ReadSetting("MAILGUN_DOMAIN") + ">");
-            request.AddParameter("to", "rammerst@gmail.com");
+            request.AddParameter("from", "Myriam Thas <info@" + ReadSetting("MAILGUN_DOMAIN") + ">");
+            request.AddParameter("to", email);
             request.AddParameter("subject", subject);
-            request.AddParameter("text", body);
+            request.AddParameter("html", body);
             request.Method = Method.POST;
+            
             client.Execute(request);
         }
         //

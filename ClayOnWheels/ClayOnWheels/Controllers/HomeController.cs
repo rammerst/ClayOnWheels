@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
 using ClayOnWheels.Models.EF;
+using Microsoft.AspNet.Identity;
 using RestSharp;
 using RestSharp.Authenticators;
 
@@ -15,6 +16,7 @@ namespace ClayOnWheels.Controllers
     public class HomeController : Controller
     {
         private bool _isAdmin;
+        private readonly MyDbContext _db = new MyDbContext();
 
         [Authorize]
         public ActionResult Index()
@@ -24,7 +26,17 @@ namespace ClayOnWheels.Controllers
             {
                 _isAdmin = ClaimsPrincipal.Current.IsInRole("Admin");
             }
+
+            if (_isAdmin == false && ClaimsPrincipal.Current != null)
+            {
+                var userId = ClaimsPrincipal.Current.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier)
+                    .Select(c => c.Value).SingleOrDefault();
+
+                var creditsSum = (from u in _db.Subscriptions where u.UserId == userId select (int?) u.Number).Sum() ?? 0;
+                ViewBag.TotalSubscriptions = creditsSum;
+            }
             ViewBag.isAdmin = _isAdmin;
+         
             return View();
         }
         public string Init()
