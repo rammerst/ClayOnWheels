@@ -15,11 +15,11 @@ namespace ClayOnWheels.Models
         [Description("#01DF3A:ENQUIRY")] // green
         Enquiry = 0,
         [Description("#FF8000:BOOKED")] // orange
-        Booked,
+        Booked = 1,
         [Description("#FF0000:CONFIRMED")] // red
-        Confirmed,
+        Confirmed = 2,
         [Description("#000000:HOLIDAYS")] // black
-        NotAvailable
+        NotAvailable = 3
 
 
     }

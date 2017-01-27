@@ -117,8 +117,8 @@ namespace ClayOnWheels.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            var Subscription = _db.Subscriptions.Find(id);
-            _db.Subscriptions.Remove(Subscription);
+            var subscription = _db.Subscriptions.Find(id);
+            _db.Subscriptions.Remove(subscription);
             _db.SaveChanges();
             return RedirectToAction("Index");
         }

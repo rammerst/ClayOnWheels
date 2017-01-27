@@ -133,5 +133,29 @@ namespace ClayOnWheels.Models.EF
             }
             return true;
         }
+
+        public static bool CreateHolidayNewEvent(string NewEventDate)
+        {
+            try
+            {
+                var ent = new MyDbContext();
+                var rec = new AppointmentDiary
+                {
+                    Title = "Verlof",
+                    DateTimeScheduled =
+                        DateTime.ParseExact(NewEventDate + " " + "00:00", "dd/MM/yyyy HH:mm",
+                            CultureInfo.InvariantCulture),
+                    AppointmentLength = 1440,
+                    StatusEnum = 3
+                };
+                ent.AppointmentDiaries.Add(rec);
+                ent.SaveChanges();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
     }
 }

@@ -22,19 +22,7 @@ namespace ClayOnWheels.Controllers
         public ActionResult Index()
         {
 
-            if (ClaimsPrincipal.Current != null)
-            {
-                _isAdmin = ClaimsPrincipal.Current.IsInRole("Admin");
-            }
-
-            if (_isAdmin == false && ClaimsPrincipal.Current != null)
-            {
-                var userId = ClaimsPrincipal.Current.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier)
-                    .Select(c => c.Value).SingleOrDefault();
-
-                var creditsSum = (from u in _db.Subscriptions where u.UserId == userId select (int?) u.Number).Sum() ?? 0;
-                ViewBag.TotalSubscriptions = creditsSum;
-            }
+            ViewBag.TotalSubscriptions = CalculateSubscriptionsForCurrentUser();
             ViewBag.isAdmin = _isAdmin;
          
             return View();
@@ -54,6 +42,28 @@ namespace ClayOnWheels.Controllers
         public bool SaveEvent(string Title, string NewEventDate, string NewEventTime, string NewEventDuration)
         {
             return DiaryEvent.CreateNewEvent(Title, NewEventDate, NewEventTime, NewEventDuration);
+        }
+
+        public bool SaveHoliday(string NewEventDate)
+        {
+            return DiaryEvent.CreateHolidayNewEvent(NewEventDate);
+        }
+
+        public bool BookWorkshop(int id)
+        {
+            var total = CalculateSubscriptionsForCurrentUser();
+            if (total > 0)
+            {
+                _db.UserSubscriptions.Add(new UserSubscription
+                {
+                    AppointmentDairyId = id,
+                    UserId = GetUserId()
+                });
+                _db.SaveChangesAsync();
+                return true;
+            }
+            return false;
+
         }
 
         public JsonResult GetDiarySummary(double start, double end)
@@ -106,39 +116,32 @@ namespace ClayOnWheels.Controllers
             return View();
         }
 
-        public ActionResult ContactPost()
+        public int CalculateSubscriptionsForCurrentUser()
         {
-            var client = new RestClient
+            var creditsSum = 0;
+            if (ClaimsPrincipal.Current != null)
             {
-                BaseUrl = new Uri("https://api.mailgun.net/v3"),
-                Authenticator = new HttpBasicAuthenticator("api",
-                   ReadSetting("MAILGUN_API_KEY"))
-            };
-            var request = new RestRequest();
-            request.AddParameter("domain", ReadSetting("MAILGUN_DOMAIN"), ParameterType.UrlSegment);
-            request.Resource = "{domain}/messages";
-            request.AddParameter("from", "Myriam Thas <mailgun@" + ReadSetting("MAILGUN_DOMAIN") + ">");
-            request.AddParameter("to", "rammerst@gmail.com");
-            request.AddParameter("subject", "Hello");
-            request.AddParameter("text", "Testing some Mailgun awesomness!");
-            request.Method = Method.POST;
-            var x = client.Execute(request);
+                _isAdmin = ClaimsPrincipal.Current.IsInRole("Admin");
+            }
 
-            return View("Contact");
+            if (_isAdmin == false && ClaimsPrincipal.Current != null)
+            {
+                var userId = GetUserId();
+
+                creditsSum = (from u in _db.Subscriptions where u.UserId == userId select (int?)u.Number).Sum() ?? 0;
+
+                //now substract all bookings
+                var bookedSum  = _db.UserSubscriptions.Count(u => u.UserId == userId);
+                creditsSum -= bookedSum;
+            }
+            return creditsSum;
         }
-        static string ReadSetting(string key)
+
+        public string GetUserId()
         {
-            try
-            {
-                var appSettings = ConfigurationManager.AppSettings;
-                string result = appSettings[key] ?? "Not Found";
-                return result;
-            }
-            catch (ConfigurationErrorsException)
-            {
-                Console.WriteLine("Error reading app settings");
-            }
-            return "";
+            return ClaimsPrincipal.Current.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier)
+                    .Select(c => c.Value).SingleOrDefault();
         }
+        
     }
 }
