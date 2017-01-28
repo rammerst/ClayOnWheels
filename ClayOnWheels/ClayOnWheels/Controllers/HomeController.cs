@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ClayOnWheels.Models;
 using System.Linq;
 using System.Security.Claims;
@@ -129,6 +130,11 @@ namespace ClayOnWheels.Controllers
             return View();
         }
 
+        public JsonResult GetUsersFromAppointment(int id)
+        {
+            var results = _db.UserSubscriptions.Where(w => w.AppointmentDairyId == id).ToList();
+            return Json(results.Select(res => _db.AspNetUsers.First(w => w.Id == res.UserId)).Select(user => user.FirstName + ' ' + user.LastName).ToArray(), JsonRequestBehavior.AllowGet);
+        }
         public int CalculateSubscriptionsForCurrentUser()
         {
             var creditsSum = 0;

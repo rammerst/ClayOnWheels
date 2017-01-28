@@ -533,6 +533,8 @@ namespace ClayOnWheels.Models.EF
         public bool LockoutEnabled { get; set; } // LockoutEnabled
         public int AccessFailedCount { get; set; } // AccessFailedCount
         public string UserName { get; set; } // UserName (length: 256)
+        public string FirstName { get; set; } // UserName (length: 256)
+        public string LastName { get; set; } // UserName (length: 256)
 
         // Reverse navigation
         public virtual System.Collections.Generic.ICollection<AspNetRole> AspNetRoles { get; set; } // Many to many mapping

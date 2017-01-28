@@ -19,8 +19,34 @@
                         }
                         $('#amountOfSubscriptions').text(response);
                     } else {
-                        alert('Error, could not calculate subscriptionsamount!');
+                        alert('Er is een fout opgetreden, het totaal aantal resterende beurten kon niet berekend worden!');
                     }
+                }
+            });
+        }
+
+        function GetUsersFromAppointment(id) {
+            var dataRow = {
+                'id': id
+            }
+            $.ajax({
+                type: 'GET',
+                url: "/Home/GetUsersFromAppointment",
+                data: dataRow,
+                success: function(response) {
+                    var cList = $('ul.mylist');
+                    $.each(response, function(i)
+                    {
+                        var li = $('<li/>')
+                            .addClass('ui-menu-item')
+                            .attr('role', 'menuitem')
+                            .appendTo(cList);
+                        var aaa = $('<a/>')
+                            .addClass('ui-all')
+                            .text(response[i])
+                            .appendTo(li);
+                    });
+                   
                 }
             });
         }
@@ -59,7 +85,18 @@
                         eventClick: function(calEvent, jsEvent, view) {
                             $('#bookDateStart').text($.fullCalendar.formatDate(calEvent.start, 'dd/MM/yyyy HH:mm'));
                             $('#bookDateEnd').text($.fullCalendar.formatDate(calEvent.end, 'dd/MM/yyyy HH:mm'));
+                            @if (ViewBag.isAdmin)
+                            {
+                                <text>
+                            ShowBookedEvents(calEvent.id, calEvent.someKey);
+                            </text>
+                            }
+                            else
+                            {
+                                <text>
                             BookEvent(calEvent.id, calEvent.someKey);
+                            </text>
+                            }
                             //alert('You clicked on event id: ' + calEvent.id
                             //    + "\nSpecial ID: " + calEvent.someKey
                             //    + "\nAnd the title is: " + calEvent.title);
@@ -231,6 +268,13 @@
                 });
             });
 
+        function ShowBookedEvents(Id, SpecialId) {
+            $('#popupEventFormBookAdmin').modal();
+            $('#bookEventAdminID').val(Id);
+            GetUsersFromAppointment(Id);
+            //cursist
+        }
+
         function BookEvent(Id, SpecialId) {
             $('#popupEventFormBook').modal();
             $('#bookEventID').val(Id);
@@ -310,6 +354,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Voeg een cursus toe:</h2>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -369,6 +414,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2><span id="bookTitle"></span></h2>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -393,6 +439,31 @@
             <div class="modal-footer">
                 <button type="button" id="btnPopupCancelBook" data-dismiss="modal" class="btn btn-danger">Annuleer cur</button>
                 <button type="button" id="btnPopupSaveBook" data-dismiss="modal" class="btn btn-primary">Boek cursus</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="popupEventFormBookAdmin">
+    <div class="modal-dialog">
+        <input type="hidden" id="bookEventAdminID">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cursisten die momenteel geboekt hebben:</h2>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="col-md-4">Naam cursist:</div>
+                        <div class="col-md-8">
+                            <ul class="mylist"/>
+                        </div>
+                    </div>
+                    <p>&nbsp;</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+               
             </div>
         </div>
     </div>
