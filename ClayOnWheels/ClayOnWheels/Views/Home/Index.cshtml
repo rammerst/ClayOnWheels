@@ -88,7 +88,7 @@
                         {
                             <text>
                         dayClick: function(date, allDay, jsEvent, view) {
-                            $('#eventTitle').val("Workshop keramiek");
+                            $('#eventTitle').val("Cursus keramiek");
                             $('#eventDate').val($.fullCalendar.formatDate(date, 'dd/MM/yyyy'));
                             $('#eventTime').val($.fullCalendar.formatDate(date, 'HH:mm'));
                             $('#eventDuration').val('180');
@@ -146,7 +146,7 @@
                     success: function(response) {
                         if (response === 'True') {
                             $('#calendar').fullCalendar('refetchEvents');
-                            alert('Uw workshop is succesvol toegevoegd, goed bezig myriam');
+                            alert('Uw cursus is succesvol toegevoegd, goed bezig myriam');
                         } else {
                             alert('Error, could not save event!');
                         }
@@ -238,10 +238,10 @@
             if (SpecialId === 666) {
                 $('#btnPopupSaveBook').hide();
                 $('#btnPopupCancelBook').show();
-                $('#bookTitle').text('annuleer een workshop');
+                $('#bookTitle').text('annuleer een cursus');
 
             } else {
-                $('#bookTitle').text('boek een workshop');
+                $('#bookTitle').text('boek een cursus');
                 $('#btnPopupCancelBook').hide();
                 $('#btnPopupSaveBook').show();
             }
@@ -303,7 +303,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Voeg een workshop toe:</h2>
+                <h2>Voeg een cursus toe:</h2>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -349,7 +349,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" id="btnPopupCancel" data-dismiss="modal" class="btn btn-danger">Cancel</button>
-                <button type="button" id="btnPopupSave" data-dismiss="modal" class="btn btn-primary">Bewaar workshop</button>
+                <button type="button" id="btnPopupSave" data-dismiss="modal" class="btn btn-primary">Bewaar cursus</button>
                 <button type="button" id="btnPopupSaveHoliday" data-dismiss="modal" class="btn btn-warning">Bewaar als verlof</button>
             </div>
         </div>
@@ -367,7 +367,7 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="col-md-4">Workshop start op:</div>
+                        <div class="col-md-4">Cursus start op:</div>
                         <div class="col-md-8">
                             <span id="bookDateStart"></span>
                         </div>
@@ -376,7 +376,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="col-md-4">Workshop eindigt op:</div>
+                        <div class="col-md-4">Cursus eindigt op:</div>
                         <div class="col-md-8">
                             <span id="bookDateEnd"></span>
                         </div>
@@ -385,8 +385,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="btnPopupCancelBook" data-dismiss="modal" class="btn btn-danger">Annuleer workshop</button>
-                <button type="button" id="btnPopupSaveBook" data-dismiss="modal" class="btn btn-primary">Boek workshop</button>
+                <button type="button" id="btnPopupCancelBook" data-dismiss="modal" class="btn btn-danger">Annuleer cur</button>
+                <button type="button" id="btnPopupSaveBook" data-dismiss="modal" class="btn btn-primary">Boek cursus</button>
             </div>
         </div>
     </div>
