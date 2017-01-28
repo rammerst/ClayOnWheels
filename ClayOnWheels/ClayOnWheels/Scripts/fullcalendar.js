@@ -46,13 +46,13 @@ var defaults = {
 	// time formats
 	titleFormat: {
 		month: 'MMMM yyyy',
-		week: "MMM d[ yyyy]{ '&#8212;'[ MMM] d yyyy}",
+		week: "d[ yyyy]{ '&#8212;'[ MMM] d }  MMMM yyyy",
 		day: 'dddd, MMM d, yyyy'
 	},
 	columnFormat: {
 		month: 'ddd',
-		week: 'ddd M/d',
-		day: 'dddd M/d'
+		week: 'ddd d/M',
+		day: 'dddd d/M'
 	},
 	timeFormat: { // for event elements
 		'': 'h(:mm)t' // default
@@ -61,7 +61,7 @@ var defaults = {
 	// locale
 	isRTL: false,
 	firstDay: 0,
-	monthNames: ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'],
+	monthNames: ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'],
 	monthNamesShort: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'],
 	dayNames: ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'],
 	dayNamesShort: ['Zon','Maa','Din','Woe','Don','Vri','Zat'],
@@ -1632,10 +1632,12 @@ var dateFormatters = {
 	yy	: function(d)	{ return (d.getFullYear()+'').substring(2) },
 	yyyy: function(d)	{ return d.getFullYear() },
 	t	: function(d)	{ return d.getHours() < 12 ? 'a' : 'p' },
-	tt	: function(d)	{ return d.getHours() < 12 ? 'am' : 'pm' },
+	tt	: function(d)	{ return d.getHours() < 12 ? 'am' : 'u' },
 	T	: function(d)	{ return d.getHours() < 12 ? 'A' : 'P' },
 	TT	: function(d)	{ return d.getHours() < 12 ? 'AM' : 'PM' },
-	u	: function(d)	{ return formatDate(d, "yyyy-MM-dd'T'HH:mm:ss'Z'") },
+	u: function (d) { return formatDate(d, "yyyy-MM-dd'T'HH:mm:ss'Z'") },
+	x: function (d) { return formatDate(d, "H:mm'") },
+
 	S	: function(d)	{
 		var date = d.getDate();
 		if (date > 10 && date < 20) {
@@ -2756,7 +2758,7 @@ setDefaults({
 	firstHour: 6,
 	slotMinutes: 30,
 	defaultEventMinutes: 120,
-	axisFormat: 'h(:mm)tt',
+	axisFormat: '(:mm)x',
 	timeFormat: {
 		agenda: 'h:mm{ - h:mm}'
 	},
