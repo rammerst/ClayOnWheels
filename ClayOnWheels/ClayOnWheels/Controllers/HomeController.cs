@@ -1,15 +1,9 @@
-﻿using ClayOnWheels.Models;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System;
+using ClayOnWheels.Models;
 using System.Linq;
 using System.Security.Claims;
-using System.Web;
 using System.Web.Mvc;
 using ClayOnWheels.Models.EF;
-using Microsoft.AspNet.Identity;
-using RestSharp;
-using RestSharp.Authenticators;
 
 namespace ClayOnWheels.Controllers
 {
@@ -24,7 +18,7 @@ namespace ClayOnWheels.Controllers
 
             ViewBag.TotalSubscriptions = CalculateSubscriptionsForCurrentUser();
             ViewBag.isAdmin = _isAdmin;
-         
+
             return View();
         }
         public string Init()
@@ -66,6 +60,25 @@ namespace ClayOnWheels.Controllers
 
         }
 
+        public bool CancelWorkshop(int id)
+        {
+            try
+            {
+                var userId = GetUserId();
+                var obj = _db.UserSubscriptions.First(w => w.AppointmentDairyId == id && w.UserId == userId);
+                _db.UserSubscriptions.Remove(obj);
+                _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                var exce = ex;
+
+            }
+            return false;
+
+        }
+
         public JsonResult GetDiarySummary(double start, double end)
         {
             var ApptListForDate = DiaryEvent.LoadAppointmentSummaryInDateRange(start, end);
@@ -85,7 +98,7 @@ namespace ClayOnWheels.Controllers
 
         public JsonResult GetDiaryEvents(double start, double end)
         {
-            var ApptListForDate = DiaryEvent.LoadAllAppointmentsInDateRange(start, end);
+            var ApptListForDate = DiaryEvent.LoadAllAppointmentsInDateRange(start, end, GetUserId());
             var eventList = from e in ApptListForDate
                             select new
                             {
@@ -131,7 +144,7 @@ namespace ClayOnWheels.Controllers
                 creditsSum = (from u in _db.Subscriptions where u.UserId == userId select (int?)u.Number).Sum() ?? 0;
 
                 //now substract all bookings
-                var bookedSum  = _db.UserSubscriptions.Count(u => u.UserId == userId);
+                var bookedSum = _db.UserSubscriptions.Count(u => u.UserId == userId);
                 creditsSum -= bookedSum;
             }
             return creditsSum;
@@ -142,6 +155,6 @@ namespace ClayOnWheels.Controllers
             return ClaimsPrincipal.Current.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier)
                     .Select(c => c.Value).SingleOrDefault();
         }
-        
+
     }
 }

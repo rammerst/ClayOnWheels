@@ -57,8 +57,8 @@ textarea {
 }
 
 .HOLIDAYS {
-    background-color: Gray;
-    border-color: #C0C0C0;
+    background-color: lightgray !important;
+    border-color: #C0C0C0 !important;
     color: black; /* text color */
     background-position: 1px 1px;
     background-repeat: no-repeat;

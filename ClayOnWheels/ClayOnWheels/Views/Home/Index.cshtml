@@ -5,9 +5,30 @@
 @section scripts{
 
     <script>
+        function CalculateSubscriptions() {
+            $.ajax({
+                type: 'GET',
+                url: "/Home/CalculateSubscriptionsForCurrentUser",
+                success: function(response) {
+                    if ($.isNumeric(response)) {
+                        var result = response;
+                        if (result === 1) {
+                            response += ' beurt over.';
+                        } else {
+                            response += ' beurten over.';
+                        }
+                        $('#amountOfSubscriptions').text(response);
+                    } else {
+                        alert('Error, could not calculate subscriptionsamount!');
+                    }
+                }
+            });
+        }
+         
         $(document)
             .ready(function() {
 
+                CalculateSubscriptions();
                 var sourceFullView = { url: '/Home/GetDiaryEvents/' };
                 var sourceSummaryView = { url: '/Home/GetDiarySummary/' };
                 var CalLoading = true;
@@ -36,8 +57,6 @@
                         slotMinutes: 30,
                         events: '/Home/GetDiaryEvents/',
                         eventClick: function(calEvent, jsEvent, view) {
-                            console.log(calEvent);
-                            //console.log(jsEvent);
                             $('#bookDateStart').text($.fullCalendar.formatDate(calEvent.start, 'dd/MM/yyyy HH:mm'));
                             $('#bookDateEnd').text($.fullCalendar.formatDate(calEvent.end, 'dd/MM/yyyy HH:mm'));
                             BookEvent(calEvent.id, calEvent.someKey);
@@ -93,14 +112,13 @@
                                 }
                             }
                         }
-
                     });
 
                 CalLoading = true;
 
 
             });
-        
+
         $('#btnPopupCancel')
             .click(function() {
                 ClearPopupFormValues();
@@ -138,32 +156,32 @@
             });
 
         $('#btnPopupSaveHoliday')
-          .click(function() {
+            .click(function() {
 
-              $('#popupEventForm').modal('hide');
+                $('#popupEventForm').modal('hide');
 
-              var dataRow = {
-                  'NewEventDate': $('#eventDate').val()
-              }
+                var dataRow = {
+                    'NewEventDate': $('#eventDate').val()
+                }
 
-              ClearPopupFormValues();
+                ClearPopupFormValues();
 
-              $.ajax({
-                  type: 'POST',
-                  url: "/Home/SaveHoliday",
-                  data: dataRow,
-                  success: function(response) {
-                      if (response === 'True') {
-                          $('#calendar').fullCalendar('clearEvents');
-                          //<$('#calendar').fullCalendar('refetchEvents');
-                          alert('Uw verlof is succesvol toegevoegd, goed bezig myriam!');
-                      } else {
-                          alert('Error, could not save event!');
-                      }
-                  }
-              });
+                $.ajax({
+                    type: 'POST',
+                    url: "/Home/SaveHoliday",
+                    data: dataRow,
+                    success: function(response) {
+                        if (response === 'True') {
+                            $('#calendar').fullCalendar('clearEvents');
+                            //<$('#calendar').fullCalendar('refetchEvents');
+                            alert('Uw verlof is succesvol toegevoegd, goed bezig myriam!');
+                        } else {
+                            alert('Error, could not save event!');
+                        }
+                    }
+                });
 
-          });
+            });
 
         $('#btnPopupSaveBook')
             .click(function() {
@@ -181,7 +199,31 @@
                     success: function(response) {
                         if (response === 'True') {
                             $('#calendar').fullCalendar('refetchEvents');
+                            CalculateSubscriptions();
                             //  alert('Uw workshop is succesvol toegevoegd, goed bezig myriam');
+                        } else {
+                            alert('Error, could not save event!');
+                        }
+                    }
+                });
+            });
+        $('#btnPopupCancelBook')
+            .click(function() {
+
+                $('#popupEventFormBook').modal('hide');
+
+                var dataRow = {
+                    'id': $('#bookEventID').val()
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: "/Home/CancelWorkshop",
+                    data: dataRow,
+                    success: function(response) {
+                        if (response === 'True') {
+                            $('#calendar').fullCalendar('refetchEvents');
+                            CalculateSubscriptions();
                         } else {
                             alert('Error, could not save event!');
                         }
@@ -192,6 +234,17 @@
         function BookEvent(Id, SpecialId) {
             $('#popupEventFormBook').modal();
             $('#bookEventID').val(Id);
+            $('#statusCode').val(SpecialId);
+            if (SpecialId === 666) {
+                $('#btnPopupSaveBook').hide();
+                $('#btnPopupCancelBook').show();
+                $('#bookTitle').text('annuleer een workshop');
+
+            } else {
+                $('#bookTitle').text('boek een workshop');
+                $('#btnPopupCancelBook').hide();
+                $('#btnPopupSaveBook').show();
+            }
         }
 
         function ShowEventPopup(date) {
@@ -236,12 +289,12 @@
         else
         {
             <text>
-                U hebt momenteel nog @ViewBag.TotalSubscriptions beurt(en).
+                U hebt momenteel nog <span id="amountOfSubscriptions"></span>
             </text>
         }
     </div>
 
-    <div id='calendar' style="width:100%"></div>
+    <div id="calendar" style="width:100%"></div>
 
 </div>
 
@@ -306,9 +359,10 @@
 <div class="modal" id="popupEventFormBook">
     <div class="modal-dialog">
         <input type="hidden" id="bookEventID">
+        <input type="hidden" id="statusCode">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Boek een workshop</h2>
+                <h2><span id="bookTitle"></span></h2>
             </div>
             <div class="modal-body">
                 <div class="row">
