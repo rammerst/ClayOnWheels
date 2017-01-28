@@ -77,3 +77,7 @@ font-size: 20px !important;  /* !important added to force override of any other 
     background-color: #e94d0a;
     border-color: #e94d0a;
 }
+.topMessage {
+    font-size: 25px;
+    font-weight: bold;
+}

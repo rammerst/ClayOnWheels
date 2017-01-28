@@ -24,7 +24,7 @@
                 }
             });
         }
-         
+
         $(document)
             .ready(function() {
 
@@ -284,15 +284,21 @@
     <div>
         @if (ViewBag.isAdmin)
         {
-            <text>U bent ingelogd als administrator!</text>
+            <text>
+                <div class="topMessage">
+                    U bent ingelogd als administrator!
+                </div>
+            </text>
         }
         else
         {
             <text>
-                U hebt momenteel nog <span id="amountOfSubscriptions"></span>
+                <div class="topMessage">U hebt momenteel nog <span id="amountOfSubscriptions"></span></div>
             </text>
         }
     </div>
+
+
 
     <div id="calendar" style="width:100%"></div>
 
