@@ -41,7 +41,7 @@
                                 .addClass('ui-menu-item')
                                 .attr('role', 'menuitem')
                                 .appendTo(cList);
-                        var aaa = $('<a/>')
+                        var aaa = $('<span/>')
                             .addClass('ui-all')
                             .text('Momenteel zijn er geen cursisten geboekt')
                             .appendTo(li);
@@ -52,7 +52,7 @@
                                 .addClass('ui-menu-item')
                                 .attr('role', 'menuitem')
                                 .appendTo(cList);
-                            var aaa = $('<a/>')
+                            var aaa = $('<span/>')
                                 .addClass('ui-all')
                                 .text(response[i])
                                 .appendTo(li);
@@ -281,6 +281,30 @@
                 });
             });
 
+        $('#btnRemoveEvent')
+            .click(function() {
+
+                $('#popupEventFormBookAdmin').modal('hide');
+
+                var dataRow = {
+                    'id': $('#bookEventAdminID').val()
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: "/Home/RemoveWorkshop",
+                    data: dataRow,
+                    success: function(response) {
+                        if (response === 'True') {
+                            $('#calendar').fullCalendar('refetchEvents');
+                           // CalculateSubscriptions();
+                        } else {
+                            alert('Error, could not save event!');
+                        }
+                    }
+                });
+            });
+
         function ShowBookedEvents(Id, SpecialId) {
             $('#popupEventFormBookAdmin').modal();
             $('#bookEventAdminID').val(Id);
@@ -450,7 +474,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="btnPopupCancelBook" data-dismiss="modal" class="btn btn-danger">Annuleer cur</button>
+                <button type="button" id="btnPopupCancelBook" data-dismiss="modal" class="btn btn-danger">Annuleer cursus</button>
                 <button type="button" id="btnPopupSaveBook" data-dismiss="modal" class="btn btn-primary">Boek cursus</button>
             </div>
         </div>
@@ -476,7 +500,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-               
+                <button type="button" id="btnRemoveEvent" data-dismiss="modal" class="btn btn-danger">Annuleer cursus</button>
             </div>
         </div>
     </div>

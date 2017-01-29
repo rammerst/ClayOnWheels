@@ -61,6 +61,33 @@ namespace ClayOnWheels.Controllers
 
         }
 
+        public bool RemoveWorkshop(int id)
+        {
+            try
+            {
+                var notifyUsers = _db.UserSubscriptions.Where(w => w.AppointmentDairyId == id);
+                if (notifyUsers.Any())
+                {
+                    foreach (var user in notifyUsers)
+                    {
+                        //todo: send mail to user to notify the cursus is cancelled
+                    }
+                }
+                var obj = _db.UserSubscriptions.RemoveRange(notifyUsers);
+                var toRemove = _db.AppointmentDiaries.FirstOrDefault(w => w.Id == id);
+                _db.AppointmentDiaries.Remove(toRemove);
+                _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                var exce = ex;
+
+            }
+            return false;
+
+        }
+
         public bool CancelWorkshop(int id)
         {
             try
