@@ -35,6 +35,16 @@ textarea {
     background-image: url('ok.png');
     padding-left: 50px;
 }
+.FULLYBOOKED {
+    
+    background-color: red;
+    border-color: red; 
+    color: White;
+    background-position: 1px 1px;
+    background-repeat: no-repeat;
+    background-image: url('ok.png');
+    padding-left: 50px;
+}
 
 .BOOKED {
     background-color: #33CCFF;

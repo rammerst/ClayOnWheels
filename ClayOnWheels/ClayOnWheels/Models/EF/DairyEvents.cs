@@ -10,7 +10,6 @@ namespace ClayOnWheels.Models.EF
 {
     public class DiaryEvent
     {
-
         public int ID;
         public string Title;
         public int SomeImportantKeyID;
@@ -32,7 +31,7 @@ namespace ClayOnWheels.Models.EF
             var toDate = ConvertFromUnixTimestamp(end);
             using (var ent = new MyDbContext())
             {
-                var rslt = ent.AppointmentDiaries.Where(s => s.DateTimeScheduled >= fromDate && EntityFunctions.AddMinutes(s.DateTimeScheduled, s.AppointmentLength) <= toDate);
+                var rslt = ent.AppointmentDiaries.Where(s => s.DateTimeScheduled >= fromDate && EntityFunctions.AddMinutes(s.DateTimeScheduled, s.AppointmentLength) <= toDate).ToArray();
                 var userRslt = ent.UserSubscriptions.Where(s => s.UserId == userid).Select(d => d.AppointmentDairyId).ToArray();
                 var result = new List<DiaryEvent>();
                 foreach (var item in rslt)
@@ -47,6 +46,8 @@ namespace ClayOnWheels.Models.EF
 
                     // "s" is a preset format that outputs as: "2009-02-27T12:12:22"
                     // field AppointmentLength is in minutes
+
+                    //when cursist has booked, show event in orange
                     if (userRslt.Contains(item.Id))
                     {
                         rec.StatusString = Enums.GetName((AppointmentStatus)1);
@@ -54,6 +55,7 @@ namespace ClayOnWheels.Models.EF
                     }
                     else
                     {
+                        //when no admin (so cursist) & 24hours before event, show as unavailable = gray
                         if (item.DateTimeScheduled <= DateTime.Now.AddDays(1) && !isAdmin)
                         {
                             rec.StatusString = Enums.GetName((AppointmentStatus)3);
@@ -61,8 +63,20 @@ namespace ClayOnWheels.Models.EF
                         }
                         else
                         {
-                            rec.StatusString = Enums.GetName((AppointmentStatus)item.StatusEnum);
-                            rec.SomeImportantKeyID = item.StatusEnum;
+
+                            //check when cursus is fully booked & the current cursist has not booked yet, show in red:
+                            var results = ent.UserSubscriptions.Count(w => w.AppointmentDairyId == item.Id);
+                            if (results >= 2)
+                            {
+                                rec.StatusString = Enums.GetName((AppointmentStatus)4);
+                                rec.SomeImportantKeyID = 4;
+                            }
+                            //everything else: show as available or holiday
+                            else
+                            {
+                                rec.StatusString = Enums.GetName((AppointmentStatus)item.StatusEnum);
+                                rec.SomeImportantKeyID = item.StatusEnum;
+                            }
                         }
                     }
 

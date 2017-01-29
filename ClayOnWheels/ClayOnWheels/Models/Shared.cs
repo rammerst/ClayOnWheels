@@ -19,7 +19,9 @@ namespace ClayOnWheels.Models
         [Description("#FF0000:CONFIRMED")] // red
         Confirmed = 2,
         [Description("#000000:HOLIDAYS")] // black
-        NotAvailable = 3
+        NotAvailable = 3,
+        [Description("red:FULLYBOOKED")] // red
+        FullyBooked = 4
 
 
     }
