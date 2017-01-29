@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Globalization; // << dont forget to add this for converting dates to localtime
 using System.Data.Entity.Core.Objects;
+using System.Security.Claims;
 
 namespace ClayOnWheels.Models.EF
 {
@@ -22,6 +23,11 @@ namespace ClayOnWheels.Models.EF
 
         public static List<DiaryEvent> LoadAllAppointmentsInDateRange(double start, double end, string userid)
         {
+            var isAdmin = false;
+            if (ClaimsPrincipal.Current != null)
+            {
+                isAdmin = ClaimsPrincipal.Current.IsInRole("Admin");
+            }
             var fromDate = ConvertFromUnixTimestamp(start);
             var toDate = ConvertFromUnixTimestamp(end);
             using (var ent = new MyDbContext())
@@ -43,15 +49,23 @@ namespace ClayOnWheels.Models.EF
                     // field AppointmentLength is in minutes
                     if (userRslt.Contains(item.Id))
                     {
-                        rec.StatusString = Enums.GetName((AppointmentStatus) 1);
+                        rec.StatusString = Enums.GetName((AppointmentStatus)1);
                         rec.SomeImportantKeyID = 666;
                     }
                     else
                     {
-                        rec.StatusString = Enums.GetName((AppointmentStatus)item.StatusEnum);
-                        rec.SomeImportantKeyID = item.StatusEnum;
+                        if (item.DateTimeScheduled <= DateTime.Now.AddDays(1) && !isAdmin)
+                        {
+                            rec.StatusString = Enums.GetName((AppointmentStatus)3);
+                            rec.SomeImportantKeyID = 3;
+                        }
+                        else
+                        {
+                            rec.StatusString = Enums.GetName((AppointmentStatus)item.StatusEnum);
+                            rec.SomeImportantKeyID = item.StatusEnum;
+                        }
                     }
-                    
+
                     rec.StatusColor = Enums.GetEnumDescription<AppointmentStatus>(rec.StatusString);
                     var ColorCode = rec.StatusColor.Substring(0, rec.StatusColor.IndexOf(":"));
                     rec.ClassName = rec.StatusColor.Substring(rec.StatusColor.IndexOf(":") + 1, rec.StatusColor.Length - ColorCode.Length - 1);
