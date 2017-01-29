@@ -28,15 +28,19 @@ namespace ClayOnWheels.Models.EF
             {
                 var rslt = ent.AppointmentDiaries.Where(s => s.DateTimeScheduled >= fromDate && EntityFunctions.AddMinutes(s.DateTimeScheduled, s.AppointmentLength) <= toDate);
                 var userRslt = ent.UserSubscriptions.Where(s => s.UserId == userid).Select(d => d.AppointmentDairyId).ToArray();
-                List<DiaryEvent> result = new List<DiaryEvent>();
+                var result = new List<DiaryEvent>();
                 foreach (var item in rslt)
                 {
-                    DiaryEvent rec = new DiaryEvent();
-                    rec.ID = item.Id;
-                   
-                    rec.StartDateString = item.DateTimeScheduled.ToString("s"); // "s" is a preset format that outputs as: "2009-02-27T12:12:22"
-                    rec.EndDateString = item.DateTimeScheduled.AddMinutes(item.AppointmentLength).ToString("s"); // field AppointmentLength is in minutes
-                    rec.Title = item.Title + " - " + item.AppointmentLength.ToString() + " mins";
+                    var rec = new DiaryEvent
+                    {
+                        ID = item.Id,
+                        StartDateString = item.DateTimeScheduled.ToString("s"),
+                        EndDateString = item.DateTimeScheduled.AddMinutes(item.AppointmentLength).ToString("s"),
+                        Title = item.Title + " - " + item.AppointmentLength + " mins"
+                    };
+
+                    // "s" is a preset format that outputs as: "2009-02-27T12:12:22"
+                    // field AppointmentLength is in minutes
                     if (userRslt.Contains(item.Id))
                     {
                         rec.StatusString = Enums.GetName((AppointmentStatus) 1);
@@ -45,11 +49,11 @@ namespace ClayOnWheels.Models.EF
                     else
                     {
                         rec.StatusString = Enums.GetName((AppointmentStatus)item.StatusEnum);
-                        rec.SomeImportantKeyID = item.SomeImportantKey;
+                        rec.SomeImportantKeyID = item.StatusEnum;
                     }
                     
                     rec.StatusColor = Enums.GetEnumDescription<AppointmentStatus>(rec.StatusString);
-                    string ColorCode = rec.StatusColor.Substring(0, rec.StatusColor.IndexOf(":"));
+                    var ColorCode = rec.StatusColor.Substring(0, rec.StatusColor.IndexOf(":"));
                     rec.ClassName = rec.StatusColor.Substring(rec.StatusColor.IndexOf(":") + 1, rec.StatusColor.Length - ColorCode.Length - 1);
                     rec.StatusColor = ColorCode;
                     result.Add(rec);

@@ -54,5 +54,12 @@
 </div>
 
 @section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
+    @*@Scripts.Render("~/bundles/jqueryval")*@
+    <script type="text/javascript">
+        $(document)
+            .ready(function() {
+                $('#DatePurchased').removeAttr("data-val-date");
+            });
+
+    </script>
 }

@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
 using System.Net;
 using System.Web.Mvc;
 using ClayOnWheels.Models.EF;
@@ -37,7 +38,12 @@ namespace ClayOnWheels.Controllers
         {
             ViewBag.UserId = new SelectList(_db.AspNetUsers, "Id", "Email");
             ViewBag.Id = new SelectList(_db.Subscriptions, "Id", "UserId");
-            return View();
+            var sub = new Subscription()
+            {
+                Number = 10,
+                DatePurchased = DateTime.Now
+            };
+            return View(sub);
         }
 
         // POST: Subscriptions/Create

@@ -47,6 +47,10 @@ namespace ClayOnWheels.Controllers
         public bool BookWorkshop(int id)
         {
             var total = CalculateSubscriptionsForCurrentUser();
+            if (total == 1)
+            {
+                //todo: Send mail to notify user he/she has to renew subscriptions
+            }
             if (total > 0)
             {
                 _db.UserSubscriptions.Add(new UserSubscription

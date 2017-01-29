@@ -5574,7 +5574,7 @@ a.list-group-item:focus {
 
 .close {
   float: right;
-  font-size: 21px;
+  font-size: 40px;
   font-weight: bold;
   line-height: 1;
   color: #000000;
@@ -5685,7 +5685,7 @@ body.modal-open,
 }
 
 .modal-header .close {
-  margin-top: -2px;
+  margin-top: -40px;
 }
 
 .modal-title {

@@ -37,29 +37,24 @@
                     var cList = $('ul.mylist');
                     cList.empty();
                     if (response.length === 0) {
-                        var li = $('<li/>')
-                                .addClass('ui-menu-item')
-                                .attr('role', 'menuitem')
-                                .appendTo(cList);
-                        var aaa = $('<span/>')
-                            .addClass('ui-all')
-                            .text('Momenteel zijn er geen cursisten geboekt')
-                            .appendTo(li);
+                        $("#divWithResults").hide();
+                        $("#divWithoutResults").show();
+                        $("#noResults").text("Momenteel zijn er geen cursisten geboekt");
                     } else {
+                        $("#divWithResults").show();
+                        $("#divWithoutResults").hide();
                         $.each(response, function(i)
                         {
                             var li = $('<li/>')
-                                .addClass('ui-menu-item')
+                                //.addClass('ui-menu-item')
                                 .attr('role', 'menuitem')
                                 .appendTo(cList);
                             var aaa = $('<span/>')
-                                .addClass('ui-all')
+                                //.addClass('ui-all')
                                 .text(response[i])
                                 .appendTo(li);
                         });
                     }
-                   
-                   
                 }
             });
         }
@@ -101,19 +96,19 @@
                             @if (ViewBag.isAdmin)
                             {
                                 <text>
-                            ShowBookedEvents(calEvent.id, calEvent.someKey);
-                            </text>
+                                    ShowBookedEvents(calEvent.id, calEvent.someKey);
+                                </text>
                             }
                             else
                             {
                                 <text>
-                            BookEvent(calEvent.id, calEvent.someKey);
-                            </text>
+                                    if (calEvent.someKey === 3) {
+                                        alert('Op deze dag kan u geen cursus reserveren!');
+                                    } else {
+                                        BookEvent(calEvent.id, calEvent.someKey);
+                                    }
+                                </text>
                             }
-                            //alert('You clicked on event id: ' + calEvent.id
-                            //    + "\nSpecial ID: " + calEvent.someKey
-                            //    + "\nAnd the title is: " + calEvent.title);
-
                         },
 
                         eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
@@ -490,14 +485,17 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-12">
-                        <div class="col-md-4">Naam cursist:</div>
+                    <div class="col-md-12" id="divWithResults">
+                        <div class="col-md-4">Geboekte cursisten:</div>
                         <div class="col-md-8">
                             <ul class="mylist"/>
                         </div>
                     </div>
-                    <p>&nbsp;</p>
-                </div>
+                    <div class="col-md-12" id="divWithoutResults">
+                        <span id="noResults"></span>
+                    </div>
+                        <p>&nbsp;</p>
+                    </div>
             </div>
             <div class="modal-footer">
                 <button type="button" id="btnRemoveEvent" data-dismiss="modal" class="btn btn-danger">Annuleer cursus</button>
