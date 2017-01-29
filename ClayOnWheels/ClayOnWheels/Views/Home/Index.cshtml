@@ -105,7 +105,12 @@
                                     if (calEvent.someKey === 3) {
                                         alert('Op deze dag kan u geen cursus reserveren!');
                                     } else {
-                                        BookEvent(calEvent.id, calEvent.someKey);
+                                        if (calEvent === 4) {
+                                            BookEventTemp(calEvent.id, calEvent.someKey);
+                                        } else {
+                                            BookEvent(calEvent.id, calEvent.someKey);
+                                        }
+                                        
                                     }
                                 </text>
                             }
@@ -228,6 +233,28 @@
 
             });
 
+        $('#btnPopupSaveBookTemp')
+          .click(function() {
+              $('#popupEventFormBookTemp').modal('hide');
+
+              var dataRow = {
+                  'id': $('#bookEventIDTemp').val()
+              }
+
+              $.ajax({
+                  type: 'POST',
+                  url: "/Home/BookWorkshopTemp",
+                  data: dataRow,
+                  success: function(response) {
+                      if (response === 'True') {
+                          $('#calendar').fullCalendar('refetchEvents');
+                      } else {
+                          alert('Er is iets fout gelopen met de reservering!');
+                      }
+                  }
+              });
+          });
+
         $('#btnPopupSaveBook')
             .click(function() {
 
@@ -306,7 +333,10 @@
             GetUsersFromAppointment(Id);
             //cursist
         }
-
+        function BookEventTemp(Id) {
+            $('#popupEventFormBookTemp').modal();
+            $('#bookEventIDTemp').val(Id);
+        }
         function BookEvent(Id, SpecialId) {
             $('#popupEventFormBook').modal();
             $('#bookEventID').val(Id);
@@ -445,6 +475,29 @@
         <input type="hidden" id="statusCode">
         <div class="modal-content">
             <div class="modal-header">
+                <h2>Helaas zit de cursus vol, u kan u op de wachtlijst plaatsen</h2>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        Om uw op de wachtlijst te plaatsen, gelieve hieronder te bevestigen. <br/>
+                        Bij bevestiging ontvangt u een mail!
+                    </div>
+                    <p>&nbsp;</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnPopupSaveBookTemp" data-dismiss="modal" class="btn btn-primary">Plaast op wachtlijst</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="popupEventFormBookTemp">
+    <div class="modal-dialog">
+        <input type="hidden" id="bookEventIDTemp">
+        <div class="modal-content">
+            <div class="modal-header">
                 <h2><span id="bookTitle"></span></h2>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
@@ -475,6 +528,7 @@
         </div>
     </div>
 </div>
+
 <div class="modal" id="popupEventFormBookAdmin">
     <div class="modal-dialog">
         <input type="hidden" id="bookEventAdminID">

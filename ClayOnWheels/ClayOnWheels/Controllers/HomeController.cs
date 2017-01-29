@@ -44,6 +44,11 @@ namespace ClayOnWheels.Controllers
             return DiaryEvent.CreateHolidayNewEvent(NewEventDate);
         }
 
+        public bool BookWorkshopTemp(int id)
+        {
+            return true;
+        }
+
         public bool BookWorkshop(int id)
         {
             var total = CalculateSubscriptionsForCurrentUser();
