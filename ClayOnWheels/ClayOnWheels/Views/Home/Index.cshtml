@@ -35,17 +35,30 @@
                 data: dataRow,
                 success: function(response) {
                     var cList = $('ul.mylist');
-                    $.each(response, function(i)
-                    {
+                    cList.empty();
+                    if (response.length === 0) {
                         var li = $('<li/>')
-                            .addClass('ui-menu-item')
-                            .attr('role', 'menuitem')
-                            .appendTo(cList);
+                                .addClass('ui-menu-item')
+                                .attr('role', 'menuitem')
+                                .appendTo(cList);
                         var aaa = $('<a/>')
                             .addClass('ui-all')
-                            .text(response[i])
+                            .text('Momenteel zijn er geen cursisten geboekt')
                             .appendTo(li);
-                    });
+                    } else {
+                        $.each(response, function(i)
+                        {
+                            var li = $('<li/>')
+                                .addClass('ui-menu-item')
+                                .attr('role', 'menuitem')
+                                .appendTo(cList);
+                            var aaa = $('<a/>')
+                                .addClass('ui-all')
+                                .text(response[i])
+                                .appendTo(li);
+                        });
+                    }
+                   
                    
                 }
             });
