@@ -224,41 +224,51 @@ namespace ClayOnWheels.Controllers
             //request.AddParameter("subject", subject);
             //request.AddParameter("html", body);
             //request.Method = Method.POST;
-            
-            //client.Execute(request);
 
-            // Command line argument must the the SMTP host.
-            var client = new SmtpClient("smtp.telenet.be", 587);
-            client.Credentials = new System.Net.NetworkCredential("myriam.thas@telenet.be", "Ginmyr56");
-            client.EnableSsl = true;
-            // Specify the e-mail sender.
-            // Create a mailing address that includes a UTF8 character
-            // in the display name.
-            var from = new MailAddress("myriam.thas@telenet.be", "Myriam Thas - Clayonwheels", System.Text.Encoding.UTF8);
-            // Set destinations for the e-mail message.
-            var to = new MailAddress(email);
-            // Specify the message content.
-            var message = new MailMessage(from, to)
+            //client.Execute(request);
+            try
             {
-                Body = body,
-                IsBodyHtml = true,
-                BodyEncoding = System.Text.Encoding.UTF8,
-                Subject = subject,
-                SubjectEncoding = System.Text.Encoding.UTF8
-            };
-            
-            // Set the method that is called back when the send operation ends.
-            client.SendCompleted += new
-            SendCompletedEventHandler(SendCompletedCallback);
-            // The userState can be any object that allows your callback 
-            // method to identify this send operation.
-            // For this example, the userToken is a string constant.
-            var userState = "test message1";
-            client.SendAsync(message, userState);
-            
-            // Clean up.
-            message.Dispose();
-            //Console.WriteLine("Goodbye.");
+                // Command line argument must the the SMTP host.
+                var client = new SmtpClient("smtp.telenet.be", 587);
+                client.Credentials = new System.Net.NetworkCredential("myriam.thas@telenet.be", "Ginmyr56");
+                client.EnableSsl = true;
+                client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                // Specify the e-mail sender.
+                // Create a mailing address that includes a UTF8 character
+                // in the display name.
+                var from = new MailAddress("myriam.thas@telenet.be", "Clayonwheels",
+                    System.Text.Encoding.UTF8);
+                // Set destinations for the e-mail message.
+                var to = new MailAddress(email);
+                // Specify the message content.
+                var message = new MailMessage(from, to)
+                {
+                    Body = body,
+                    IsBodyHtml = true,
+                    BodyEncoding = System.Text.Encoding.UTF8,
+                    Subject = subject,
+                    SubjectEncoding = System.Text.Encoding.UTF8
+                };
+
+                // Set the method that is called back when the send operation ends.
+                client.SendCompleted += new
+                    SendCompletedEventHandler(SendCompletedCallback);
+                // The userState can be any object that allows your callback 
+                // method to identify this send operation.
+                // For this example, the userToken is a string constant.
+                var userState = "test message1";
+                client.Send(message);
+
+                // Clean up.
+                message.Dispose();
+                //Console.WriteLine("Goodbye.");
+            }
+            catch (Exception ex)
+            {
+                var message = ex.Message;
+            }
+
+
         }
         //
         // GET: /Account/ConfirmEmail
