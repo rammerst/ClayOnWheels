@@ -46,6 +46,14 @@ namespace ClayOnWheels.Controllers
 
         public bool BookWorkshopTemp(int id)
         {
+            _db.UserSubscriptions.Add(new UserSubscription
+            {
+                AppointmentDairyId = id,
+                UserId = GetUserId(),
+                Created = DateTime.Now,
+                Pending = 1
+            });
+            _db.SaveChangesAsync();
             return true;
         }
 
@@ -61,7 +69,9 @@ namespace ClayOnWheels.Controllers
                 _db.UserSubscriptions.Add(new UserSubscription
                 {
                     AppointmentDairyId = id,
-                    UserId = GetUserId()
+                    UserId = GetUserId(),
+                    Created = DateTime.Now,
+                    Pending = 0
                 });
                 _db.SaveChangesAsync();
                 return true;
@@ -74,7 +84,7 @@ namespace ClayOnWheels.Controllers
         {
             try
             {
-                var notifyUsers = _db.UserSubscriptions.Where(w => w.AppointmentDairyId == id);
+                var notifyUsers = _db.UserSubscriptions.Where(w => w.AppointmentDairyId == id && w.Pending != 1) ;
                 if (notifyUsers.Any())
                 {
                     foreach (var user in notifyUsers)
@@ -168,7 +178,7 @@ namespace ClayOnWheels.Controllers
 
         public JsonResult GetUsersFromAppointment(int id)
         {
-            var results = _db.UserSubscriptions.Where(w => w.AppointmentDairyId == id).ToList();
+            var results = _db.UserSubscriptions.Where(w => w.AppointmentDairyId == id && w.Pending != 1).ToList();
             return Json(results.Select(res => _db.AspNetUsers.First(w => w.Id == res.UserId)).Select(user => user.FirstName + ' ' + user.LastName).ToArray(), JsonRequestBehavior.AllowGet);
         }
         public int CalculateSubscriptionsForCurrentUser()
@@ -186,7 +196,7 @@ namespace ClayOnWheels.Controllers
                 creditsSum = (from u in _db.Subscriptions where u.UserId == userId select (int?)u.Number).Sum() ?? 0;
 
                 //now substract all bookings
-                var bookedSum = _db.UserSubscriptions.Count(u => u.UserId == userId);
+                var bookedSum = _db.UserSubscriptions.Count(u => u.UserId == userId && u.Pending != 1);
                 creditsSum -= bookedSum;
             }
             return creditsSum;

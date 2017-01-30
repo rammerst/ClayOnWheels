@@ -32,7 +32,7 @@ namespace ClayOnWheels.Models.EF
             using (var ent = new MyDbContext())
             {
                 var rslt = ent.AppointmentDiaries.Where(s => s.DateTimeScheduled >= fromDate && EntityFunctions.AddMinutes(s.DateTimeScheduled, s.AppointmentLength) <= toDate).ToArray();
-                var userRslt = ent.UserSubscriptions.Where(s => s.UserId == userid).Select(d => d.AppointmentDairyId).ToArray();
+                var userRslt = ent.UserSubscriptions.Where(s => s.UserId == userid && s.Pending != 1).Select(d => d.AppointmentDairyId).ToArray();
                 var result = new List<DiaryEvent>();
                 foreach (var item in rslt)
                 {
@@ -65,7 +65,7 @@ namespace ClayOnWheels.Models.EF
                         {
 
                             //check when cursus is fully booked & the current cursist has not booked yet, show in red:
-                            var results = ent.UserSubscriptions.Count(w => w.AppointmentDairyId == item.Id);
+                            var results = ent.UserSubscriptions.Count(w => w.AppointmentDairyId == item.Id && w.Pending != 1);
                             if (results >= 2)
                             {
                                 rec.StatusString = Enums.GetName((AppointmentStatus)4);

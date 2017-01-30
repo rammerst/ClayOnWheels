@@ -217,6 +217,10 @@
     <Compile Include="Migrations\201701191408309_AddAddress.Designer.cs">
       <DependentUpon>201701191408309_AddAddress.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201701300738300_UserSubscriptionAddPendingAndDateCreated.cs" />
+    <Compile Include="Migrations\201701300738300_UserSubscriptionAddPendingAndDateCreated.Designer.cs">
+      <DependentUpon>201701300738300_UserSubscriptionAddPendingAndDateCreated.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\EF\Dairy.cs">
@@ -379,6 +383,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201701191408309_AddAddress.resx">
       <DependentUpon>201701191408309_AddAddress.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701300738300_UserSubscriptionAddPendingAndDateCreated.resx">
+      <DependentUpon>201701300738300_UserSubscriptionAddPendingAndDateCreated.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
