@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Configuration;
 using System.Globalization;
 using System.Linq;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
@@ -184,24 +186,79 @@ namespace ClayOnWheels.Controllers
             return View(model);
         }
 
+        static bool mailSent = false;
+        private static void SendCompletedCallback(object sender, AsyncCompletedEventArgs e)
+        {
+            // Get the unique identifier for this asynchronous operation.
+            String token = (string)e.UserState;
+
+            if (e.Cancelled)
+            {
+                //trace("[{0}] Send canceled.", token);
+            }
+            if (e.Error != null)
+            {
+                //Console.WriteLine("[{0}] {1}", token, e.Error.ToString());
+            }
+            else
+            {
+                //Console.WriteLine("Message sent.");
+            }
+            mailSent = true;
+        }
+
+
         private void SendEmailAsync(string email, string subject, string body)
         {
-            var client = new RestClient
-            {
-                BaseUrl = new Uri("https://api.mailgun.net/v3"),
-                Authenticator = new HttpBasicAuthenticator("api",
-                   ReadSetting("MAILGUN_API_KEY"))
-            };
-            var request = new RestRequest();
-            request.AddParameter("domain", ReadSetting("MAILGUN_DOMAIN"), ParameterType.UrlSegment);
-            request.Resource = "{domain}/messages";
-            request.AddParameter("from", "Myriam Thas <info@" + ReadSetting("MAILGUN_DOMAIN") + ">");
-            request.AddParameter("to", email);
-            request.AddParameter("subject", subject);
-            request.AddParameter("html", body);
-            request.Method = Method.POST;
+            //var client = new RestClient
+            //{
+            //    BaseUrl = new Uri("https://api.mailgun.net/v3"),
+            //    Authenticator = new HttpBasicAuthenticator("api",
+            //       ReadSetting("MAILGUN_API_KEY"))
+            //};
+            //var request = new RestRequest();
+            //request.AddParameter("domain", ReadSetting("MAILGUN_DOMAIN"), ParameterType.UrlSegment);
+            //request.Resource = "{domain}/messages";
+            //request.AddParameter("from", "Myriam Thas <info@" + ReadSetting("MAILGUN_DOMAIN") + ">");
+            //request.AddParameter("to", email);
+            //request.AddParameter("subject", subject);
+            //request.AddParameter("html", body);
+            //request.Method = Method.POST;
             
-            client.Execute(request);
+            //client.Execute(request);
+
+            // Command line argument must the the SMTP host.
+            var client = new SmtpClient("smtp.telenet.be", 587);
+            client.Credentials = new System.Net.NetworkCredential("myriam.thas@telenet.be", "Ginmyr56");
+            client.EnableSsl = true;
+            // Specify the e-mail sender.
+            // Create a mailing address that includes a UTF8 character
+            // in the display name.
+            var from = new MailAddress("myriam.thas@telenet.be", "Myriam Thas - Clayonwheels", System.Text.Encoding.UTF8);
+            // Set destinations for the e-mail message.
+            var to = new MailAddress(email);
+            // Specify the message content.
+            var message = new MailMessage(from, to)
+            {
+                Body = body,
+                IsBodyHtml = true,
+                BodyEncoding = System.Text.Encoding.UTF8,
+                Subject = subject,
+                SubjectEncoding = System.Text.Encoding.UTF8
+            };
+            
+            // Set the method that is called back when the send operation ends.
+            client.SendCompleted += new
+            SendCompletedEventHandler(SendCompletedCallback);
+            // The userState can be any object that allows your callback 
+            // method to identify this send operation.
+            // For this example, the userToken is a string constant.
+            var userState = "test message1";
+            client.SendAsync(message, userState);
+            
+            // Clean up.
+            message.Dispose();
+            //Console.WriteLine("Goodbye.");
         }
         //
         // GET: /Account/ConfirmEmail
