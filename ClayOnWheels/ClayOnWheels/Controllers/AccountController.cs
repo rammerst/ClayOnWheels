@@ -230,7 +230,7 @@ namespace ClayOnWheels.Controllers
             {
                 // Command line argument must the the SMTP host.
                 var client = new SmtpClient("smtp.telenet.be", 587);
-                client.Credentials = new System.Net.NetworkCredential("myriam.thas@telenet.be", "Ginmyr56");
+                client.Credentials = new System.Net.NetworkCredential("myriam.thas@telenet.be", ReadSetting("mail"));
                 client.EnableSsl = true;
                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                 // Specify the e-mail sender.
