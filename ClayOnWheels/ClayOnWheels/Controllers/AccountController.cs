@@ -176,7 +176,14 @@ namespace ClayOnWheels.Controllers
                     // Send an email with this link
                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    SendEmailAsync(user.Email, "Bevstig uw account bij Clay on Wheels", "Gelieve op deze link te klikken om uw account te bevestigen <a href=\"" + callbackUrl + "\">here</a>");
+                    if (callbackUrl != null)
+                    {
+                        var uri = new Uri(callbackUrl);
+                        var clean = uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port,
+                                UriFormat.UriEscaped);
+                        SendEmailAsync(user.Email, "Bevstig uw account bij Clay on Wheels", "Gelieve op deze link te klikken om uw account te bevestigen <a href=\"" + clean + "\">here</a>");
+                    }
+                    
                     return RedirectToAction("Index", "Home");
                 }
                 AddErrors(result);
