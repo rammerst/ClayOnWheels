@@ -11,6 +11,7 @@
                 url: "/Home/CalculateSubscriptionsForCurrentUser",
                 success: function(response) {
                     if ($.isNumeric(response)) {
+                        $('#amount').val(response);
                         var result = response;
                         if (result === 1) {
                             response += ' beurt over.';
@@ -43,17 +44,17 @@
                     } else {
                         $("#divWithResults").show();
                         $("#divWithoutResults").hide();
-                        $.each(response, function(i)
-                        {
-                            var li = $('<li/>')
-                                //.addClass('ui-menu-item')
-                                .attr('role', 'menuitem')
-                                .appendTo(cList);
-                            var aaa = $('<span/>')
-                                //.addClass('ui-all')
-                                .text(response[i])
-                                .appendTo(li);
-                        });
+                        $.each(response,
+                            function(i) {
+                                var li = $('<li/>')
+                                    //.addClass('ui-menu-item')
+                                    .attr('role', 'menuitem')
+                                    .appendTo(cList);
+                                var aaa = $('<span/>')
+                                    //.addClass('ui-all')
+                                    .text(response[i])
+                                    .appendTo(li);
+                            });
                     }
                 }
             });
@@ -69,105 +70,111 @@
 
                 $('#calendar')
                     .fullCalendar({
-                        format: 'DD/MM/YYYY HH:mm',
-                        firstDay: 1,
-                        hiddenDays: [0, 6],
-                        minTime: '13:00:00',
-                        maxTime: '22:00:00',
-                        header: {
-                            left: 'prev,next today',
-                            center: 'title',
-                            right: 'month,agendaWeek'
-                        },
-                        views: {
-                            listDay: { buttonText: 'list day' },
-                            listWeek: { buttonText: 'list week' }
-                        },
+                            format: 'DD/MM/YYYY HH:mm',
+                            firstDay: 1,
+                            hiddenDays: [0, 6],
+                            minTime: '13:00:00',
+                            maxTime: '22:00:00',
+                            header: {
+                                left: 'prev,next today',
+                                center: 'title',
+                                right: 'month,agendaWeek'
+                            },
+                            views: {
+                                listDay: { buttonText: 'list day' },
+                                listWeek: { buttonText: 'list week' }
+                            },
 
-                        defaultView: 'agendaWeek',
-                        editable: @ViewBag.isAdmin.ToString().ToLower(),
-                        allDaySlot: false,
-                        selectable: true,
-                        slotMinutes: 30,
-                        events: '/Home/GetDiaryEvents/',
-                        eventClick: function(calEvent, jsEvent, view) {
-                            $('#bookDateStart').text($.fullCalendar.formatDate(calEvent.start, 'dd/MM/yyyy HH:mm'));
-                            $('#bookDateEnd').text($.fullCalendar.formatDate(calEvent.end, 'dd/MM/yyyy HH:mm'));
-                            @if (ViewBag.isAdmin)
-                            {
-                                <text>
-                                    ShowBookedEvents(calEvent.id, calEvent.someKey);
-                                </text>
-                            }
-                            else
-                            {
-                                <text>
-                                    if (calEvent.someKey === 3) {
-                                        alert('Op deze dag kan u geen cursus reserveren!');
-                                    } else {
-                                        if (calEvent === 4) {
-                                            BookEventTemp(calEvent.id, calEvent.someKey);
-                                        } else {
-                                            BookEvent(calEvent.id, calEvent.someKey);
-                                        }
-                                        
-                                    }
-                                </text>
-                            }
-                        },
-
-                        eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
-                            if (confirm("Confirm move?")) {
-                                UpdateEvent(event.id, event.start);
-                            } else {
-                                revertFunc();
-                            }
-                        },
-
-                        eventResize: function(event, dayDelta, minuteDelta, revertFunc) {
-
-                            if (confirm("Confirm change appointment length?")) {
-                                UpdateEvent(event.id, event.start, event.end);
-                            } else {
-                                revertFunc();
-                            }
-                        },
-
-
-                        @if (ViewBag.isAdmin)
-                        {
-                            <text>
-                        dayClick: function(date, allDay, jsEvent, view) {
-                            $('#eventTitle').val("Cursus keramiek");
-                            $('#eventDate').val($.fullCalendar.formatDate(date, 'dd/MM/yyyy'));
-                            $('#eventTime').val($.fullCalendar.formatDate(date, 'HH:mm'));
-                            $('#eventDuration').val('180');
-                            ShowEventPopup(date);
-                        },
-                        </text>
-                        }
-
-                        viewRender: function(view, element) {
-
-                            if (!CalLoading) {
-
-                                if (view.name === 'month') {
-                                    $('#calendar').fullCalendar('removeEventSource', sourceFullView);
-                                    $('#calendar').fullCalendar('removeEvents');
-                                    $('#calendar').fullCalendar('addEventSource', sourceSummaryView);
-                                } else {
-                                    $('#calendar').fullCalendar('removeEventSource', sourceSummaryView);
-                                    $('#calendar').fullCalendar('removeEvents');
-                                    $('#calendar').fullCalendar('addEventSource', sourceFullView);
+                            defaultView: 'agendaWeek',
+                            editable: @ViewBag.isAdmin.ToString().ToLower(),
+                            allDaySlot: false,
+                            selectable: true,
+                            slotMinutes: 30,
+                            events: '/Home/GetDiaryEvents/',
+                            eventClick: function(calEvent, jsEvent, view) {
+                                $('#bookDateStart').text($.fullCalendar.formatDate(calEvent.start, 'dd/MM/yyyy HH:mm'));
+                                $('#bookDateEnd').text($.fullCalendar.formatDate(calEvent.end, 'dd/MM/yyyy HH:mm'));
+                                @if (ViewBag.isAdmin)
+                                {
+                                    <text>
+                                        ShowBookedEvents(calEvent.id, calEvent.someKey);
+                                    </text>
                                 }
-                            }
+                                else
+                                {
+                                    <text>
+                                        if (calEvent.someKey === 3) {
+                                            alert('Op deze dag kan u geen cursus reserveren!');
+                                        } else {
+                                            var items = $("#amount").val();
+                                            console.log(items);
+                                            if (items === "0") {
+                                                alert("U hebt geen resterende beurten, gelieve eerste een beurtenkaart aan te schaffen.");
+                                            } 
+                                            else {
+                                        
+                                                if (calEvent === 4) {
+                                                    BookEventTemp(calEvent.id, calEvent.someKey);
+                                                } else {
+                                                    BookEvent(calEvent.id, calEvent.someKey);
+                                                }    
+                                            }
+                                        }
+                                    </text>
+                                }
+                        },
+                        eventDrop:
+
+                function(event, dayDelta, minuteDelta, allDay, revertFunc) {
+                    if (confirm("Confirm move?")) {
+                        UpdateEvent(event.id, event.start);
+                    } else {
+                        revertFunc();
+                    }
+                },
+
+                eventResize: function(event, dayDelta, minuteDelta, revertFunc) {
+
+                    if (confirm("Confirm change appointment length?")) {
+                        UpdateEvent(event.id, event.start, event.end);
+                    } else {
+                        revertFunc();
+                    }
+                },
+
+
+                @if (ViewBag.isAdmin)
+                {
+                    <text>
+                dayClick: function(date, allDay, jsEvent, view) {
+                    $('#eventTitle').val("Cursus keramiek");
+                    $('#eventDate').val($.fullCalendar.formatDate(date, 'dd/MM/yyyy'));
+                    $('#eventTime').val($.fullCalendar.formatDate(date, 'HH:mm'));
+                    $('#eventDuration').val('180');
+                    ShowEventPopup(date);
+                },
+                </text>
+                }
+
+                viewRender: function(view, element) {
+
+                    if (!CalLoading) {
+
+                        if (view.name === 'month') {
+                            $('#calendar').fullCalendar('removeEventSource', sourceFullView);
+                            $('#calendar').fullCalendar('removeEvents');
+                            $('#calendar').fullCalendar('addEventSource', sourceSummaryView);
+                        } else {
+                            $('#calendar').fullCalendar('removeEventSource', sourceSummaryView);
+                            $('#calendar').fullCalendar('removeEvents');
+                            $('#calendar').fullCalendar('addEventSource', sourceFullView);
                         }
-                    });
-
-                CalLoading = true;
-
-
+                    }
+                }
             });
+
+        CalLoading = true;
+        });
 
         $('#btnPopupCancel')
             .click(function() {
@@ -234,26 +241,26 @@
             });
 
         $('#btnPopupSaveBookTemp')
-          .click(function() {
-              $('#popupEventFormBookTemp').modal('hide');
+            .click(function() {
+                $('#popupEventFormBookTemp').modal('hide');
 
-              var dataRow = {
-                  'id': $('#bookEventIDTemp').val()
-              }
+                var dataRow = {
+                    'id': $('#bookEventIDTemp').val()
+                }
 
-              $.ajax({
-                  type: 'POST',
-                  url: "/Home/BookWorkshopTemp",
-                  data: dataRow,
-                  success: function(response) {
-                      if (response === 'True') {
-                          $('#calendar').fullCalendar('refetchEvents');
-                      } else {
-                          alert('Er is iets fout gelopen met de reservering!');
-                      }
-                  }
-              });
-          });
+                $.ajax({
+                    type: 'POST',
+                    url: "/Home/BookWorkshopTemp",
+                    data: dataRow,
+                    success: function(response) {
+                        if (response === 'True') {
+                            $('#calendar').fullCalendar('refetchEvents');
+                        } else {
+                            alert('Er is iets fout gelopen met de reservering!');
+                        }
+                    }
+                });
+            });
 
         $('#btnPopupSaveBook')
             .click(function() {
@@ -319,7 +326,7 @@
                     success: function(response) {
                         if (response === 'True') {
                             $('#calendar').fullCalendar('refetchEvents');
-                           // CalculateSubscriptions();
+                            // CalculateSubscriptions();
                         } else {
                             alert('Error, could not save event!');
                         }
@@ -333,10 +340,12 @@
             GetUsersFromAppointment(Id);
             //cursist
         }
+
         function BookEventTemp(Id) {
             $('#popupEventFormBookTemp').modal();
             $('#bookEventIDTemp').val(Id);
         }
+
         function BookEvent(Id, SpecialId) {
             $('#popupEventFormBook').modal();
             $('#bookEventID').val(Id);
@@ -387,6 +396,7 @@
 }
 
 <div class="container">
+    <input type="hidden" id="amount"/>
     <div>
         @if (ViewBag.isAdmin)
         {
@@ -406,7 +416,7 @@
 
 
 
-    <div id="calendar" style="width:100%"></div>
+    <div id="calendar" style="width: 100%"></div>
 
 </div>
 
@@ -469,10 +479,9 @@
     </div>
 </div>
 <!-- Modal popup to book a new event -->
-<div class="modal" id="popupEventFormBook">
+<div class="modal" id="popupEventFormBookTemp">
     <div class="modal-dialog">
-        <input type="hidden" id="bookEventID">
-        <input type="hidden" id="statusCode">
+        <input type="hidden" id="bookEventIDTemp"Temp>
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Helaas zit de cursus vol, u kan u op de wachtlijst plaatsen</h2>
@@ -493,9 +502,10 @@
         </div>
     </div>
 </div>
-<div class="modal" id="popupEventFormBookTemp">
+<div class="modal" id="popupEventFormBook">
     <div class="modal-dialog">
-        <input type="hidden" id="bookEventIDTemp">
+        <input type="hidden" id="bookEventID">
+        <input type="hidden" id="statusCode">
         <div class="modal-content">
             <div class="modal-header">
                 <h2><span id="bookTitle"></span></h2>
