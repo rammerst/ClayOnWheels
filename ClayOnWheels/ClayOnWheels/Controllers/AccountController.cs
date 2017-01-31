@@ -181,6 +181,10 @@ namespace ClayOnWheels.Controllers
                         var uri = new Uri(callbackUrl);
                         var clean = uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port,
                                 UriFormat.UriEscaped);
+                        var body =
+                            "Je registratie is goed gelukt! Vóór je kan boeken vragen we je om 250 euro te storten op onze rekening BE76 3630 8223 2495 met als melding je voor - en achternaam.<br/><br/>";
+                        body += "Bij ontvangst van je betaling krijg je via mail een bevestiging van je betaling.<br/><br/>";
+                        body += "Je kan dan in de kalender je cursus boeken.";
                         SendEmailAsync(user.Email, "Bevstig uw account bij Clay on Wheels", "Gelieve op deze link te klikken om uw account te bevestigen <a href=\"" + clean + "\">here</a>");
                     }
                     
