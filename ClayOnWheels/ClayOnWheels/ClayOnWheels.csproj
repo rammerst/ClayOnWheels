@@ -227,6 +227,10 @@
     <Compile Include="Migrations\201701312057375_addActive.Designer.cs">
       <DependentUpon>201701312057375_addActive.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201702010810594_addActive1.cs" />
+    <Compile Include="Migrations\201702010810594_addActive1.Designer.cs">
+      <DependentUpon>201702010810594_addActive1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\EF\Dairy.cs">
@@ -402,6 +406,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201701312057375_addActive.resx">
       <DependentUpon>201701312057375_addActive.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702010810594_addActive1.resx">
+      <DependentUpon>201702010810594_addActive1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
