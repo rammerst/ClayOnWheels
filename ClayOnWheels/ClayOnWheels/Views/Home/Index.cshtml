@@ -15,7 +15,13 @@
                         var result = response;
                         if (result === 1) {
                             response += ' beurt over.';
+                            $("#topMessage").class = "topMessageWarning";
                         } else {
+                            if (result <= 0){
+                                $("#topMessage").class = "topMessageDanger";
+                            }else{
+                                $("#topMessage").class = "topMessageNormal";
+                            }
                             response += ' beurten over.';
                         }
                         $('#amountOfSubscriptions').text(response);
@@ -399,7 +405,7 @@
         else
         {
             <text>
-                <div class="topMessage">U hebt momenteel nog <span id="amountOfSubscriptions"></span></div>
+                <div id="topMessage" class="topMessage">U hebt momenteel nog <span id="amountOfSubscriptions"></span></div>
             </text>
         }
     </div>

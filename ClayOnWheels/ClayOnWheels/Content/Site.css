@@ -24,6 +24,22 @@ textarea {
     max-width: 280px;
 }
 
+.topMessageNormal{
+    background-color:none;
+    color: black;
+    font-weight:normal;
+}
+
+.topMessageDanger{
+    background-color: red;
+    color: white;
+    font-weight: bold;
+}
+.topMessageWarning{
+    background-color: orange;
+    color: black;
+    font-weight: bold;
+}
 
 .ENQUIRY {
     

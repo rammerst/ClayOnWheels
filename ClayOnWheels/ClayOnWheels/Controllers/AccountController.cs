@@ -12,15 +12,18 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using ClayOnWheels.Models;
-using ClayOnWheels.Models.EF;
 using RestSharp;
 using RestSharp.Authenticators;
+using ClayOnWheels.Functions;
+using ClayOnWheels.Models.EF;
 
 namespace ClayOnWheels.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
+        private readonly MyDbContext _db = new MyDbContext();
+
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
@@ -155,13 +158,6 @@ namespace ClayOnWheels.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
-            var db = new MyDbContext();
-            var active = 0;
-            var count = db.AspNetUsers.Count(w => w.Active);
-            if (count < 70)
-            {
-                active = 1;
-            }
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser
@@ -172,9 +168,7 @@ namespace ClayOnWheels.Controllers
                     City = model.City,
                     FirstName = model.FirstName,
                     LastName = model.LastName,
-                    PostalCode = model.PostalCode,
-                    Active = active,
-                    PhoneNumber = model.PhoneNumber
+                    PostalCode = model.PostalCode
                 };
                 // Add the Address properties:
                 var result = await UserManager.CreateAsync(user, model.Password);
@@ -191,13 +185,10 @@ namespace ClayOnWheels.Controllers
                         var uri = new Uri(callbackUrl);
                         var clean = uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port,
                                 UriFormat.UriEscaped);
-                        var body =
-                            "Je registratie is goed gelukt! Vóór je kan boeken vragen we je om 250 euro te storten op onze rekening BE76 3630 8223 2495 met als melding je voor - en achternaam.<br/><br/>";
-                        body += "Bij ontvangst van je betaling krijg je via mail een bevestiging van je betaling.<br/><br/>";
-                        body += "Je kan dan in de kalender je cursus boeken.";
-                        SendEmailAsync(user.Email, "Bevstig uw account bij Clay on Wheels", "Gelieve op deze link te klikken om uw account te bevestigen <a href=\"" + clean + "\">here</a>");
+                       
+                        Mailer.SendEmail(user.Email, "Bevstig uw account bij Clay on Wheels", "Gelieve op deze link te klikken om uw account te bevestigen <a href=\"" + clean + "\">here</a>");
                     }
-
+                    
                     return RedirectToAction("Index", "Home");
                 }
                 AddErrors(result);
@@ -207,90 +198,10 @@ namespace ClayOnWheels.Controllers
             return View(model);
         }
 
-        static bool mailSent = false;
-        private static void SendCompletedCallback(object sender, AsyncCompletedEventArgs e)
-        {
-            // Get the unique identifier for this asynchronous operation.
-            String token = (string)e.UserState;
-
-            if (e.Cancelled)
-            {
-                //trace("[{0}] Send canceled.", token);
-            }
-            if (e.Error != null)
-            {
-                //Console.WriteLine("[{0}] {1}", token, e.Error.ToString());
-            }
-            else
-            {
-                //Console.WriteLine("Message sent.");
-            }
-            mailSent = true;
-        }
+        
 
 
-        private void SendEmailAsync(string email, string subject, string body)
-        {
-            //var client = new RestClient
-            //{
-            //    BaseUrl = new Uri("https://api.mailgun.net/v3"),
-            //    Authenticator = new HttpBasicAuthenticator("api",
-            //       ReadSetting("MAILGUN_API_KEY"))
-            //};
-            //var request = new RestRequest();
-            //request.AddParameter("domain", ReadSetting("MAILGUN_DOMAIN"), ParameterType.UrlSegment);
-            //request.Resource = "{domain}/messages";
-            //request.AddParameter("from", "Myriam Thas <info@" + ReadSetting("MAILGUN_DOMAIN") + ">");
-            //request.AddParameter("to", email);
-            //request.AddParameter("subject", subject);
-            //request.AddParameter("html", body);
-            //request.Method = Method.POST;
-
-            //client.Execute(request);
-            try
-            {
-                // Command line argument must the the SMTP host.
-                var client = new SmtpClient("smtp.telenet.be", 587);
-                client.Credentials = new System.Net.NetworkCredential("myriam.thas@telenet.be", ReadSetting("mail"));
-                client.EnableSsl = true;
-                client.DeliveryMethod = SmtpDeliveryMethod.Network;
-                // Specify the e-mail sender.
-                // Create a mailing address that includes a UTF8 character
-                // in the display name.
-                var from = new MailAddress("myriam.thas@telenet.be", "Clayonwheels",
-                    System.Text.Encoding.UTF8);
-                // Set destinations for the e-mail message.
-                var to = new MailAddress(email);
-                // Specify the message content.
-                var message = new MailMessage(from, to)
-                {
-                    Body = body,
-                    IsBodyHtml = true,
-                    BodyEncoding = System.Text.Encoding.UTF8,
-                    Subject = subject,
-                    SubjectEncoding = System.Text.Encoding.UTF8
-                };
-
-                // Set the method that is called back when the send operation ends.
-                client.SendCompleted += new
-                    SendCompletedEventHandler(SendCompletedCallback);
-                // The userState can be any object that allows your callback 
-                // method to identify this send operation.
-                // For this example, the userToken is a string constant.
-                var userState = "test message1";
-                client.Send(message);
-
-                // Clean up.
-                message.Dispose();
-                //Console.WriteLine("Goodbye.");
-            }
-            catch (Exception ex)
-            {
-                var message = ex.Message;
-            }
-
-
-        }
+       
         //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
@@ -300,6 +211,18 @@ namespace ClayOnWheels.Controllers
             {
                 return View("Error");
             }
+
+            var user = _db.AspNetUsers.FirstOrDefault(w => w.Id == userId);
+            if (user != null)
+            {
+                var textAfterConfirm =
+                         "Je registratie is goed gelukt! Vóór je kan boeken vragen we je om 250 euro te storten op onze rekening BE76 3630 8223 2495 met als melding je voor - en achternaam.<br/><br/>";
+                textAfterConfirm += "Bij ontvangst van je betaling krijg je via mail een bevestiging van je betaling.<br/><br/>";
+                textAfterConfirm += "Je kan dan in de kalender je cursus boeken.";
+                Mailer.SendEmail(user.Email, "Registratie gelukt bij Clay on Wheels!", textAfterConfirm);
+            }
+
+
             var result = await UserManager.ConfirmEmailAsync(userId, code);
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
@@ -601,19 +524,6 @@ namespace ClayOnWheels.Controllers
         }
         #endregion
 
-        private static string ReadSetting(string key)
-        {
-            try
-            {
-                var appSettings = ConfigurationManager.AppSettings;
-                var result = appSettings[key] ?? "Not Found";
-                return result;
-            }
-            catch (ConfigurationErrorsException)
-            {
-                //Tracing.("Error reading app settings");
-            }
-            return "";
-        }
+     
     }
 }
