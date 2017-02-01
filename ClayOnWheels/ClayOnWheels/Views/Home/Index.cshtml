@@ -238,8 +238,8 @@
                     data: dataRow,
                     success: function(response) {
                         if (response === 'True') {
-                            $('#calendar').fullCalendar('clearEvents');
-                            //<$('#calendar').fullCalendar('refetchEvents');
+                           // $('#calendar').fullCalendar('clearEvents');
+                            $('#calendar').fullCalendar('refetchEvents');
                             alert('Uw verlof is succesvol toegevoegd, goed bezig myriam!');
                         } else {
                             alert('Error, could not save event!');

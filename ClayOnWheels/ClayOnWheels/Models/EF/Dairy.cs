@@ -536,6 +536,10 @@ namespace ClayOnWheels.Models.EF
         public string UserName { get; set; } // UserName (length: 256)
         public string FirstName { get; set; } // UserName (length: 256)
         public string LastName { get; set; } // UserName (length: 256)
+        public string Address { get; set; }
+        public string City { get; set; }
+        public string PostalCode { get; set; }
+        public bool Active { get; set; }
 
         // Reverse navigation
         public virtual System.Collections.Generic.ICollection<AspNetRole> AspNetRoles { get; set; } // Many to many mapping

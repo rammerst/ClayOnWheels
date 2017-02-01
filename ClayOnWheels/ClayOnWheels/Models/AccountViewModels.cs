@@ -99,6 +99,10 @@ namespace ClayOnWheels.Models
         [Required]
         [Display(Name = "Achternaam")]
         public string LastName { get; set; }
+
+        [Required]
+        [Display(Name = "Telefoon (Gsm)")]
+        public string PhoneNumber { get; set; }
     }
 
     public class ResetPasswordViewModel

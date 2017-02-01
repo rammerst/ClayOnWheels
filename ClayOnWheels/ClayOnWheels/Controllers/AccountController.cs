@@ -12,6 +12,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using ClayOnWheels.Models;
+using ClayOnWheels.Models.EF;
 using RestSharp;
 using RestSharp.Authenticators;
 
@@ -154,6 +155,13 @@ namespace ClayOnWheels.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
+            var db = new MyDbContext();
+            var active = 0;
+            var count = db.AspNetUsers.Count(w => w.Active);
+            if (count < 70)
+            {
+                active = 1;
+            }
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser
@@ -164,7 +172,9 @@ namespace ClayOnWheels.Controllers
                     City = model.City,
                     FirstName = model.FirstName,
                     LastName = model.LastName,
-                    PostalCode = model.PostalCode
+                    PostalCode = model.PostalCode,
+                    Active = active,
+                    PhoneNumber = model.PhoneNumber
                 };
                 // Add the Address properties:
                 var result = await UserManager.CreateAsync(user, model.Password);
@@ -187,7 +197,7 @@ namespace ClayOnWheels.Controllers
                         body += "Je kan dan in de kalender je cursus boeken.";
                         SendEmailAsync(user.Email, "Bevstig uw account bij Clay on Wheels", "Gelieve op deze link te klikken om uw account te bevestigen <a href=\"" + clean + "\">here</a>");
                     }
-                    
+
                     return RedirectToAction("Index", "Home");
                 }
                 AddErrors(result);
@@ -601,7 +611,7 @@ namespace ClayOnWheels.Controllers
             }
             catch (ConfigurationErrorsException)
             {
-               //Tracing.("Error reading app settings");
+                //Tracing.("Error reading app settings");
             }
             return "";
         }
