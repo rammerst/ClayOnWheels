@@ -15,12 +15,12 @@
                         var result = response;
                         if (result === 1) {
                             response += ' beurt over.';
-                            $("#topMessage").class = "topMessageWarning";
+                            $("#topMessage").attr("class","topMessageWarning");
                         } else {
                             if (result <= 0){
-                                $("#topMessage").class = "topMessageDanger";
+                                $("#topMessage").attr("class","topMessageDanger");
                             }else{
-                                $("#topMessage").class = "topMessageNormal";
+                                $("#topMessage").attr("class","topMessageNormal");
                             }
                             response += ' beurten over.';
                         }
