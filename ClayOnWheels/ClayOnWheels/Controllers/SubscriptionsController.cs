@@ -3,6 +3,7 @@ using System.Data.Entity;
 using System.Net;
 using System.Web.Mvc;
 using ClayOnWheels.Models.EF;
+using System.Linq;
 
 namespace ClayOnWheels.Controllers
 {
@@ -36,7 +37,14 @@ namespace ClayOnWheels.Controllers
         // GET: Subscriptions/Create
         public ActionResult Create()
         {
-            ViewBag.UserId = new SelectList(_db.AspNetUsers, "Id", "Email");
+            var users = _db.AspNetUsers.Where(w=>w.Active).ToList();
+            var item = from s in users
+                       select new SelectListItem
+                       {
+                           Text = s.FirstName + " - " + s.LastName,
+                           Value = s.Id
+                       };
+            ViewBag.UserId = item;
             ViewBag.Id = new SelectList(_db.Subscriptions, "Id", "UserId");
             var sub = new Subscription()
             {
