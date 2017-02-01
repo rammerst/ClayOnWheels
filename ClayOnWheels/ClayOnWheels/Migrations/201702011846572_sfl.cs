@@ -3,16 +3,16 @@ namespace ClayOnWheels.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class addActive1 : DbMigration
+    public partial class sfl : DbMigration
     {
         public override void Up()
         {
-            DropColumn("dbo.AspNetUsers", "Active");
+            AddColumn("dbo.AspNetUsers", "Active", c => c.Boolean());
         }
-        
+
         public override void Down()
         {
-            AddColumn("dbo.AspNetUsers", "Active", c => c.Int(nullable: false));
+            DropColumn("dbo.AspNetUsers", "Active");
         }
     }
 }

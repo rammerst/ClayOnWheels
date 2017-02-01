@@ -7,13 +7,13 @@ namespace ClayOnWheels.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class addActive1 : IMigrationMetadata
+    public sealed partial class sfl : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(addActive1));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(sfl));
         
         string IMigrationMetadata.Id
         {
-            get { return "201702010810594_addActive1"; }
+            get { return "201702011846572_sfl"; }
         }
         
         string IMigrationMetadata.Source

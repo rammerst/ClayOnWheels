@@ -227,9 +227,9 @@
     <Compile Include="Migrations\201701312057375_addActive.Designer.cs">
       <DependentUpon>201701312057375_addActive.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201702010810594_addActive1.cs" />
-    <Compile Include="Migrations\201702010810594_addActive1.Designer.cs">
-      <DependentUpon>201702010810594_addActive1.cs</DependentUpon>
+    <Compile Include="Migrations\201702011846572_sfl.cs" />
+    <Compile Include="Migrations\201702011846572_sfl.Designer.cs">
+      <DependentUpon>201702011846572_sfl.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -247,7 +247,6 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-   
     <Content Include="Content\bootstrap-responsive.css" />
     <Content Include="Content\bootstrap-responsive.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -404,8 +403,8 @@
     <EmbeddedResource Include="Migrations\201701312057375_addActive.resx">
       <DependentUpon>201701312057375_addActive.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201702010810594_addActive1.resx">
-      <DependentUpon>201702010810594_addActive1.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201702011846572_sfl.resx">
+      <DependentUpon>201702011846572_sfl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
