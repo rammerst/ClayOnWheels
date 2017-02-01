@@ -27,17 +27,20 @@ textarea {
 .topMessageNormal{
     background-color:none;
     color: black;
+    font-size: 18px;
     font-weight:normal;
 }
 
 .topMessageDanger{
     background-color: red;
     color: white;
+    font-size: 20px;
     font-weight: bold;
 }
 .topMessageWarning{
     background-color: orange;
     color: black;
+    font-size: 20px;
     font-weight: bold;
 }
 
