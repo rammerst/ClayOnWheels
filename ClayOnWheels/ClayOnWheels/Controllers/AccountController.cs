@@ -185,8 +185,9 @@ namespace ClayOnWheels.Controllers
                         var uri = new Uri(callbackUrl);
                         var clean = uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port,
                                 UriFormat.UriEscaped);
-                       
-                        Mailer.SendEmail(user.Email, "Bevstig uw account bij Clay on Wheels", "Gelieve op deze link te klikken om uw account te bevestigen <a href=\"" + clean + "\">here</a>");
+                        var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\ConfirmAccount.html"));
+                        body = body.Replace("[LINK]", clean);
+                        Mailer.SendEmail(user.Email, "Bevstig uw account bij Clay on Wheels", body);
                     }
                     
                     return RedirectToAction("Index", "Home");

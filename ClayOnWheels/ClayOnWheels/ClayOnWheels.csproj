@@ -300,6 +300,8 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="MailTemplates\ConfirmAccount.html" />
+    <Content Include="MailTemplates\AfterConfirmationSuccess.html" />
     <Content Include="Models\EF\Dairy.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Dairy.cs</LastGenOutput>

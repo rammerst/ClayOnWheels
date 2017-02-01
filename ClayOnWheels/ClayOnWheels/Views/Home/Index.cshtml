@@ -109,13 +109,13 @@
                             } else {
                                 $('#bookTitle').text('Boek een cursus op ' + weekDay);
                             }
-                           
+
 
                             @if (ViewBag.isAdmin)
                             {
                                 <text>
-                            ShowBookedEvents(calEvent.id, calEvent.someKey);
-                            </text>
+                                    ShowBookedEvents(calEvent.id, calEvent.someKey);
+                                </text>
                             }
                             else
                             {
@@ -126,7 +126,7 @@
                                 } else {
                                     ShowInfoModal("Cursus volzet: Op deze dag kan u geen cursus boeken.");
                                 }
-                               
+
                             } else {
                                 var items = $("#amount").val();
                                 if (items === "0") {
@@ -207,7 +207,7 @@
                $('#infoModal').modal('hide');
            });
 
-        
+
 
         $('#btnPopupSave')
             .click(function() {
@@ -256,7 +256,7 @@
                     data: dataRow,
                     success: function(response) {
                         if (response === 'True') {
-                           // $('#calendar').fullCalendar('clearEvents');
+                            // $('#calendar').fullCalendar('clearEvents');
                             $('#calendar').fullCalendar('refetchEvents');
                             alert('Uw verlof is succesvol toegevoegd, goed bezig myriam!');
                         } else {
@@ -338,8 +338,8 @@
                             }
                         }
                     });
-                } 
-               
+                }
+
             });
 
         function ShowBookedEvents(Id, SpecialId) {
@@ -361,7 +361,7 @@
             if (SpecialId === 666) {
                 $('#btnPopupSaveBook').hide();
                 $('#btnPopupCancelBook').show();
-                
+
 
             } else {
                 $('#btnPopupCancelBook').hide();
@@ -557,7 +557,7 @@
 </div>
 <div class="modal" id="infoModal">
     <div class="modal-dialog">
-       
+
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Cursus boeken is momenteel niet mogelijk:</h2>

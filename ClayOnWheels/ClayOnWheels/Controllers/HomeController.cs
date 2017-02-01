@@ -16,8 +16,8 @@ namespace ClayOnWheels.Controllers
         [Authorize]
         public ActionResult Index()
         {
-
-            ViewBag.TotalSubscriptions = CalculateSubscriptionsForCurrentUser();
+            
+            // ViewBag.TotalSubscriptions = CalculateSubscriptionsForCurrentUser();
             ViewBag.isAdmin = _isAdmin;
 
             return View();
