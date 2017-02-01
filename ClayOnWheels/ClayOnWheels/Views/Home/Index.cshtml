@@ -98,8 +98,19 @@
                         slotMinutes: 30,
                         events: '/Home/GetDiaryEvents/',
                         eventClick: function(calEvent, jsEvent, view) {
-                            $('#bookDateStart').text($.fullCalendar.formatDate(calEvent.start, 'dd/MM/yyyy HH:mm'));
-                            $('#bookDateEnd').text($.fullCalendar.formatDate(calEvent.end, 'dd/MM/yyyy HH:mm'));
+                            $('#bookDateStart').text($.fullCalendar.formatDate(calEvent.start, 'HH:mm'));
+                            $('#bookDateEnd').text($.fullCalendar.formatDate(calEvent.end, 'HH:mm'));
+
+                            var weekDay = $.fullCalendar.formatDate(calEvent.start, 'dddd').toLowerCase();
+                            weekDay += ' ' + $.fullCalendar.formatDate(calEvent.start, 'H').toLowerCase();
+                            weekDay += ' ' + $.fullCalendar.formatDate(calEvent.start, 'MMMM').toLowerCase();
+                            if (calEvent.someKey === 666) {
+                                $('#bookTitle').text('Annuleer de cursus van ' + weekDay);
+                            } else {
+                                $('#bookTitle').text('Boek een cursus op ' + weekDay);
+                            }
+                           
+
                             @if (ViewBag.isAdmin)
                             {
                                 <text>
@@ -350,10 +361,9 @@
             if (SpecialId === 666) {
                 $('#btnPopupSaveBook').hide();
                 $('#btnPopupCancelBook').show();
-                $('#bookTitle').text('annuleer een cursus');
+                
 
             } else {
-                $('#bookTitle').text('boek een cursus');
                 $('#btnPopupCancelBook').hide();
                 $('#btnPopupSaveBook').show();
             }
