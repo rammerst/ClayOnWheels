@@ -34,9 +34,9 @@ namespace ClayOnWheels.Controllers
         }
 
 
-        public bool SaveEvent(string Title, string NewEventDate, string NewEventTime, string NewEventDuration)
+        public bool SaveEvent(string Title, string NewEventDate, string NewEventTime, string NewEventTimeEnd)
         {
-            return DiaryEvent.CreateNewEvent(Title, NewEventDate, NewEventTime, NewEventDuration);
+            return DiaryEvent.CreateNewEvent(Title, NewEventDate, NewEventTime, NewEventTimeEnd);
         }
 
         public bool SaveHoliday(string NewEventDate)

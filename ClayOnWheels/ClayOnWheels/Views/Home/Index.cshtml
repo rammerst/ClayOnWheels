@@ -153,7 +153,8 @@
                             $('#eventTitle').val("Cursus keramiek");
                             $('#eventDate').val($.fullCalendar.formatDate(date, 'dd/MM/yyyy'));
                             $('#eventTime').val($.fullCalendar.formatDate(date, 'HH:mm'));
-                            $('#eventDuration').val('180');
+                            var dateEnd = addMinutes(date, 180);
+                            $('#eventTimeEnd').val($.fullCalendar.formatDate(dateEnd, 'HH:mm'));
                             ShowEventPopup(date);
                         },
                         </text>
@@ -206,7 +207,7 @@
                     'Title': $('#eventTitle').val(),
                     'NewEventDate': $('#eventDate').val(),
                     'NewEventTime': $('#eventTime').val(),
-                    'NewEventDuration': $('#eventDuration').val()
+                    'NewEventTimeEnd': $('#eventTimeEnd').val()
                 }
 
                 ClearPopupFormValues();
@@ -370,6 +371,9 @@
             $('#eventDateTime').val("");
             $('#eventDuration').val("");
         }
+        function addMinutes(date, minutes) {
+            return new Date(date.getTime() + minutes*60000);
+        }
 
         function UpdateEvent(EventID, EventStart, EventEnd) {
 
@@ -448,7 +452,7 @@
 
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="col-md-4">Tijdstip</div>
+                        <div class="col-md-4">Aanvang cursus</div>
                         <div class="col-md-8">
                             <input id="eventTime" type="text" />
                         </div>
@@ -458,9 +462,9 @@
 
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="col-md-4">Lengte in minuten</div>
+                        <div class="col-md-4">Einde cursus</div>
                         <div class="col-md-8">
-                            <input id="eventDuration" type="text" value="180" />
+                            <input id="eventTimeEnd" type="text" />
                         </div>
                     </div>
                 </div>

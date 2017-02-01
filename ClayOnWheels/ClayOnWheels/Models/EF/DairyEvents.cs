@@ -153,18 +153,21 @@ namespace ClayOnWheels.Models.EF
         }
 
 
-        public static bool CreateNewEvent(string Title, string NewEventDate, string NewEventTime, string NewEventDuration)
+        public static bool CreateNewEvent(string Title, string NewEventDate, string NewEventTime, string NewEventTimeEnd)
         {
             try
             {
+                var start = DateTime.ParseExact(NewEventDate + " " + NewEventTime, "dd/MM/yyyy HH:mm",
+                    CultureInfo.InvariantCulture);
+                var end = DateTime.ParseExact(NewEventDate + " " + NewEventTimeEnd, "dd/MM/yyyy HH:mm",
+                    CultureInfo.InvariantCulture);
+                var span = end.Subtract(start);
                 var ent = new MyDbContext();
                 var rec = new AppointmentDiary
                 {
                     Title = Title,
-                    DateTimeScheduled =
-                        DateTime.ParseExact(NewEventDate + " " + NewEventTime, "dd/MM/yyyy HH:mm",
-                            CultureInfo.InvariantCulture),
-                    AppointmentLength = int.Parse(NewEventDuration)
+                    DateTimeScheduled = start,
+                    AppointmentLength = (int) span.TotalMinutes
                 };
                 ent.AppointmentDiaries.Add(rec);
                 ent.SaveChanges();
