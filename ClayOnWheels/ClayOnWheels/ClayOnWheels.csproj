@@ -300,6 +300,9 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="MailTemplates\BetalingOntvangen.html" />
+    <Content Include="MailTemplates\AfterConfirmationFailed.html" />
+    <Content Include="MailTemplates\BeurtenOp.html" />
     <Content Include="MailTemplates\ConfirmAccount.html" />
     <Content Include="MailTemplates\AfterConfirmationSuccess.html" />
     <Content Include="Models\EF\Dairy.tt">

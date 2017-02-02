@@ -198,11 +198,7 @@ namespace ClayOnWheels.Controllers
             // If we got this far, something failed, redisplay form
             return View(model);
         }
-
         
-
-
-       
         //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
@@ -216,14 +212,20 @@ namespace ClayOnWheels.Controllers
             var user = _db.AspNetUsers.FirstOrDefault(w => w.Id == userId);
             if (user != null)
             {
-                var textAfterConfirm =
-                         "Je registratie is goed gelukt! Vóór je kan boeken vragen we je om 250 euro te storten op onze rekening BE76 3630 8223 2495 met als melding je voor - en achternaam.<br/><br/>";
-                textAfterConfirm += "Bij ontvangst van je betaling krijg je via mail een bevestiging van je betaling.<br/><br/>";
-                textAfterConfirm += "Je kan dan in de kalender je cursus boeken.";
-                Mailer.SendEmail(user.Email, "Registratie gelukt bij Clay on Wheels!", textAfterConfirm);
+                var usersRegistered = _db.AspNetUsers.Count(w => w.Active);
+                if (usersRegistered >= 70)
+                {
+                    var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\AfterConfirmationFailed.html"));
+                    Mailer.SendEmail(user.Email, "Registratie gelukt bij Clay on Wheels - wachtlijst", body);
+                }
+                else
+                {
+                    var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\AfterConfirmationSuccess.html"));
+                    Mailer.SendEmail(user.Email, "Registratie gelukt bij Clay on Wheels", body);
+                }
+              
             }
-
-
+            
             var result = await UserManager.ConfirmEmailAsync(userId, code);
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }

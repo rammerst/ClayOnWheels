@@ -4,6 +4,7 @@ using System.Net;
 using System.Web.Mvc;
 using ClayOnWheels.Models.EF;
 using System.Linq;
+using ClayOnWheels.Functions;
 
 namespace ClayOnWheels.Controllers
 {
@@ -65,6 +66,15 @@ namespace ClayOnWheels.Controllers
             {
                 _db.Subscriptions.Add(subscriptions);
                 _db.SaveChanges();
+
+                var id = subscriptions.UserId;
+                var s = _db.AspNetUsers.FirstOrDefault(f => f.Id == id);
+                if (s != null)
+                {
+                    var email = s.Email;
+                    var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\BetalingOntvangen.html"));
+                    Mailer.SendEmail(email, "Betaling gelukt bij Clay on Wheels", body);
+                }
                 return RedirectToAction("Index");
             }
 

@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using ClayOnWheels.Models;
 using System.Linq;
 using System.Security.Claims;
 using System.Web.Mvc;
+using ClayOnWheels.Functions;
 using ClayOnWheels.Models.EF;
 
 namespace ClayOnWheels.Controllers
@@ -20,7 +20,6 @@ namespace ClayOnWheels.Controllers
             {
                 _isAdmin = ClaimsPrincipal.Current.IsInRole("Admin");
             }
-            // ViewBag.TotalSubscriptions = CalculateSubscriptionsForCurrentUser();
             ViewBag.isAdmin = _isAdmin;
 
             return View();
@@ -63,10 +62,7 @@ namespace ClayOnWheels.Controllers
         public bool BookWorkshop(int id)
         {
             var total = CalculateSubscriptionsForCurrentUser();
-            if (total == 1)
-            {
-                //todo: Send mail to notify user he/she has to renew subscriptions
-            }
+            var sendMail = total == 1;
             if (total > 0)
             {
                 _db.UserSubscriptions.Add(new UserSubscription
@@ -77,6 +73,12 @@ namespace ClayOnWheels.Controllers
                     Pending = 0
                 });
                 _db.SaveChangesAsync();
+                var user = _db.AspNetUsers.FirstOrDefault(w => w.Id == GetUserId());
+                if (user != null)
+                {
+                    var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\BeurtenOp.html"));
+                    Mailer.SendEmail(user.Email, "Aanvraag nieuwe beurtenkaart van Clay on Wheels", body);
+                }
                 return true;
             }
             return false;
