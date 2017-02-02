@@ -16,7 +16,10 @@ namespace ClayOnWheels.Controllers
         [Authorize]
         public ActionResult Index()
         {
-            
+            if (ClaimsPrincipal.Current != null)
+            {
+                _isAdmin = ClaimsPrincipal.Current.IsInRole("Admin");
+            }
             // ViewBag.TotalSubscriptions = CalculateSubscriptionsForCurrentUser();
             ViewBag.isAdmin = _isAdmin;
 
