@@ -258,10 +258,23 @@ namespace ClayOnWheels.Controllers
 
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                 // Send an email with this link
-                // string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                // var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);		
-                // await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
-                // return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                var code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+
+                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+
+
+                if (callbackUrl != null)
+                {
+                    var uri = new Uri(callbackUrl);
+                    var clean = uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port,
+                            UriFormat.UriEscaped);
+                    var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\ResetPassword.html"));
+                    body = body.Replace("[LINK]", clean);
+                    Mailer.SendEmail(user.Email, "Reset uw wachtwoord bij Clay on Wheels", body);
+                }
+                //await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                return RedirectToAction("ForgotPasswordConfirmation", "Account");
+
             }
 
             // If we got this far, something failed, redisplay form

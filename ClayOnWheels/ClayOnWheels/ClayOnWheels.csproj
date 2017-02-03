@@ -307,6 +307,7 @@
     <Content Include="MailTemplates\BetalingOntvangen.html" />
     <Content Include="MailTemplates\AfterConfirmationFailed.html" />
     <Content Include="MailTemplates\BeurtenOp.html" />
+    <Content Include="MailTemplates\ResetPasswoord.html" />
     <Content Include="MailTemplates\ConfirmAccount.html" />
     <Content Include="MailTemplates\AfterConfirmationSuccess.html" />
     <Content Include="Models\EF\Dairy.tt">

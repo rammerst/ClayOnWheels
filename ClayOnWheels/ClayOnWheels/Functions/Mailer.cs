@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Linq;
 using System.Net.Mail;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace ClayOnWheels.Functions
@@ -44,7 +45,7 @@ namespace ClayOnWheels.Functions
                 // method to identify this send operation.
                 // For this example, the userToken is a string constant.
                 var userState = "test message1";
-                client.Send(message);
+                client.SendAsync(message, userState);
 
                 // Clean up.
                 message.Dispose();
