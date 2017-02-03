@@ -160,6 +160,7 @@ namespace ClayOnWheels.Controllers
         {
             if (ModelState.IsValid)
             {
+                var totalActive = _db.AspNetUsers.Count(w => w.Active);
                 var user = new ApplicationUser
                 {
                     UserName = model.Email,
@@ -168,7 +169,8 @@ namespace ClayOnWheels.Controllers
                     City = model.City,
                     FirstName = model.FirstName,
                     LastName = model.LastName,
-                    PostalCode = model.PostalCode
+                    PostalCode = model.PostalCode,
+                    Active = totalActive < 70
                 };
                 // Add the Address properties:
                 var result = await UserManager.CreateAsync(user, model.Password);

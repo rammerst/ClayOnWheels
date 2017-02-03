@@ -231,6 +231,10 @@
     <Compile Include="Migrations\201702011846572_sfl.Designer.cs">
       <DependentUpon>201702011846572_sfl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201702030705185_joske.cs" />
+    <Compile Include="Migrations\201702030705185_joske.Designer.cs">
+      <DependentUpon>201702030705185_joske.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\EF\Dairy.cs">
@@ -410,6 +414,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201702011846572_sfl.resx">
       <DependentUpon>201702011846572_sfl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702030705185_joske.resx">
+      <DependentUpon>201702030705185_joske.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
