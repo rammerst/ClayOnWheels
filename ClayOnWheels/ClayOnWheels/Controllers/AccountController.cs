@@ -185,13 +185,13 @@ namespace ClayOnWheels.Controllers
                     if (callbackUrl != null)
                     {
                         var uri = new Uri(callbackUrl);
-                        var clean = uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port,
+                        var clean = uri.ToString().Contains("localhost") ? uri.ToString() : uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port,
                                 UriFormat.UriEscaped);
                         var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\ConfirmAccount.html"));
                         body = body.Replace("[LINK]", clean);
                         Mailer.SendEmail(user.Email, "Bevstig uw account bij Clay on Wheels", body);
                     }
-                    
+
                     return RedirectToAction("Index", "Home");
                 }
                 AddErrors(result);
@@ -200,7 +200,7 @@ namespace ClayOnWheels.Controllers
             // If we got this far, something failed, redisplay form
             return View(model);
         }
-        
+
         //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
@@ -225,9 +225,9 @@ namespace ClayOnWheels.Controllers
                     var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\AfterConfirmationSuccess.html"));
                     Mailer.SendEmail(user.Email, "Registratie gelukt bij Clay on Wheels", body);
                 }
-              
+
             }
-            
+
             var result = await UserManager.ConfirmEmailAsync(userId, code);
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
@@ -542,6 +542,6 @@ namespace ClayOnWheels.Controllers
         }
         #endregion
 
-     
+
     }
 }
