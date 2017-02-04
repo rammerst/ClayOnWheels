@@ -190,7 +190,7 @@ namespace ClayOnWheels.Controllers
                         var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\ConfirmAccount.html"));
                         body = body.Replace("[LINK]", clean);
                         body = body.Replace("[NAME]", model.FirstName);
-                        Mailer.SendEmail(user.Email, "Bevstig uw account bij Clay on Wheels", body);
+                        Mailer.SendEmail(user.Email, "Bevestig uw account bij Clay on Wheels", body);
                     }
 
                     return RedirectToAction("Index", "Home");
