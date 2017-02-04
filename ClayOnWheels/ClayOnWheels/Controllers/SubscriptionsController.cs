@@ -71,8 +71,9 @@ namespace ClayOnWheels.Controllers
                 var s = _db.AspNetUsers.FirstOrDefault(f => f.Id == id);
                 if (s != null)
                 {
-                    var email = s.Email;
+                    var email = s.Email;                  
                     var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\BetalingOntvangen.html"));
+                    body = body.Replace("[NAME]", s.FirstName);
                     Mailer.SendEmail(email, "Betaling gelukt bij Clay on Wheels", body);
                 }
                 return RedirectToAction("Index");

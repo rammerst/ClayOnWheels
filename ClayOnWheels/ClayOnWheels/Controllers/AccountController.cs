@@ -220,11 +220,13 @@ namespace ClayOnWheels.Controllers
                     if (usersRegistered >= 70)
                     {
                         var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\AfterConfirmationFailed.html"));
+                        body = body.Replace("[NAME]", user.FirstName);
                         Mailer.SendEmail(user.Email, "Registratie gelukt bij Clay on Wheels - wachtlijst", body);
                     }
                     else
                     {
                         var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\AfterConfirmationSuccess.html"));
+                        body = body.Replace("[NAME]", user.FirstName);
                         Mailer.SendEmail(user.Email, "Registratie gelukt bij Clay on Wheels", body);
                     }
                     return View("ConfirmEmail");
