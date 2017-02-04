@@ -257,8 +257,9 @@ namespace ClayOnWheels.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindByNameAsync(model.Email);
-                if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
+                var user = _db.AspNetUsers.FirstOrDefault(w => w.Email == model.Email);
+                //var user = await UserManager.FindByNameAsync(model.Email);
+                if (user == null) //|| !(await UserManager.IsEmailConfirmedAsync(user.Id))s
                 {
                     // Don't reveal that the user does not exist or is not confirmed
                     return View("ForgotPasswordConfirmation");
@@ -274,10 +275,11 @@ namespace ClayOnWheels.Controllers
                 if (callbackUrl != null)
                 {
                     var uri = new Uri(callbackUrl);
-                    var clean = uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port,
+                    var clean = uri.ToString().Contains("localhost") ? uri.ToString() : uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port,
                             UriFormat.UriEscaped);
-                    var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\ResetPassword.html"));
+                    var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\ResetPasswoord.html"));
                     body = body.Replace("[LINK]", clean);
+                    body = body.Replace("[NAME]", user.FirstName);
                     Mailer.SendEmail(user.Email, "Reset uw wachtwoord bij Clay on Wheels", body);
                 }
                 //await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");

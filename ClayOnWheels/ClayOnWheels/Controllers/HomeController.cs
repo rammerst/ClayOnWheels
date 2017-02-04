@@ -77,6 +77,7 @@ namespace ClayOnWheels.Controllers
                 if (user != null)
                 {
                     var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\BeurtenOp.html"));
+                    body = body.Replace("[NAME]", user.FirstName);
                     Mailer.SendEmail(user.Email, "Aanvraag nieuwe beurtenkaart van Clay on Wheels", body);
                 }
                 return true;
