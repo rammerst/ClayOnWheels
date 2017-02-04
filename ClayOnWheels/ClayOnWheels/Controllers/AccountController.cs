@@ -210,26 +210,32 @@ namespace ClayOnWheels.Controllers
             {
                 return View("Error");
             }
-
-            var user = _db.AspNetUsers.FirstOrDefault(w => w.Id == userId);
-            if (user != null)
+            try
             {
-                var usersRegistered = _db.AspNetUsers.Count(w => w.Active);
-                if (usersRegistered >= 70)
+                var user = _db.AspNetUsers.FirstOrDefault(w => w.Id == userId);
+                if (user != null)
                 {
-                    var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\AfterConfirmationFailed.html"));
-                    Mailer.SendEmail(user.Email, "Registratie gelukt bij Clay on Wheels - wachtlijst", body);
+                    var usersRegistered = _db.AspNetUsers.Count(w => w.Active);
+                    if (usersRegistered >= 70)
+                    {
+                        var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\AfterConfirmationFailed.html"));
+                        Mailer.SendEmail(user.Email, "Registratie gelukt bij Clay on Wheels - wachtlijst", body);
+                    }
+                    else
+                    {
+                        var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\AfterConfirmationSuccess.html"));
+                        Mailer.SendEmail(user.Email, "Registratie gelukt bij Clay on Wheels", body);
+                    }
+                    return View("ConfirmEmail");
                 }
-                else
-                {
-                    var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\AfterConfirmationSuccess.html"));
-                    Mailer.SendEmail(user.Email, "Registratie gelukt bij Clay on Wheels", body);
-                }
-
             }
-
-            var result = await UserManager.ConfirmEmailAsync(userId, code);
-            return View(result.Succeeded ? "ConfirmEmail" : "Error");
+            catch (Exception ex)
+            {
+                // var result = await UserManager.ConfirmEmailAsync(userId, code);
+                //sSystem.Diagnostics.Tracing.L
+                return View("Error");
+            }
+            
         }
 
         //
