@@ -189,6 +189,7 @@ namespace ClayOnWheels.Controllers
                                 UriFormat.UriEscaped);
                         var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\ConfirmAccount.html"));
                         body = body.Replace("[LINK]", clean);
+                        body = body.Replace("[NAME]", model.FirstName);
                         Mailer.SendEmail(user.Email, "Bevstig uw account bij Clay on Wheels", body);
                     }
 
@@ -204,7 +205,7 @@ namespace ClayOnWheels.Controllers
         //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
-        public async Task<ActionResult> ConfirmEmail(string userId, string code)
+        public ActionResult ConfirmEmail(string userId, string code)
         {
             if (userId == null || code == null)
             {
@@ -235,7 +236,8 @@ namespace ClayOnWheels.Controllers
                 //sSystem.Diagnostics.Tracing.L
                 return View("Error");
             }
-            
+            return View("Error");
+
         }
 
         //
