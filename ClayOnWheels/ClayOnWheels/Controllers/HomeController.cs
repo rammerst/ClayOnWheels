@@ -74,7 +74,7 @@ namespace ClayOnWheels.Controllers
                 });
                 _db.SaveChangesAsync();
                 var user = _db.AspNetUsers.FirstOrDefault(w => w.Id == GetUserId());
-                if (user != null)
+                if (user != null && sendMail)
                 {
                     var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\BeurtenOp.html"));
                     body = body.Replace("[NAME]", user.FirstName);

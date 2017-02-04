@@ -41,7 +41,7 @@ namespace ClayOnWheels.Models.EF
                         ID = item.Id,
                         StartDateString = item.DateTimeScheduled.ToString("s"),
                         EndDateString = item.DateTimeScheduled.AddMinutes(item.AppointmentLength).ToString("s"),
-                        Title = item.Title + " - " + item.AppointmentLength + " mins"
+                        Title = item.Title
                     };
 
                     // "s" is a preset format that outputs as: "2009-02-27T12:12:22"
