@@ -1,10 +1,44 @@
 ﻿@{
     ViewBag.Title = "Calender";
 }
+<style type="text/css">
+    .panel-default {
+        width: 415px;
+    }
 
+    .box {
+        display: inline-block;
+        height: 20px;
+        width: 35px;
+        border: 2px solid;
+    }
+</style>
 @section scripts{
 
     <script>
+        var colorList = {'Beschikbaar - Boek hier je les': 'rgb(1, 223, 58)', 'Les correct geboekt - Klik hier om te annuleren.':'#FF9933','Les volzet - Deze les is momenteel volzet.': 'red', 'Geen les / verleden - Hier kan u niet boeken.': '#fcfc58','Geannuleerd - uitzonderlijk geen les':'#ABABAB'};
+
+        colorize = function(colorList) {
+            var container = document.getElementById('container');
+
+            for (var key in colorList) {
+                var boxContainer = document.createElement("DIV");
+                var box = document.createElement("DIV");
+                var label = document.createElement("SPAN");
+
+                label.innerHTML = '  ' + key;
+                box.className = "box";
+                box.style.backgroundColor = colorList[key];
+
+                boxContainer.appendChild(box);
+                boxContainer.appendChild(label);
+
+                container.appendChild(boxContainer);
+
+            }
+        }
+
+
         function CalculateSubscriptions() {
             $.ajax({
                 type: 'GET',
@@ -102,35 +136,46 @@
                             $('#bookDateEnd').text($.fullCalendar.formatDate(calEvent.end, 'HH:mm'));
 
                             var weekDay = $.fullCalendar.formatDate(calEvent.start, 'dddd').toLowerCase();
-                            weekDay += ' ' + $.fullCalendar.formatDate(calEvent.start, 'H').toLowerCase();
+                            weekDay += ' ' + $.fullCalendar.formatDate(calEvent.start, 'dd').toLowerCase();
                             weekDay += ' ' + $.fullCalendar.formatDate(calEvent.start, 'MMMM').toLowerCase();
                             if (calEvent.someKey === 666) {
-                                $('#bookTitle').text('Annuleer de cursus van ' + weekDay);
+                                $('#bookTitle').text('Annuleer de les van ' + weekDay);
                             } else {
-                                $('#bookTitle').text('Boek een cursus op ' + weekDay);
+                                $('#bookTitle').text('Boek een les op ' + weekDay);
                             }
 
 
                             @if (ViewBag.isAdmin)
                             {
                                 <text>
-                                    ShowBookedEvents(calEvent.id, calEvent.someKey);
-                                </text>
+                            ShowBookedEvents(calEvent.id, calEvent.someKey);
+                            </text>
                             }
                             else
                             {
                                 <text>
                             if (calEvent.someKey === 3 || calEvent.someKey === 4) {
                                 if (calEvent.someKey === 3) {
-                                    ShowInfoModal("Vakantie: Op deze dag kan u geen cursus boeken.");
+                                    ShowInfoModal("Vakantie: Op deze dag kan u geen les boeken.");
                                 } else {
-                                    ShowInfoModal("Cursus volzet: Op deze dag kan u geen cursus boeken.");
+                                    if (calEvent.someKey === 2){
+                                        ShowInfoModal("Les geannuleerd: Op deze dag kan u geen les boeken.");
+                                    }else{
+                                        if(calEvent.someKey === 0){
+                                            ShowInfoModal("Les boeken niet mogelijk: Lessen in het verleden of tot 24 u voor de les zijn niet boekbaar");
+                                        }else{
+                                            //4
+                                            ShowInfoModal("Les volzet: Op deze dag kan u geen les boeken.");
+                                        }
+                                       
+                                    }
+                                    
                                 }
 
                             } else {
                                 var items = $("#amount").val();
                                 if (items === "0") {
-                                    ShowInfoModal("U hebt geen resterende beurten, gelieve eerste een beurtenkaart aan te schaffen.");
+                                    ShowInfoModal("Een les boeken is momenteel niet mogelijk.<br/><br/> Gelieve 250 euro te storten op onze rekening BE 76 3630 8223 2495. <br/><br/>Bij ontvangst van je betaling kan je boeken. <br/>Je word per mail verwittigd wanneer je kan starten met boeken.");
                                 } else {
                                     BookEvent(calEvent.id, calEvent.someKey);
                                 }
@@ -161,7 +206,7 @@
                         {
                             <text>
                         dayClick: function(date, allDay, jsEvent, view) {
-                            $('#eventTitle').val("Cursus keramiek");
+                            $('#eventTitle').val("Boek hier je les");
                             $('#eventDate').val($.fullCalendar.formatDate(date, 'dd/MM/yyyy'));
                             $('#eventTime').val($.fullCalendar.formatDate(date, 'HH:mm'));
                             var dateEnd = addMinutes(date, 180);
@@ -189,6 +234,8 @@
                     });
 
                 CalLoading = true;
+
+                colorize(colorList);
             });
 
         $('#btnPopupCancel')
@@ -230,7 +277,7 @@
                     success: function(response) {
                         if (response === 'True') {
                             $('#calendar').fullCalendar('refetchEvents');
-                            alert('Uw cursus is succesvol toegevoegd, goed bezig myriam');
+                            alert('Uw les is succesvol toegevoegd, goed bezig myriam');
                         } else {
                             alert('Error, could not save event!');
                         }
@@ -318,7 +365,7 @@
 
         $('#btnRemoveEvent')
             .click(function() {
-                if (confirm('Bent u zeker dat u deze cursus wil annuleren?')) {
+                if (confirm('Bent u zeker dat u deze les wil annuleren?')) {
                     $('#popupEventFormBookAdmin').modal('hide');
 
                     var dataRow = {
@@ -342,6 +389,33 @@
 
             });
 
+        $('#btnRemoveReplaceEvent')
+           .click(function() {
+               if (confirm('Bent u zeker dat u deze les wil annuleren?')) {
+                   $('#popupEventFormBookAdmin').modal('hide');
+
+                   var dataRow = {
+                       'id': $('#bookEventAdminID').val(),
+                       'withReplacement': 'True'
+                   }
+
+                   $.ajax({
+                       type: 'POST',
+                       url: "/Home/RemoveWorkshop",
+                       data: dataRow,
+                       success: function(response) {
+                           if (response === 'True') {
+                               $('#calendar').fullCalendar('refetchEvents');
+                               // CalculateSubscriptions();
+                           } else {
+                               alert('Error, could not save event!');
+                           }
+                       }
+                   });
+               }
+
+           });
+
         function ShowBookedEvents(Id, SpecialId) {
             $('#popupEventFormBookAdmin').modal();
             $('#bookEventAdminID').val(Id);
@@ -350,7 +424,7 @@
         }
 
         function ShowInfoModal(message) {
-            $('#infoMsg').text(message);
+            $('#infoMsg').html(message);
             $('#infoModal').modal();
         }
 
@@ -427,153 +501,201 @@
 
 
     <div id="calendar" style="width: 100%"></div>
-
-</div>
-
-<!-- Modal popup to create a new event record -->
-<div class="modal" id="popupEventForm">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Voeg een cursus toe:</h2>
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        <input type="hidden" id="eventID">
-                        <div class="col-md-4">Titel</div>
-                        <div class="col-md-8">
-                            <input id="eventTitle" type="text" placeholder="Geef een title (optioneel)" />
+    <br />
+    <div class="content">
+        <div class="body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Legende</div>
+                            <div class="panel-body">
+                                <div id="container">
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <p>&nbsp;</p>
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="col-md-4">Datum</div>
-                        <div class="col-md-8">
-                            <input id="eventDate" type="text" />
-                        </div>
                     </div>
-                </div>
-                <p>&nbsp;</p>
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="col-md-4">Aanvang cursus</div>
-                        <div class="col-md-8">
-                            <input id="eventTime" type="text" />
-                        </div>
-                    </div>
-                </div>
-                <p>&nbsp;</p>
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="col-md-4">Einde cursus</div>
-                        <div class="col-md-8">
-                            <input id="eventTimeEnd" type="text" />
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Stappenplan</div>
+                            <div class="panel-body">
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <div class="col-md-10">
+                                            <ul>
+                                                <li>
+                                                    <b>Stap 1: </b> Kies een juiste dag
+                                                </li>
+                                                <li>
+                                                    <b>Stap 2: </b> Klik op een groen vrij moment
+                                                </li>
+                                                <li>
+                                                    <b>Stap 3: </b> Klik op 'Boek les'
+                                                </li>
+                                                <li>
+                                                    <b>Stap 4: </b> Uw les is geboekt
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <p>&nbsp;</p>
             </div>
-            <div class="modal-footer">
-                <button type="button" id="btnPopupCancel" data-dismiss="modal" class="btn btn-danger">Cancel</button>
-                <button type="button" id="btnPopupSave" data-dismiss="modal" class="btn btn-primary">Bewaar cursus</button>
-                <button type="button" id="btnPopupSaveHoliday" data-dismiss="modal" class="btn btn-warning">Bewaar als verlof</button>
-            </div>
         </div>
     </div>
-</div>
+            
+         
 
-<div class="modal" id="popupEventFormBook">
-    <div class="modal-dialog">
-        <input type="hidden" id="bookEventID">
-        <input type="hidden" id="statusCode">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><span id="bookTitle"></span></h2>
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="col-md-4">Cursus start op:</div>
-                        <div class="col-md-8">
-                            <span id="bookDateStart"></span>
+            <!-- Modal popup to create a new event record -->
+            <div class="modal" id="popupEventForm">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Voeg een les toe:</h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <input type="hidden" id="eventID">
+                                    <div class="col-md-4">Titel</div>
+                                    <div class="col-md-8">
+                                        <input id="eventTitle" type="text" placeholder="Geef een title (optioneel)" />
+                                    </div>
+                                </div>
+                            </div>
+                            <p>&nbsp;</p>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">Datum</div>
+                                    <div class="col-md-8">
+                                        <input id="eventDate" type="text" />
+                                    </div>
+                                </div>
+                            </div>
+                            <p>&nbsp;</p>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">Aanvang les</div>
+                                    <div class="col-md-8">
+                                        <input id="eventTime" type="text" />
+                                    </div>
+                                </div>
+                            </div>
+                            <p>&nbsp;</p>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">Einde les</div>
+                                    <div class="col-md-8">
+                                        <input id="eventTimeEnd" type="text" />
+                                    </div>
+                                </div>
+                            </div>
+                            <p>&nbsp;</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="btnPopupCancel" data-dismiss="modal" class="btn btn-danger">Cancel</button>
+                            <button type="button" id="btnPopupSave" data-dismiss="modal" class="btn btn-primary">Bewaar les</button>
+                            <button type="button" id="btnPopupSaveHoliday" data-dismiss="modal" class="btn btn-warning">Bewaar als verlof</button>
                         </div>
                     </div>
-                    <p>&nbsp;</p>
                 </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="col-md-4">Cursus eindigt op:</div>
-                        <div class="col-md-8">
-                            <span id="bookDateEnd"></span>
+            </div>
+
+            <div class="modal" id="popupEventFormBook">
+                <div class="modal-dialog">
+                    <input type="hidden" id="bookEventID">
+                    <input type="hidden" id="statusCode">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2><span id="bookTitle"></span></h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">Les start op:</div>
+                                    <div class="col-md-8">
+                                        <span id="bookDateStart"></span>
+                                    </div>
+                                </div>
+                                <p>&nbsp;</p>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">Les eindigt op:</div>
+                                    <div class="col-md-8">
+                                        <span id="bookDateEnd"></span>
+                                    </div>
+                                </div>
+                                <p>&nbsp;</p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="btnPopupCancelBook" data-dismiss="modal" class="btn btn-danger">Annuleer les</button>
+                            <button type="button" id="btnPopupSaveBook" data-dismiss="modal" class="btn btn-primary">Boek les</button>
                         </div>
                     </div>
-                    <p>&nbsp;</p>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" id="btnPopupCancelBook" data-dismiss="modal" class="btn btn-danger">Annuleer cursus</button>
-                <button type="button" id="btnPopupSaveBook" data-dismiss="modal" class="btn btn-primary">Boek cursus</button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="modal" id="popupEventFormBookAdmin">
-    <div class="modal-dialog">
-        <input type="hidden" id="bookEventAdminID">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Cursisten die momenteel geboekt hebben:</h2>
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12" id="divWithResults">
-                        <div class="col-md-4">Geboekte cursisten:</div>
-                        <div class="col-md-8">
-                            <ul class="mylist" />
+            <div class="modal" id="popupEventFormBookAdmin">
+                <div class="modal-dialog">
+                    <input type="hidden" id="bookEventAdminID">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Cursisten die momenteel geboekt hebben:</h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12" id="divWithResults">
+                                    <div class="col-md-4">Geboekte cursisten:</div>
+                                    <div class="col-md-8">
+                                        <ul class="mylist" />
+                                    </div>
+                                </div>
+                                <div class="col-md-12" id="divWithoutResults">
+                                    <span id="noResults"></span>
+                                </div>
+                                <p>&nbsp;</p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="btnRemoveCancel" data-dismiss="modal" class="btn btn-primary">Cancel</button>
+                            <button type="button" id="btnRemoveEvent" data-dismiss="modal" class="btn btn-danger">Annuleer les</button>
+                            <button type="button" id="btnRemoveReplaceEvent" data-dismiss="modal" class="btn btn-danger">Annuleer les EN TOON</button>
                         </div>
                     </div>
-                    <div class="col-md-12" id="divWithoutResults">
-                        <span id="noResults"></span>
-                    </div>
-                    <p>&nbsp;</p>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" id="btnRemoveCancel" data-dismiss="modal" class="btn btn-primary">Cancel</button>
-                <button type="button" id="btnRemoveEvent" data-dismiss="modal" class="btn btn-danger">Annuleer cursus</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal" id="infoModal">
-    <div class="modal-dialog">
-
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Cursus boeken is momenteel niet mogelijk:</h2>
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        <span id="infoMsg"></span>
+            <div class="modal" id="infoModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Een les boeken is momenteel niet mogelijk:</h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <span id="infoMsg"></span>
+                                </div>
+                                <p>&nbsp;</p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="btnCloseInfo" data-dismiss="modal" class="btn btn-primary">Sluit venster</button>
+                        </div>
                     </div>
-                    <p>&nbsp;</p>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" id="btnCloseInfo" data-dismiss="modal" class="btn btn-primary">Sluit venster</button>
-            </div>
         </div>
-    </div>
-</div>

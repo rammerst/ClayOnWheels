@@ -32,104 +32,149 @@ namespace ClayOnWheels.Controllers
 
         public void UpdateEvent(int id, string NewEventStart, string NewEventEnd)
         {
-            DiaryEvent.UpdateDiaryEvent(id, NewEventStart, NewEventEnd);
+            if (ClaimsPrincipal.Current != null)
+            {
+                DiaryEvent.UpdateDiaryEvent(id, NewEventStart, NewEventEnd);
+            }
         }
-
 
         public bool SaveEvent(string Title, string NewEventDate, string NewEventTime, string NewEventTimeEnd)
         {
-            return DiaryEvent.CreateNewEvent(Title, NewEventDate, NewEventTime, NewEventTimeEnd);
+            if (ClaimsPrincipal.Current != null)
+            {
+                return DiaryEvent.CreateNewEvent(Title, NewEventDate, NewEventTime, NewEventTimeEnd);
+            }
+            return false;
         }
 
         public bool SaveHoliday(string NewEventDate)
         {
-            return DiaryEvent.CreateHolidayNewEvent(NewEventDate);
+            if (ClaimsPrincipal.Current != null)
+            {
+                return DiaryEvent.CreateHolidayNewEvent(NewEventDate);
+            }
+            return false;
         }
 
         public bool BookWorkshopTemp(int id)
         {
-            _db.UserSubscriptions.Add(new UserSubscription
-            {
-                AppointmentDairyId = id,
-                UserId = GetUserId(),
-                Created = DateTime.Now,
-                Pending = 1
-            });
-            _db.SaveChangesAsync();
-            return true;
-        }
-
-        public bool BookWorkshop(int id)
-        {
-            var total = CalculateSubscriptionsForCurrentUser();
-            var sendMail = total == 1;
-            if (total > 0)
+            if (ClaimsPrincipal.Current != null)
             {
                 _db.UserSubscriptions.Add(new UserSubscription
                 {
                     AppointmentDairyId = id,
                     UserId = GetUserId(),
                     Created = DateTime.Now,
-                    Pending = 0
+                    Pending = 1
                 });
                 _db.SaveChangesAsync();
-                var user = _db.AspNetUsers.FirstOrDefault(w => w.Id == GetUserId());
-                if (user != null && sendMail)
-                {
-                    var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\BeurtenOp.html"));
-                    body = body.Replace("[NAME]", user.FirstName);
-                    Mailer.SendEmail(user.Email, "Aanvraag nieuwe beurtenkaart van Clay on Wheels", body);
-                }
                 return true;
             }
             return false;
-
         }
 
-        public bool RemoveWorkshop(int id)
+        public bool BookWorkshop(int id)
         {
-            try
+            if (ClaimsPrincipal.Current != null)
             {
-                var notifyUsers = _db.UserSubscriptions.Where(w => w.AppointmentDairyId == id && w.Pending != 1) ;
-                if (notifyUsers.Any())
+                var total = CalculateSubscriptionsForCurrentUser();
+                var sendMail = total == 1;
+                if (total > 0)
                 {
-                    foreach (var user in notifyUsers)
+                    _db.UserSubscriptions.Add(new UserSubscription
                     {
-                        //todo: send mail to user to notify the cursus is cancelled
+                        AppointmentDairyId = id,
+                        UserId = GetUserId(),
+                        Created = DateTime.Now,
+                        Pending = 0
+                    });
+                    _db.SaveChanges();
+                    var userId = GetUserId();
+                    var user = _db.AspNetUsers.FirstOrDefault(w => w.Id == userId);
+                    if (user != null && sendMail)
+                    {
+                        var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\BeurtenOp.html"));
+                        body = body.Replace("[NAME]", user.FirstName);
+                        Mailer.SendEmail(user.Email, "Aanvraag nieuwe beurtenkaart van Clay on Wheels", body);
                     }
+                    return true;
                 }
-                var obj = _db.UserSubscriptions.RemoveRange(notifyUsers);
-                var toRemove = _db.AppointmentDiaries.FirstOrDefault(w => w.Id == id);
-                _db.AppointmentDiaries.Remove(toRemove);
-                _db.SaveChangesAsync();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                var exce = ex;
-
+                return false;
             }
             return false;
+        }
 
+        public bool RemoveWorkshop(int id,bool withReplacement = false)
+        {
+            if (ClaimsPrincipal.Current != null)
+            {
+                try
+                {
+                    DateTime dateToUser;
+                    var notifyUsers = _db.UserSubscriptions.Where(w => w.AppointmentDairyId == id && w.Pending != 1);
+
+                    var obj = _db.UserSubscriptions.RemoveRange(notifyUsers);
+                    var toRemove = _db.AppointmentDiaries.FirstOrDefault(w => w.Id == id);
+                    dateToUser = toRemove.DateTimeScheduled;
+                    if (withReplacement)
+                    {
+                        toRemove.Title = "Annulering";
+                        toRemove.StatusEnum = 2;
+                    }
+                    else
+                    {
+                        _db.AppointmentDiaries.Remove(toRemove);
+                    }
+                    
+                    _db.SaveChanges();
+
+                    if (notifyUsers.Any())
+                    {
+                        foreach (var user in notifyUsers)
+                        {
+                            var userInfo = _db.AspNetUsers.FirstOrDefault(w => w.Id == user.UserId);
+                            if (userInfo != null)
+                            {
+                                var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\LesGeannuleer.html"));
+                                body = body.Replace("[NAME]", userInfo.FirstName);
+                                body = body.Replace("[DATECANCELLED]", dateToUser.ToString("dd'/'MM'/'yyyy' HH:MM"));
+                                Mailer.SendEmail(userInfo.Email, "Aanvraag nieuwe beurtenkaart van Clay on Wheels", body);
+                            }
+                        }
+                    }
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    var exce = ex;
+
+                }
+                return false;
+            }
+            return false;
         }
 
         public bool CancelWorkshop(int id)
         {
-            try
+            if (ClaimsPrincipal.Current != null)
             {
-                var userId = GetUserId();
-                var obj = _db.UserSubscriptions.First(w => w.AppointmentDairyId == id && w.UserId == userId);
-                _db.UserSubscriptions.Remove(obj);
-                _db.SaveChangesAsync();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                var exce = ex;
+                try
+                {
+                    var userId = GetUserId();
+                    var obj = _db.UserSubscriptions.First(w => w.AppointmentDairyId == id && w.UserId == userId);
+                    _db.UserSubscriptions.Remove(obj);
+                    _db.SaveChangesAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    var exce = ex;
 
+                }
+                return false;
             }
             return false;
-
         }
 
         public JsonResult GetDiarySummary(double start, double end)
@@ -208,10 +253,11 @@ namespace ClayOnWheels.Controllers
             return creditsSum;
         }
 
-        public string GetUserId()
+        public static string GetUserId()
         {
-            return ClaimsPrincipal.Current.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier)
+            var id = ClaimsPrincipal.Current.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier)
                     .Select(c => c.Value).SingleOrDefault();
+            return id;
         }
 
     }

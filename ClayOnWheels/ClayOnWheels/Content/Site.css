@@ -24,20 +24,21 @@ textarea {
     max-width: 280px;
 }
 
-.topMessageNormal{
-    background-color:none;
+.topMessageNormal {
+    background-color: none;
     color: black;
     font-size: 18px;
-    font-weight:normal;
+    font-weight: normal;
 }
 
-.topMessageDanger{
+.topMessageDanger {
     background-color: red;
     color: white;
     font-size: 20px;
     font-weight: bold;
 }
-.topMessageWarning{
+
+.topMessageWarning {
     background-color: orange;
     color: black;
     font-size: 20px;
@@ -45,24 +46,25 @@ textarea {
 }
 
 .ENQUIRY {
-    
     background-color: #FF9933;
-    border-color: #C0C0C0; 
+    border-color: #C0C0C0;
     color: White;
     background-position: 1px 1px;
     background-repeat: no-repeat;
-    background-image: url('ok.png');
-    padding-left: 50px;
+    /*background-image: url('ok.png');*/
+    padding-left: 10px;
+    padding-top: 20px;
 }
+
 .FULLYBOOKED {
-    
     background-color: red;
-    border-color: red; 
+    border-color: red;
     color: White;
     background-position: 1px 1px;
     background-repeat: no-repeat;
-    background-image: url('ok.png');
-    padding-left: 50px;
+    /*background-image: url('ok.png');*/
+    padding-left: 5px;
+    padding-top: 20px;
 }
 
 .BOOKED {
@@ -71,42 +73,52 @@ textarea {
     color: White; /* text color */
     background-position: 1px 1px;
     background-repeat: no-repeat;
-    background-image: url('ok.png');
-    padding-left: 0px;
+    /*background-image: url('ok.png');*/
+    padding-left: 5px;
+    padding-top: 20px;
 }
 
-.CONFIRMED {
-    background-color: #33CC33;
+.CANCELLED {
+    background-color: #ABABAB;
     border-color: #C0C0C0;
     color: White; /* text color */
     background-position: 1px 1px;
     background-repeat: no-repeat;
-    background-image: url('Money.png');
-    padding-left: 50px;
+    /*background-image: url('Money.png');*/
+    padding-left: 5px;
+    padding-top: 20px;
 }
 
 .HOLIDAYS {
-    background-color: #E2EB1E !important;
-    border-color: #E2EB1E !important;
-    color: black; /* text color */
+    background-color: #fcfc58 !important;
+    border-color: #fcfc58 !important;
+    color: black !important; /* text color */
     background-position: 1px 1px;
     background-repeat: no-repeat;
-    background-image: url('Money.png');
-    padding-left: 50px;
+    /*background-image: url('Money.png');*/
+    padding-left: 5px;
+    padding-top: 20px;
 }
 
 h2 {
-font-size: 20px !important;  /* !important added to force override of any other h2 in CSS*/
+    font-size: 20px !important; /* !important added to force override of any other h2 in CSS*/
 }
+
 .navbar-inverse {
     background-color: #e94d0a;
     border-color: #e94d0a;
 }
+
 .navbar {
     background-color: #e94d0a;
     border-color: #e94d0a;
 }
+
 .topMessage {
     font-size: 25px;
     font-weight: bold;
+}
+
+.fc-event-time {
+    display: none;
 }

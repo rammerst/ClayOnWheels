@@ -186,7 +186,7 @@ namespace ClayOnWheels.Models.EF
                 var ent = new MyDbContext();
                 var rec = new AppointmentDiary
                 {
-                    Title = "Verlof",
+                    Title = "Geen les",
                     DateTimeScheduled =
                         DateTime.ParseExact(NewEventDate + " " + "00:00", "dd/MM/yyyy HH:mm",
                             CultureInfo.InvariantCulture),
