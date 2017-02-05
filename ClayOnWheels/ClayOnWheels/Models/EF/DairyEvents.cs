@@ -51,7 +51,7 @@ namespace ClayOnWheels.Models.EF
                     if (userRslt.Contains(item.Id))
                     {
                         rec.StatusString = Enums.GetName((AppointmentStatus)1);
-                        rec.SomeImportantKeyID = 666;
+                        rec.SomeImportantKeyID = item.DateTimeScheduled <= DateTime.Now.AddDays(1) ? 667 : 666;
                     }
                     else
                     {
@@ -167,7 +167,7 @@ namespace ClayOnWheels.Models.EF
                 {
                     Title = Title,
                     DateTimeScheduled = start,
-                    AppointmentLength = (int) span.TotalMinutes
+                    AppointmentLength = (int)span.TotalMinutes
                 };
                 ent.AppointmentDiaries.Add(rec);
                 ent.SaveChanges();

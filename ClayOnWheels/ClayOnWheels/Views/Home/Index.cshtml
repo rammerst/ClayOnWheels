@@ -138,11 +138,7 @@
                             var weekDay = $.fullCalendar.formatDate(calEvent.start, 'dddd').toLowerCase();
                             weekDay += ' ' + $.fullCalendar.formatDate(calEvent.start, 'dd').toLowerCase();
                             weekDay += ' ' + $.fullCalendar.formatDate(calEvent.start, 'MMMM').toLowerCase();
-                            if (calEvent.someKey === 666) {
-                                $('#bookTitle').text('Annuleer de les van ' + weekDay);
-                            } else {
-                                $('#bookTitle').text('Boek een les op ' + weekDay);
-                            }
+                            
 
 
                             @if (ViewBag.isAdmin)
@@ -177,7 +173,8 @@
                                 if (items === "0") {
                                     ShowInfoModal("Een les boeken is momenteel niet mogelijk.<br/><br/> Gelieve 250 euro te storten op onze rekening BE 76 3630 8223 2495. <br/><br/>Bij ontvangst van je betaling kan je boeken. <br/>Je word per mail verwittigd wanneer je kan starten met boeken.");
                                 } else {
-                                    BookEvent(calEvent.id, calEvent.someKey);
+                                    
+                                    BookEvent(calEvent.id, calEvent.someKey,weekDay);
                                 }
                             }
                             </text>
@@ -428,19 +425,28 @@
             $('#infoModal').modal();
         }
 
-        function BookEvent(Id, SpecialId) {
+        function BookEvent(Id, SpecialId, weekDay) {
             $('#popupEventFormBook').modal();
             $('#bookEventID').val(Id);
             $('#statusCode').val(SpecialId);
-            if (SpecialId === 666) {
+            
+            if (SpecialId === 667) {
                 $('#btnPopupSaveBook').hide();
-                $('#btnPopupCancelBook').show();
-
-
-            } else {
                 $('#btnPopupCancelBook').hide();
-                $('#btnPopupSaveBook').show();
+                $('#bookTitle').text('Les geboekt op ' + weekDay);
+            }else{
+                if (SpecialId === 666) {
+                    $('#btnPopupSaveBook').hide();
+                    $('#btnPopupCancelBook').show();
+                    $('#bookTitle').text('Annuleer de les van ' + weekDay);
+
+                } else {
+                    $('#btnPopupCancelBook').hide();
+                    $('#btnPopupSaveBook').show();
+                    $('#bookTitle').text('Boek een les op ' + weekDay);
+                }
             }
+           
         }
 
         function ShowEventPopup(date) {
