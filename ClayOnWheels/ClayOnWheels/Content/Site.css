@@ -48,7 +48,8 @@ textarea {
 .ENQUIRY {
     background-color: #FF9933;
     border-color: #C0C0C0;
-    color: White;
+    color: black !important;
+    font-weight: bold;
     background-position: 1px 1px;
     background-repeat: no-repeat;
     /*background-image: url('ok.png');*/
@@ -60,6 +61,7 @@ textarea {
     background-color: red;
     border-color: red;
     color: White;
+    font-weight: bold;
     background-position: 1px 1px;
     background-repeat: no-repeat;
     /*background-image: url('ok.png');*/
@@ -71,6 +73,7 @@ textarea {
     background-color: #33CCFF;
     border-color: #C0C0C0;
     color: White; /* text color */
+    font-weight: bold;
     background-position: 1px 1px;
     background-repeat: no-repeat;
     /*background-image: url('ok.png');*/
@@ -82,6 +85,7 @@ textarea {
     background-color: #ABABAB;
     border-color: #C0C0C0;
     color: White; /* text color */
+    font-weight: bold;
     background-position: 1px 1px;
     background-repeat: no-repeat;
     /*background-image: url('Money.png');*/
@@ -93,6 +97,7 @@ textarea {
     background-color: #fcfc58 !important;
     border-color: #fcfc58 !important;
     color: black !important; /* text color */
+    font-weight: bold;
     background-position: 1px 1px;
     background-repeat: no-repeat;
     /*background-image: url('Money.png');*/
