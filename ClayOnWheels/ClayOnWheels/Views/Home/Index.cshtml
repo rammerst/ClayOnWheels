@@ -12,6 +12,11 @@
         width: 35px;
         border: 2px solid;
     }
+    .boxContainer {
+         display: flex;
+        align-items: center;
+        padding-bottom: 3px;
+    }
 </style>
 @section scripts{
 
@@ -23,10 +28,11 @@
 
             for (var key in colorList) {
                 var boxContainer = document.createElement("DIV");
+                boxContainer.className = "boxContainer";
                 var box = document.createElement("DIV");
                 var label = document.createElement("SPAN");
 
-                label.innerHTML = '  ' + key;
+                label.innerHTML = '&nbsp;  ' + key;
                 box.className = "box";
                 box.style.backgroundColor = colorList[key];
 
@@ -87,11 +93,9 @@
                         $.each(response,
                             function(i) {
                                 var li = $('<li/>')
-                                    //.addClass('ui-menu-item')
                                     .attr('role', 'menuitem')
                                     .appendTo(cList);
-                                var aaa = $('<span/>')
-                                    //.addClass('ui-all')
+                                    $('<span/>')
                                     .text(response[i])
                                     .appendTo(li);
                             });
@@ -117,8 +121,11 @@
                         maxTime: '22:00:00',
                         header: {
                             left: 'prev,next today',
-                            center: 'title',
-                            right: 'month,agendaWeek'
+                            center: 'title'
+                            @if (@ViewBag.isAdmin.ToString().ToLower() == "true")
+                            {
+                                <text>,right: 'month,agendaWeek'</text>
+                            }
                         },
                         views: {
                             listDay: { buttonText: 'list day' },
@@ -138,7 +145,7 @@
                             var weekDay = $.fullCalendar.formatDate(calEvent.start, 'dddd').toLowerCase();
                             weekDay += ' ' + $.fullCalendar.formatDate(calEvent.start, 'd').toLowerCase();
                             weekDay += ' ' + $.fullCalendar.formatDate(calEvent.start, 'MMMM').toLowerCase();
-                            
+
 
 
                             @if (ViewBag.isAdmin)
@@ -164,9 +171,9 @@
                                             //4
                                             ShowInfoModal("Les volzet: Op deze dag kan u geen les boeken.");
                                         }
-                                       
+
                                     }
-                                    
+
                                 }
 
                             } else {
@@ -174,7 +181,7 @@
                                 if (items === "0") {
                                     ShowInfoModal("Een les boeken is momenteel niet mogelijk.<br/><br/> Gelieve 250 euro te storten op onze rekening BE 76 3630 8223 2495. <br/><br/>Bij ontvangst van je betaling kan je boeken. <br/>Je word per mail verwittigd wanneer je kan starten met boeken.");
                                 } else {
-                                    
+
                                     BookEvent(calEvent.id, calEvent.someKey,weekDay);
                                 }
                             }
@@ -430,7 +437,7 @@
             $('#popupEventFormBook').modal();
             $('#bookEventID').val(Id);
             $('#statusCode').val(SpecialId);
-            
+
             if (SpecialId === 667) {
                 $('#btnPopupSaveBook').hide();
                 $('#btnPopupCancelBook').hide();
@@ -447,7 +454,7 @@
                     $('#bookTitle').text('Boek een les op ' + weekDay);
                 }
             }
-           
+
         }
 
         function ShowEventPopup(date) {
