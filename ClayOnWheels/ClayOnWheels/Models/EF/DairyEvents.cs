@@ -18,6 +18,7 @@ namespace ClayOnWheels.Models.EF
         public string StatusString;
         public string StatusColor;
         public string ClassName;
+        public int OriginalKeyID;
 
 
         public static List<DiaryEvent> LoadAllAppointmentsInDateRange(double start, double end, string userid)
@@ -55,6 +56,7 @@ namespace ClayOnWheels.Models.EF
                     }
                     else
                     {
+                        rec.OriginalKeyID = item.StatusEnum;
                         //when no admin (so cursist) & 24hours before event, show as unavailable = gray
                         if (item.DateTimeScheduled <= DateTime.Now.AddDays(1) && !isAdmin)
                         {

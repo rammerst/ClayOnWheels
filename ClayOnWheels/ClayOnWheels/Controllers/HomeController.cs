@@ -15,7 +15,7 @@ namespace ClayOnWheels.Controllers
     {
         private bool _isAdmin;
         private readonly MyDbContext _db = new MyDbContext();
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        //private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         [Authorize]
         public ActionResult Index()
@@ -154,7 +154,7 @@ namespace ClayOnWheels.Controllers
                 }
                 catch (Exception ex)
                 {
-                    logger.ErrorException("Exception in RemoveWorkshop", ex);
+                    //logger.ErrorException("Exception in RemoveWorkshop", ex);
                     throw;
 
                 }
@@ -195,6 +195,7 @@ namespace ClayOnWheels.Controllers
                                 start = e.StartDateString,
                                 end = e.EndDateString,
                                 someKey = e.SomeImportantKeyID,
+                                textKey = e.OriginalKeyID,
                                 allDay = false
                             };
             var rows = eventList.ToArray();
@@ -214,6 +215,7 @@ namespace ClayOnWheels.Controllers
                                 color = e.StatusColor,
                                 className = e.ClassName,
                                 someKey = e.SomeImportantKeyID,
+                                textKey = e.OriginalKeyID,
                                 allDay = false
                             };
             var rows = eventList.ToArray();

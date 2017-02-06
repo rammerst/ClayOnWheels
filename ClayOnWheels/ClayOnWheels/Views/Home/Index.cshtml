@@ -10,7 +10,7 @@
         display: inline-block;
         height: 20px;
         width: 35px;
-        border: 2px solid;
+        border: 1px solid;
     }
     .boxContainer {
          display: flex;
@@ -21,7 +21,13 @@
 @section scripts{
 
     <script>
-        var colorList = {'Beschikbaar - Boek hier je les': 'rgb(1, 223, 58)', 'Les correct geboekt - Klik hier om te annuleren.':'#FF9933','Les volzet - Deze les is momenteel volzet.': 'red', 'Geen les / verleden - Hier kan u niet boeken.': '#fcfc58','Geannuleerd - uitzonderlijk geen les':'#ABABAB'};
+        var colorList = {
+            'Beschikbaar - Boek hier je les': 'rgb(1, 223, 58)',
+            'Les correct geboekt - Klik hier om te annuleren.': '#FF9933',
+            'Les volzet - Deze les is momenteel volzet.': 'red',
+            'Geen les / verleden - Hier kan u niet boeken.': '#fcfc58',
+            'Geannuleerd - uitzonderlijk geen les': '#ABABAB'
+        };
 
         colorize = function(colorList) {
             var container = document.getElementById('container');
@@ -55,12 +61,12 @@
                         var result = response;
                         if (result === 1) {
                             response += ' beurt over.';
-                            $("#topMessage").attr("class","topMessageWarning");
+                            $("#topMessage").attr("class", "topMessageWarning");
                         } else {
-                            if (result <= 0){
-                                $("#topMessage").attr("class","topMessageDanger");
-                            }else{
-                                $("#topMessage").attr("class","topMessageNormal");
+                            if (result <= 0) {
+                                $("#topMessage").attr("class", "topMessageDanger");
+                            } else {
+                                $("#topMessage").attr("class", "topMessageNormal");
                             }
                             response += ' beurten over.';
                         }
@@ -95,7 +101,7 @@
                                 var li = $('<li/>')
                                     .attr('role', 'menuitem')
                                     .appendTo(cList);
-                                    $('<span/>')
+                                $('<span/>')
                                     .text(response[i])
                                     .appendTo(li);
                             });
@@ -124,7 +130,8 @@
                             center: 'title'
                             @if (@ViewBag.isAdmin.ToString().ToLower() == "true")
                             {
-                                <text>,right: 'month,agendaWeek'</text>
+                                <text>,
+                            right: 'month,agendaWeek'</text>
                             }
                         },
                         views: {
@@ -160,14 +167,28 @@
                             console.log(calEvent);
                             if (calEvent.someKey === 3 || calEvent.someKey === 4 || calEvent.someKey === 2) {
                                 if (calEvent.someKey === 3) {
-                                    ShowInfoModal("Vakantie: Op deze dag kan u geen les boeken.");
-                                } else {
-                                    if (calEvent.someKey === 2){
+                                    if (calEvent.textKey === 2) {
                                         ShowInfoModal("Les geannuleerd: Op deze dag kan u geen les boeken.");
-                                    }else{
-                                        if(calEvent.someKey === 0){
+
+                                    } else {
+                                        if (calEvent.textKey === 4) {
+                                            ShowInfoModal("Les volzet: Op deze dag kan u geen les boeken.");
+                                        } else {
+                                            if (calEvent.textKey === 3) {
+                                                ShowInfoModal("Vakantie: Op deze dag kan u geen les boeken.");
+                                            } else {
+                                                //0
+                                                ShowInfoModal("Les boeken niet mogelijk: Lessen in het verleden of tot 24 u voor de les zijn niet boekbaar");
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    if (calEvent.someKey === 2) {
+                                        ShowInfoModal("Les geannuleerd: Op deze dag kan u geen les boeken.");
+                                    } else {
+                                        if (calEvent.someKey === 0) {
                                             ShowInfoModal("Les boeken niet mogelijk: Lessen in het verleden of tot 24 u voor de les zijn niet boekbaar");
-                                        }else{
+                                        } else {
                                             //4
                                             ShowInfoModal("Les volzet: Op deze dag kan u geen les boeken.");
                                         }
@@ -182,7 +203,7 @@
                                     ShowInfoModal("Een les boeken is momenteel niet mogelijk.<br/><br/> Gelieve 250 euro te storten op onze rekening BE 76 3630 8223 2495. <br/><br/>Bij ontvangst van je betaling kan je boeken. <br/>Je word per mail verwittigd wanneer je kan starten met boeken.");
                                 } else {
 
-                                    BookEvent(calEvent.id, calEvent.someKey,weekDay);
+                                    BookEvent(calEvent.id, calEvent.someKey, weekDay);
                                 }
                             }
                             </text>
@@ -250,15 +271,14 @@
             });
 
         $('#btnRemoveCancel')
-           .click(function() {
-               $('#popupEventFormBookAdmin').modal('hide');
-           });
+            .click(function() {
+                $('#popupEventFormBookAdmin').modal('hide');
+            });
 
         $('#btnCloseInfo')
-           .click(function() {
-               $('#infoModal').modal('hide');
-           });
-
+            .click(function() {
+                $('#infoModal').modal('hide');
+            });
 
 
         $('#btnPopupSave')
@@ -395,31 +415,31 @@
             });
 
         $('#btnRemoveReplaceEvent')
-           .click(function() {
-               if (confirm('Bent u zeker dat u deze les wil annuleren?')) {
-                   $('#popupEventFormBookAdmin').modal('hide');
+            .click(function() {
+                if (confirm('Bent u zeker dat u deze les wil annuleren?')) {
+                    $('#popupEventFormBookAdmin').modal('hide');
 
-                   var dataRow = {
-                       'id': $('#bookEventAdminID').val(),
-                       'withReplacement': 'True'
-                   }
+                    var dataRow = {
+                        'id': $('#bookEventAdminID').val(),
+                        'withReplacement': 'True'
+                    }
 
-                   $.ajax({
-                       type: 'POST',
-                       url: "/Home/RemoveWorkshop",
-                       data: dataRow,
-                       success: function(response) {
-                           if (response === 'True') {
-                               $('#calendar').fullCalendar('refetchEvents');
-                               // CalculateSubscriptions();
-                           } else {
-                               alert('Error, could not save event!');
-                           }
-                       }
-                   });
-               }
+                    $.ajax({
+                        type: 'POST',
+                        url: "/Home/RemoveWorkshop",
+                        data: dataRow,
+                        success: function(response) {
+                            if (response === 'True') {
+                                $('#calendar').fullCalendar('refetchEvents');
+                                // CalculateSubscriptions();
+                            } else {
+                                alert('Error, could not save event!');
+                            }
+                        }
+                    });
+                }
 
-           });
+            });
 
         function ShowBookedEvents(Id, SpecialId) {
             $('#popupEventFormBookAdmin').modal();
@@ -442,7 +462,7 @@
                 $('#btnPopupSaveBook').hide();
                 $('#btnPopupCancelBook').hide();
                 $('#bookTitle').text('Les geboekt op ' + weekDay);
-            }else{
+            } else {
                 if (SpecialId === 666) {
                     $('#btnPopupSaveBook').hide();
                     $('#btnPopupCancelBook').show();
@@ -469,8 +489,9 @@
             $('#eventDateTime').val("");
             $('#eventDuration').val("");
         }
+
         function addMinutes(date, minutes) {
-            return new Date(date.getTime() + minutes*60000);
+            return new Date(date.getTime() + minutes * 60000);
         }
 
         function UpdateEvent(EventID, EventStart, EventEnd) {
