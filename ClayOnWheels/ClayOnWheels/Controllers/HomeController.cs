@@ -5,13 +5,17 @@ using System.Security.Claims;
 using System.Web.Mvc;
 using ClayOnWheels.Functions;
 using ClayOnWheels.Models.EF;
+using NLog;
 
 namespace ClayOnWheels.Controllers
 {
+
+
     public class HomeController : Controller
     {
         private bool _isAdmin;
         private readonly MyDbContext _db = new MyDbContext();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         [Authorize]
         public ActionResult Index()
@@ -150,7 +154,7 @@ namespace ClayOnWheels.Controllers
                 }
                 catch (Exception ex)
                 {
-                    var exce = ex;
+                    logger.ErrorException("Exception in RemoveWorkshop", ex);
                     throw;
 
                 }
