@@ -104,7 +104,7 @@ namespace ClayOnWheels.Controllers
             return false;
         }
 
-        public bool RemoveWorkshop(int id,bool withReplacement = false)
+        public bool RemoveWorkshop(int id, bool withReplacement = false)
         {
             if (ClaimsPrincipal.Current != null)
             {
@@ -113,32 +113,35 @@ namespace ClayOnWheels.Controllers
                     DateTime dateToUser;
                     var notifyUsers = _db.UserSubscriptions.Where(w => w.AppointmentDairyId == id && w.Pending != 1);
 
-                    var obj = _db.UserSubscriptions.RemoveRange(notifyUsers);
+                    _db.UserSubscriptions.RemoveRange(notifyUsers);
                     var toRemove = _db.AppointmentDiaries.FirstOrDefault(w => w.Id == id);
-                    dateToUser = toRemove.DateTimeScheduled;
-                    if (withReplacement)
+                    if (toRemove != null)
                     {
-                        toRemove.Title = "Annulering";
-                        toRemove.StatusEnum = 2;
-                    }
-                    else
-                    {
-                        _db.AppointmentDiaries.Remove(toRemove);
-                    }
-                    
-                    _db.SaveChanges();
-
-                    if (notifyUsers.Any())
-                    {
-                        foreach (var user in notifyUsers)
+                        dateToUser = toRemove.DateTimeScheduled;
+                        if (withReplacement)
                         {
-                            var userInfo = _db.AspNetUsers.FirstOrDefault(w => w.Id == user.UserId);
-                            if (userInfo != null)
+                            toRemove.Title = "Annulering les";
+                            toRemove.StatusEnum = 2;
+                        }
+                        else
+                        {
+                            _db.AppointmentDiaries.Remove(toRemove);
+                        }
+
+                        _db.SaveChanges();
+
+                        if (notifyUsers.Any())
+                        {
+                            foreach (var user in notifyUsers)
                             {
-                                var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\LesGeannuleer.html"));
-                                body = body.Replace("[NAME]", userInfo.FirstName);
-                                body = body.Replace("[DATECANCELLED]", dateToUser.ToString("dd'/'MM'/'yyyy' HH:MM"));
-                                Mailer.SendEmail(userInfo.Email, "Aanvraag nieuwe beurtenkaart van Clay on Wheels", body);
+                                var userInfo = _db.AspNetUsers.FirstOrDefault(w => w.Id == user.UserId);
+                                if (userInfo != null)
+                                {
+                                    var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\LesGeannuleer.html"));
+                                    body = body.Replace("[NAME]", userInfo.FirstName);
+                                    body = body.Replace("[DATECANCELLED]", dateToUser.ToString("dd'/'MM'/'yyyy' HH:MM"));
+                                    Mailer.SendEmail(userInfo.Email, "Aanvraag nieuwe beurtenkaart van Clay on Wheels", body);
+                                }
                             }
                         }
                     }
@@ -148,9 +151,9 @@ namespace ClayOnWheels.Controllers
                 catch (Exception ex)
                 {
                     var exce = ex;
+                    throw;
 
                 }
-                return false;
             }
             return false;
         }

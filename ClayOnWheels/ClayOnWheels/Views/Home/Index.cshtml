@@ -136,7 +136,7 @@
                             $('#bookDateEnd').text($.fullCalendar.formatDate(calEvent.end, 'HH:mm'));
 
                             var weekDay = $.fullCalendar.formatDate(calEvent.start, 'dddd').toLowerCase();
-                            weekDay += ' ' + $.fullCalendar.formatDate(calEvent.start, 'dd').toLowerCase();
+                            weekDay += ' ' + $.fullCalendar.formatDate(calEvent.start, 'd').toLowerCase();
                             weekDay += ' ' + $.fullCalendar.formatDate(calEvent.start, 'MMMM').toLowerCase();
                             
 
@@ -150,7 +150,8 @@
                             else
                             {
                                 <text>
-                            if (calEvent.someKey === 3 || calEvent.someKey === 4) {
+                            console.log(calEvent);
+                            if (calEvent.someKey === 3 || calEvent.someKey === 4 || calEvent.someKey === 2) {
                                 if (calEvent.someKey === 3) {
                                     ShowInfoModal("Vakantie: Op deze dag kan u geen les boeken.");
                                 } else {
