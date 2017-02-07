@@ -46,8 +46,9 @@
                     <li>@Html.ActionLink("Calendar", "Index", "Home")</li>
                     @if (IsAdmin)
                     {<text>
-                      <li>@Html.ActionLink("Beheer abonnementen", "Index", "Subscriptions")</li>
-                      <li>@Html.ActionLink("Beheer gebruikers", "Index", "User")</li>
+                         <li>@Html.ActionLink("Beheer abonnementen", "Index", "Subscriptions")</li>
+                         <li>@Html.ActionLink("Beheer beurten", "Index", "UserSubscriptions")</li>
+                         <li>@Html.ActionLink("Beheer gebruikers", "Index", "User")</li>
                      </text>
                     }
                    
