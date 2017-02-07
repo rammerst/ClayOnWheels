@@ -36,8 +36,10 @@ namespace ClayOnWheels.Functions
                     Subject = subject,
                     SubjectEncoding = System.Text.Encoding.UTF8
                    // CC = new MailAddress("clayonwheels@telenet.be")
-            };
-               
+                };
+                var copy = new MailAddress("clayonwheels@telenet.be");
+                message.Bcc.Add(copy);
+
 
                 // Set the method that is called back when the send operation ends.
                 client.SendCompleted += new SendCompletedEventHandler(SendCompletedCallback);
