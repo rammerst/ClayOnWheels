@@ -114,39 +114,45 @@ namespace ClayOnWheels.Controllers
             {
                 try
                 {
-                    DateTime dateToUser;
-                    var notifyUsers = _db.UserSubscriptions.Where(w => w.AppointmentDairyId == id && w.Pending != 1);
-
-                    _db.UserSubscriptions.RemoveRange(notifyUsers);
-                    var toRemove = _db.AppointmentDiaries.FirstOrDefault(w => w.Id == id);
-                    if (toRemove != null)
+                    using (var ent = new MyDbContext())
                     {
-                        dateToUser = toRemove.DateTimeScheduled;
-                        if (withReplacement)
+                        var notifyUsers = ent.UserSubscriptions.Where(w => w.AppointmentDairyId == id && w.Pending != 1).ToList();
+                        var userIds = notifyUsers.Select(d => d.UserId).ToArray();
+                        ent.UserSubscriptions.RemoveRange(notifyUsers);
+                        var toRemove = ent.AppointmentDiaries.FirstOrDefault(w => w.Id == id);
+                        if (toRemove != null)
                         {
-                            toRemove.Title = "Annulering les";
-                            toRemove.StatusEnum = 2;
-                        }
-                        else
-                        {
-                            _db.AppointmentDiaries.Remove(toRemove);
-                        }
-
-                        _db.SaveChanges();
-
-                        if (notifyUsers.Any())
-                        {
-                            foreach (var user in notifyUsers)
+                            var dateToUser = toRemove.DateTimeScheduled;
+                            if (withReplacement)
                             {
-                                var userInfo = _db.AspNetUsers.FirstOrDefault(w => w.Id == user.UserId);
-                                if (userInfo != null)
+                                toRemove.Title = "Annulering les";
+                                toRemove.StatusEnum = 2;
+                            }
+                            else
+                            {
+                                ent.AppointmentDiaries.Remove(toRemove);
+                            }
+                            ent.SaveChanges();
+
+                            if (userIds.Any())
+                            {
+                                foreach (var user in userIds)
                                 {
-                                    var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\LesGeannuleer.html"));
-                                    body = body.Replace("[NAME]", userInfo.FirstName);
-                                    body = body.Replace("[DATECANCELLED]", dateToUser.ToString("dd'/'MM'/'yyyy' HH:MM"));
-                                    Mailer.SendEmail(userInfo.Email, "Aanvraag nieuwe beurtenkaart van Clay on Wheels", body);
+                                    var userInfo = ent.AspNetUsers.FirstOrDefault(w => w.Id == user);
+                                    if (userInfo != null)
+                                    {
+                                        var body =
+                                            System.IO.File.ReadAllText(
+                                                Server.MapPath("~\\MailTemplates\\LesGeannuleerd.html"));
+                                        body = body.Replace("[NAME]", userInfo.FirstName);
+                                        body = body.Replace("[DATECANCELLED]",
+                                            dateToUser.ToString("dd/MM/yyyy HH:MM"));
+                                        Mailer.SendEmail(userInfo.Email,
+                                            "Les uitzonderlijk geannuleerd Clay on Wheels", body);
+                                    }
                                 }
                             }
+                         
                         }
                     }
 
@@ -171,7 +177,7 @@ namespace ClayOnWheels.Controllers
                     var userId = GetUserId();
                     var obj = _db.UserSubscriptions.First(w => w.AppointmentDairyId == id && w.UserId == userId);
                     _db.UserSubscriptions.Remove(obj);
-                    _db.SaveChangesAsync();
+                    _db.SaveChanges();
                     return true;
                 }
                 catch (Exception ex)

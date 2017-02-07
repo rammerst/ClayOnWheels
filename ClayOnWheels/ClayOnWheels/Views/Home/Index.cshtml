@@ -59,7 +59,9 @@
                     if ($.isNumeric(response)) {
                         $('#amount').val(response);
                         var result = response;
-                        if (result === 1) {
+                        console.log(result === 1);
+                        console.log(result);
+                        if (result === '1') {
                             response += ' beurt over.';
                             $("#topMessage").attr("class", "topMessageWarning");
                         } else {
@@ -199,7 +201,7 @@
 
                             } else {
                                 var items = $("#amount").val();
-                                if (items === "0") {
+                                if (items === "0" && calEvent.someKey !== 666) {
                                     ShowInfoModal("Een les boeken is momenteel niet mogelijk.<br/><br/> Gelieve 250 euro te storten op onze rekening BE 76 3630 8223 2495. <br/><br/>Bij ontvangst van je betaling kan je boeken. <br/>Je word per mail verwittigd wanneer je kan starten met boeken.");
                                 } else {
 

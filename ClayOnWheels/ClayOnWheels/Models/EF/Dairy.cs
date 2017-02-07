@@ -610,7 +610,8 @@ namespace ClayOnWheels.Models.EF
         public int AppointmentDairyId { get; set; } // AppointmentDairyId
         public DateTime Created { get; set; } // DateCreated
         public int Pending { get; set; } // Pending
-        // Foreign keys
+                                         // Foreign keys
+
         public virtual AspNetUser AspNetUser { get; set; } // FK_dbo.UserSubscriptions.AspNetUsers_UserId
     }
 
