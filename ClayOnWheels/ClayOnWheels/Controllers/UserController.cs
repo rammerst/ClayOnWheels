@@ -14,7 +14,9 @@ namespace ClayOnWheels.Controllers
         // GET: User
         public ActionResult Index()
         {
-            return View(db.AspNetUsers.ToList());
+            var list = db.AspNetUsers.ToList();
+            ViewBag.TotalActive = list.Count(w => w.Active);
+            return View(list);
         }
 
         // GET: User/Details/5
@@ -75,7 +77,7 @@ namespace ClayOnWheels.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Email,EmailConfirmed,PasswordHash,SecurityStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEndDateUtc,LockoutEnabled,AccessFailedCount,UserName,FirstName,LastName,Address,City,PostalCode")] AspNetUser aspNetUser)
+        public ActionResult Edit([Bind(Include = "Id,Email,EmailConfirmed,PasswordHash,SecurityStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEndDateUtc,LockoutEnabled,AccessFailedCount,UserName,FirstName,LastName,Address,City,PostalCode,Active")] AspNetUser aspNetUser)
         {
             if (ModelState.IsValid)
             {

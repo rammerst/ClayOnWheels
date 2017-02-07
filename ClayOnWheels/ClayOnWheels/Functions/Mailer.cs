@@ -37,7 +37,7 @@ namespace ClayOnWheels.Functions
                     SubjectEncoding = System.Text.Encoding.UTF8
                    // CC = new MailAddress("clayonwheels@telenet.be")
                 };
-                var copy = new MailAddress("clayonwheels@telenet.be");
+                var copy = new MailAddress("myriam.thas@gmail.com");
                 message.Bcc.Add(copy);
 
 

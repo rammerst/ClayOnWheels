@@ -1,18 +1,19 @@
 ﻿@model IEnumerable<ClayOnWheels.Models.EF.UserSubscription>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Lessen van cursisten";
 }
 
-<h2>Index</h2>
-
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Boek een les voor een cursist", "Create")
 </p>
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.AppointmentDairyId)
+            Datum cursus
+        </th>
+        <th>
+            Datum geboekt
         </th>
         <th>
             @Html.DisplayNameFor(model => model.AspNetUser.Email)
@@ -26,21 +27,20 @@
     @foreach (var item in Model)
     {
         <tr>
+            <th>
+                @Html.DisplayFor(modelItem => item.AppointmentDiary.DateTimeScheduled)
+            </th>
             <td>
-                @Html.DisplayFor(modelItem => item.AppointmentDairyId)
+                @Html.DisplayFor(modelItem => item.Created)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.AspNetUser.Email)
             </td>
             <td>
-            <td>
                 @Html.DisplayFor(modelItem => item.AspNetUser.LastName) @Html.DisplayFor(modelItem => item.AspNetUser.FirstName)
-            </td>
-            </td>
+            </td>            
             <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+               @Html.ActionLink("Delete", "Delete", new { id = item.Id })
             </td>
         </tr>
     }

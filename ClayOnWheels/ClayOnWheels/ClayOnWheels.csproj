@@ -268,6 +268,7 @@
       <DependentUpon>Dairy.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\EF\DairyEvents.cs" />
+    <Compile Include="Models\GenericPrincipalExtensions.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Shared.cs" />

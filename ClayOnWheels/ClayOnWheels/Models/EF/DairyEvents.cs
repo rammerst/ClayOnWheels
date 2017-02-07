@@ -30,6 +30,7 @@ namespace ClayOnWheels.Models.EF
             }
             var fromDate = ConvertFromUnixTimestamp(start);
             var toDate = ConvertFromUnixTimestamp(end);
+            toDate = toDate.AddHours(1);
             using (var ent = new MyDbContext())
             {
                 var rslt = ent.AppointmentDiaries.Where(s => s.DateTimeScheduled >= fromDate && EntityFunctions.AddMinutes(s.DateTimeScheduled, s.AppointmentLength) <= toDate).ToArray();
@@ -72,6 +73,7 @@ namespace ClayOnWheels.Models.EF
                             {
                                 rec.StatusString = Enums.GetName((AppointmentStatus)4);
                                 rec.SomeImportantKeyID = 4;
+                                rec.Title = "Les volzet";
                             }
                             //everything else: show as available or holiday
                             else

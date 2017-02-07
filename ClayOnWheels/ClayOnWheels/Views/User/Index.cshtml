@@ -1,13 +1,10 @@
 ﻿@model IEnumerable< ClayOnWheels.Models.EF.AspNetUser>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Overzicht";
 }
-
-<h2>Index</h2>
-
 <p>
-    @Html.ActionLink("Create New", "Create")
+    Totaal aantal actieve gebruikers: @ViewBag.TotalActive
 </p>
 <table class="table">
     <tr>

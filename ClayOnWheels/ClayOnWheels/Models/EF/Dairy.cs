@@ -33,6 +33,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ClayOnWheels.Models.EF
 {
+    using System.Collections.Generic;
     using System.Linq;
 
     #region Unit of work
@@ -495,10 +496,12 @@ namespace ClayOnWheels.Models.EF
         public System.DateTime DateTimeScheduled { get; set; } // DateTimeScheduled
         public int AppointmentLength { get; set; } // AppointmentLength
         public int StatusEnum { get; set; } // StatusENUM
+        public virtual System.Collections.Generic.ICollection<UserSubscription> UserSubscriptions { get; set; } // UserSubscriptions.FK_dbo.UserSubscriptions.AspNetUsers_UserId
 
         public AppointmentDiary()
         {
             StatusEnum = 0;
+            UserSubscriptions = new System.Collections.Generic.List<UserSubscription>();
         }
     }
 
@@ -613,6 +616,7 @@ namespace ClayOnWheels.Models.EF
                                          // Foreign keys
 
         public virtual AspNetUser AspNetUser { get; set; } // FK_dbo.UserSubscriptions.AspNetUsers_UserId
+        public virtual AppointmentDiary AppointmentDiary { get; set; }
     }
 
     #endregion
@@ -788,6 +792,7 @@ namespace ClayOnWheels.Models.EF
 
             // Foreign keys
             HasRequired(a => a.AspNetUser).WithMany(b => b.UserSubscriptions).HasForeignKey(c => c.UserId); // FK_dbo.UserSubscriptions.AspNetUsers_UserId
+            HasRequired(a => a.AppointmentDiary).WithMany(b => b.UserSubscriptions).HasForeignKey(c => c.AppointmentDairyId); // FK_dbo.UserSubscriptions.AspNetUsers_UserId
         }
     }
 
