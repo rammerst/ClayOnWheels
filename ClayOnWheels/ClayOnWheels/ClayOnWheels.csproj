@@ -231,6 +231,7 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\SubscriptionsController.cs" />
     <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Controllers\UserSubscriptionsController.cs" />
     <Compile Include="Functions\Mailer.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -413,6 +414,11 @@
     <Content Include="Views\User\Details.cshtml" />
     <Content Include="Views\User\Edit.cshtml" />
     <Content Include="Views\User\Index.cshtml" />
+    <Content Include="Views\UserSubscriptions\Create.cshtml" />
+    <Content Include="Views\UserSubscriptions\Delete.cshtml" />
+    <Content Include="Views\UserSubscriptions\Details.cshtml" />
+    <Content Include="Views\UserSubscriptions\Edit.cshtml" />
+    <Content Include="Views\UserSubscriptions\Index.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
