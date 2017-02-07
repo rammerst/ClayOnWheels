@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using ClayOnWheels.Models.EF;
+using ClayOnWheels.Models;
 
 namespace testdbfirst.Controllers
 {
@@ -39,7 +40,23 @@ namespace testdbfirst.Controllers
         // GET: UserSubscription/Create
         public ActionResult Create()
         {
-            ViewBag.UserId = new SelectList(db.AspNetUsers, "Id", "Email");
+            var date = DateTime.Now.AddDays(-1);
+            var subscriptions = db.AppointmentDiaries.Where(w => w.DateTimeScheduled >= date && w.StatusEnum != 2 && w.StatusEnum !=3).ToList();
+            var users = db.AspNetUsers.Where(w => w.Active).ToList();
+            var userItems = from s in users
+                       select new SelectListItem
+                       {
+                           Text = s.FirstName + " - " + s.LastName + '(' + s.Email + ')',
+                           Value = s.Id
+                       };
+            ViewBag.UserId = userItems;
+            var item = from s in subscriptions
+                       select new SelectListItem
+                       {
+                           Text = s.DateTimeScheduled + " - " + Enums.GetName((AppointmentStatus)s.StatusEnum),
+                           Value = s.Id.ToString()
+                       };
+            ViewBag.AppointmentDairyId = item;
             return View();
         }
 
@@ -52,6 +69,7 @@ namespace testdbfirst.Controllers
         {
             if (ModelState.IsValid)
             {
+                UserSubscription.Created = DateTime.Now;
                 db.UserSubscriptions.Add(UserSubscription);
                 db.SaveChanges();
                 return RedirectToAction("Index");

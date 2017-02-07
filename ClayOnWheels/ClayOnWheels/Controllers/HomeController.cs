@@ -5,7 +5,6 @@ using System.Security.Claims;
 using System.Web.Mvc;
 using ClayOnWheels.Functions;
 using ClayOnWheels.Models.EF;
-using NLog;
 
 namespace ClayOnWheels.Controllers
 {

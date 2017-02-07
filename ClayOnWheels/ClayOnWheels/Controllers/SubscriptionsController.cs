@@ -42,7 +42,7 @@ namespace ClayOnWheels.Controllers
             var item = from s in users
                        select new SelectListItem
                        {
-                           Text = s.FirstName + " - " + s.LastName,
+                           Text = s.FirstName + " - " + s.LastName + '(' + s.Email + ')',
                            Value = s.Id
                        };
             ViewBag.UserId = item;
