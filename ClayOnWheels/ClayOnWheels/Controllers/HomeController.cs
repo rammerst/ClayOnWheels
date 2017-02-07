@@ -146,7 +146,7 @@ namespace ClayOnWheels.Controllers
                                                 Server.MapPath("~\\MailTemplates\\LesGeannuleerd.html"));
                                         body = body.Replace("[NAME]", userInfo.FirstName);
                                         body = body.Replace("[DATECANCELLED]",
-                                            dateToUser.ToString("dd/MM/yyyy HH:MM"));
+                                            dateToUser.ToString("dd/MM/yyyy HH:mm"));
                                         Mailer.SendEmail(userInfo.Email,
                                             "Les uitzonderlijk geannuleerd Clay on Wheels", body);
                                     }
