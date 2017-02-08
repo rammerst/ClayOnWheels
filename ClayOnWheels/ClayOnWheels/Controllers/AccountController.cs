@@ -214,6 +214,7 @@ namespace ClayOnWheels.Controllers
             }
             try
             {
+                UserManager.ConfirmEmailAsync(userId, code);
                 var user = _db.AspNetUsers.FirstOrDefault(w => w.Id == userId);
                 if (user != null)
                 {
