@@ -18,7 +18,7 @@ namespace testdbfirst.Controllers
         // GET: UserSubscription
         public ActionResult Index()
         {
-            var userSubscriptions = db.UserSubscriptions.Include(u => u.AspNetUser).Include(a => a.AppointmentDiary).OrderBy(b => b.AppointmentDiary.DateTimeScheduled);
+            var userSubscriptions = db.UserSubscriptions.Include(u => u.AspNetUser).Include(a => a.AppointmentDiary).Where(u => u.AspNetUser.Active).OrderBy(b => b.AppointmentDiary.DateTimeScheduled).ToList();
             return View(userSubscriptions.ToList());
         }
 

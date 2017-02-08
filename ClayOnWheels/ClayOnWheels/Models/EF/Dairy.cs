@@ -574,6 +574,20 @@ namespace ClayOnWheels.Models.EF
         public virtual AspNetUser AspNetUser { get; set; } // FK_dbo.AspNetUserClaims_dbo.AspNetUsers_UserId
     }
 
+    public class AspNetUserRoles
+    {
+        
+        public string UserId { get; set; } // UserId (length: 128)
+        public string RoleId { get; set; } // RoleId (length: 128)
+
+
+
+        // Foreign keys
+        public virtual AspNetUser AspNetUser { get; set; } // FK_dbo.AspNetUserClaims_dbo.AspNetUsers_UserId
+
+        public virtual AspNetRole AspNetRole { get; set; } // FK_dbo.AspNetUserClaims_dbo.AspNetUsers_UserId
+    }
+
     // AspNetUserLogins
     [System.CodeDom.Compiler.GeneratedCode("EF.Reverse.POCO.Generator", "2.25.0.0")]
     public class AspNetUserLogin
@@ -722,6 +736,7 @@ namespace ClayOnWheels.Models.EF
             // Foreign keys
             HasRequired(a => a.AspNetUser).WithMany(b => b.AspNetUserClaims).HasForeignKey(c => c.UserId); // FK_dbo.AspNetUserClaims_dbo.AspNetUsers_UserId
         }
+
     }
 
     // AspNetUserLogins
