@@ -77,7 +77,7 @@ namespace ClayOnWheels.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Email,EmailConfirmed,PasswordHash,SecurityStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEndDateUtc,LockoutEnabled,AccessFailedCount,UserName,FirstName,LastName,Address,City,PostalCode,Active")] AspNetUser aspNetUser)
+        public ActionResult Edit([Bind(Include = "Id,Email,PhoneNumber,FirstName,LastName,Address,City,PostalCode,Active")] AspNetUser aspNetUser)
         {
             if (ModelState.IsValid)
             {

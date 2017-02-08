@@ -164,7 +164,7 @@ namespace ClayOnWheels.Controllers
                 var totalActive = _db.AspNetUsers.Count(w => w.Active);
                 var user = new ApplicationUser
                 {
-                    UserName = model.Email,
+                    UserName = model.FirstName,
                     Email = model.Email,
                     Address = model.Address,
                     City = model.City,
