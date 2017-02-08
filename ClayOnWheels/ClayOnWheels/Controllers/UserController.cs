@@ -77,13 +77,26 @@ namespace ClayOnWheels.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Email,PhoneNumber,FirstName,LastName,Address,City,PostalCode,Active")] AspNetUser aspNetUser)
+        public ActionResult Edit([Bind(Include = "Id,Email,EmailConfirmed,PasswordHash,SecurityStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEndDateUtc,LockoutEnabled,AccessFailedCount,UserName,FirstName,LastName,Address,City,PostalCode,Active")] AspNetUser aspNetUser)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(aspNetUser).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                var joske = db.AspNetUsers.FirstOrDefault(w => w.Id == aspNetUser.Id);
+                if (joske != null)
+                {
+                    joske.Email = aspNetUser.Email;
+                    joske.PhoneNumber = aspNetUser.PhoneNumber;
+                    joske.PostalCode = aspNetUser.PostalCode;
+                    joske.FirstName = aspNetUser.FirstName;
+                    joske.LastName = aspNetUser.LastName;
+                    joske.UserName = aspNetUser.UserName;
+                    joske.Address = aspNetUser.Address;
+                    joske.Active = aspNetUser.Active;
+                    joske.City = aspNetUser.City;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                
             }
             return View(aspNetUser);
         }
