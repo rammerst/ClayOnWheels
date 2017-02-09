@@ -219,6 +219,7 @@ namespace ClayOnWheels.Controllers
                 if (user != null)
                 {
                     user.EmailConfirmed = true;
+                    _db.SaveChanges();
                     var usersRegistered = _db.AspNetUsers.Count(w => w.Active);
                     if (usersRegistered >= 70)
                     {
@@ -232,14 +233,11 @@ namespace ClayOnWheels.Controllers
                         body = body.Replace("[NAME]", user.FirstName);
                         Mailer.SendEmail(user.Email, "Registratie gelukt bij Clay on Wheels", body);
                     }
-                    _db.SaveChangesAsync();
                     return View("ConfirmEmail");
                 }
             }
             catch (Exception ex)
             {
-                // var result = await UserManager.ConfirmEmailAsync(userId, code);
-                //sSystem.Diagnostics.Tracing.L
                 return View("Error");
             }
             return View("Error");
