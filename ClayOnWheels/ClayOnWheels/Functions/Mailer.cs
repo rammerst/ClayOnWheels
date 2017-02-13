@@ -47,7 +47,7 @@ namespace ClayOnWheels.Functions
                 // method to identify this send operation.
                 // For this example, the userToken is a string constant.
                 var userState = "test message1";
-                client.Send(message);
+               // client.Send(message);
 
                 // Clean up.
                 message.Dispose();
