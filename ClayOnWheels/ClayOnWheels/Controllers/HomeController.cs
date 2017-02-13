@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Web.Mvc;
 using ClayOnWheels.Functions;
 using ClayOnWheels.Models.EF;
+using Microsoft.AspNet.Identity;
 
 namespace ClayOnWheels.Controllers
 {
@@ -37,6 +38,10 @@ namespace ClayOnWheels.Controllers
         {
             if (ClaimsPrincipal.Current != null)
             {
+                var identity = (ClaimsIdentity)User.Identity;
+                var name = identity.FindFirstValue(ClaimTypes.Surname);
+                var email = identity.FindFirstValue(ClaimTypes.Name);
+
                 DiaryEvent.UpdateDiaryEvent(id, NewEventStart, NewEventEnd);
             }
         }

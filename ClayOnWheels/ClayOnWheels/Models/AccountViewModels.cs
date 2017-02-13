@@ -64,12 +64,12 @@ namespace ClayOnWheels.Models
 
     public class RegisterViewModel
     {
-        [Required]
+        [Required(ErrorMessageResourceName = "EmailMandatory", ErrorMessageResourceType = typeof(Messages))]
         [EmailAddress]
         [Display(Name = "Email-adres")]
         public string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessageResourceName = "PaswoordMandatory", ErrorMessageResourceType = typeof(Messages))]
         [StringLength(100, ErrorMessage = "Het {0} moet minstens {2} karakters bevatten.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Paswoord")]
@@ -80,27 +80,27 @@ namespace ClayOnWheels.Models
         [Compare("Password", ErrorMessage = "Passwoord en bevestig passwoord moeten identiek zijn.")]
         public string ConfirmPassword { get; set; }
 
-        [Required]
+        [Required(ErrorMessageResourceName = "StraatMandatory", ErrorMessageResourceType = typeof(Messages))]
         [Display(Name = "Straatnaam en nummer")]
         public string Address { get; set; }
 
-        [Required]
+        [Required(ErrorMessageResourceName = "GemeenteMandatory", ErrorMessageResourceType =typeof(Messages))]
         [Display(Name = "Gemeente")]
         public string City { get; set; }
 
-        [Required]
+        [Required(ErrorMessageResourceName = "PostcodeMandatory", ErrorMessageResourceType = typeof(Messages))]
         [Display(Name = "Postcode")]
         public string PostalCode { get; set; }
 
-        [Required]
+        [Required(ErrorMessageResourceName = "VoornaamMandatory", ErrorMessageResourceType = typeof(Messages))]
         [Display(Name = "Voornaam")]
         public string FirstName { get; set; }
 
-        [Required]
+        [Required(ErrorMessageResourceName = "AchternaamMandatory", ErrorMessageResourceType = typeof(Messages))]
         [Display(Name = "Achternaam")]
         public string LastName { get; set; }
 
-        [Required]
+        [Required(ErrorMessageResourceName = "TelefoonMandatory", ErrorMessageResourceType = typeof(Messages))]
         [Display(Name = "Telefoon (Gsm)")]
         public string PhoneNumber { get; set; }
     }

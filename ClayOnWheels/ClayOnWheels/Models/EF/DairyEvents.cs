@@ -30,7 +30,7 @@ namespace ClayOnWheels.Models.EF
             }
             var fromDate = ConvertFromUnixTimestamp(start);
             var toDate = ConvertFromUnixTimestamp(end);
-            toDate = toDate.AddHours(1);
+            toDate = toDate.AddHours(2);
             using (var ent = new MyDbContext())
             {
                 var rslt = ent.AppointmentDiaries.Where(s => s.DateTimeScheduled >= fromDate && EntityFunctions.AddMinutes(s.DateTimeScheduled, s.AppointmentLength) <= toDate).ToArray();
@@ -42,7 +42,7 @@ namespace ClayOnWheels.Models.EF
                     {
                         ID = item.Id,
                         StartDateString = item.DateTimeScheduled.ToString("s"),
-                        EndDateString = item.DateTimeScheduled.AddMinutes(item.AppointmentLength).ToString("s"),
+                        EndDateString = item.DateTimeScheduled.AddMinutes(item.AppointmentLength + 30).ToString("s"),
                         Title = item.Title
                     };
 

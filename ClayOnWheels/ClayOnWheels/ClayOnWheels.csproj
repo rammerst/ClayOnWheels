@@ -271,6 +271,11 @@
     <Compile Include="Models\GenericPrincipalExtensions.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\Messages.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Messages.resx</DependentUpon>
+    </Compile>
     <Compile Include="Models\Shared.cs" />
     <Compile Include="Models\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -450,6 +455,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201702030705185_joske.resx">
       <DependentUpon>201702030705185_joske.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Models\Messages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
