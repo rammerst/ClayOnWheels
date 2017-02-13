@@ -59,8 +59,6 @@
                     if ($.isNumeric(response)) {
                         $('#amount').val(response);
                         var result = response;
-                        console.log(result === 1);
-                        console.log(result);
                         if (result === '1') {
                             response += ' beurt over.';
                             $("#topMessage").attr("class", "topMessageWarning");
@@ -166,7 +164,6 @@
                             else
                             {
                                 <text>
-                            console.log(calEvent);
                             if (calEvent.someKey === 3 || calEvent.someKey === 4 || calEvent.someKey === 2) {
                                 if (calEvent.someKey === 3) {
                                     if (calEvent.textKey === 2) {
