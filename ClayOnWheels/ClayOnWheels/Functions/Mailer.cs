@@ -11,6 +11,51 @@ namespace ClayOnWheels.Functions
 {
     public class Mailer
     {
+        public static void SendErrorEmail(Exception ex)
+        {
+            try
+            {
+                // Command line argument must the the SMTP host.
+                var client = new SmtpClient("smtp.telenet.be", 587)
+                {
+                    Credentials = new System.Net.NetworkCredential("myriam.thas@telenet.be", ReadSetting("mail")),
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network
+                };
+                // Specify the e-mail sender.
+                // Create a mailing address that includes a UTF8 character
+                // in the display name.
+                var from = new MailAddress("myriam.thas@telenet.be", "Clayonwheels", System.Text.Encoding.UTF8);
+                // Set destinations for the e-mail message.
+                var to = new MailAddress("brambarnard@gmail.com");
+
+                // Specify the message content.
+                var message = new MailMessage(from, to)
+                {
+                    Body = ex.ToString(),
+                    IsBodyHtml = true,
+                    BodyEncoding = System.Text.Encoding.UTF8,
+                    Subject = "Clay on wheels - Unexpected error occured",
+                    SubjectEncoding = System.Text.Encoding.UTF8
+                };
+                
+                // Set the method that is called back when the send operation ends.
+                client.SendCompleted += new SendCompletedEventHandler(SendCompletedCallback);
+                // The userState can be any object that allows your callback 
+                // method to identify this send operation.
+                // For this example, the userToken is a string constant.
+                var userState = "test message1";
+                client.Send(message);
+
+                // Clean up.
+                message.Dispose();
+                //Console.WriteLine("Goodbye.");
+            }
+            catch (Exception exc)
+            {
+                //eat exc
+            }
+        }
         public static void SendEmail(string sendTo, string subject, string body)
         {
             try
@@ -96,19 +141,3 @@ namespace ClayOnWheels.Functions
     }
 }
 
-//var client = new RestClient
-//{
-//    BaseUrl = new Uri("https://api.mailgun.net/v3"),
-//    Authenticator = new HttpBasicAuthenticator("api",
-//       ReadSetting("MAILGUN_API_KEY"))
-//};
-//var request = new RestRequest();
-//request.AddParameter("domain", ReadSetting("MAILGUN_DOMAIN"), ParameterType.UrlSegment);
-//request.Resource = "{domain}/messages";
-//request.AddParameter("from", "Myriam Thas <info@" + ReadSetting("MAILGUN_DOMAIN") + ">");
-//request.AddParameter("to", email);
-//request.AddParameter("subject", subject);
-//request.AddParameter("html", body);
-//request.Method = Method.POST;
-
-//client.Execute(request);

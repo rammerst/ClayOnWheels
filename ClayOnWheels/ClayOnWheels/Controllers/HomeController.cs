@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Web.Mvc;
 using ClayOnWheels.Functions;
 using ClayOnWheels.Models.EF;
-
+using log4net;
 namespace ClayOnWheels.Controllers
 {
 
@@ -14,7 +14,8 @@ namespace ClayOnWheels.Controllers
     {
         private bool _isAdmin;
         private readonly MyDbContext _db = new MyDbContext();
-        //private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILog logger = LogManager.GetLogger(typeof(HomeController));
+
 
         [Authorize]
         public ActionResult Index()
@@ -159,8 +160,8 @@ namespace ClayOnWheels.Controllers
                 }
                 catch (Exception ex)
                 {
-                    //logger.ErrorException("Exception in RemoveWorkshop", ex);
-                    throw;
+                    logger.Error("Exception in RemoveWorkshop", ex);
+                    return false;
 
                 }
             }
@@ -181,10 +182,10 @@ namespace ClayOnWheels.Controllers
                 }
                 catch (Exception ex)
                 {
-                    var exce = ex;
+                    logger.Error("Exception in RemoveWorkshop", ex);
+                    return false;
 
                 }
-                return false;
             }
             return false;
         }

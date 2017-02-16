@@ -1,10 +1,5 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Configuration;
-using System.Globalization;
 using System.Linq;
-using System.Net.Mail;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -12,10 +7,9 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using ClayOnWheels.Models;
-using RestSharp;
-using RestSharp.Authenticators;
 using ClayOnWheels.Functions;
 using ClayOnWheels.Models.EF;
+using log4net;
 
 namespace ClayOnWheels.Controllers
 {
@@ -23,7 +17,7 @@ namespace ClayOnWheels.Controllers
     public class AccountController : Controller
     {
         private readonly MyDbContext _db = new MyDbContext();
-
+        private static readonly ILog logger = LogManager.GetLogger(typeof(HomeController));
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
@@ -238,6 +232,7 @@ namespace ClayOnWheels.Controllers
             }
             catch (Exception ex)
             {
+                logger.Error("Exception in ConfirmEmail", ex);
                 return View("Error");
             }
             return View("Error");
