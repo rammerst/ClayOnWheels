@@ -161,6 +161,7 @@ namespace ClayOnWheels.Controllers
                 catch (Exception ex)
                 {
                     logger.Error("Exception in RemoveWorkshop", ex);
+                    Mailer.SendErrorEmail(ex);
                     return false;
 
                 }
@@ -183,6 +184,7 @@ namespace ClayOnWheels.Controllers
                 catch (Exception ex)
                 {
                     logger.Error("Exception in RemoveWorkshop", ex);
+                    Mailer.SendErrorEmail(ex);
                     return false;
 
                 }

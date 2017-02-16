@@ -233,6 +233,7 @@ namespace ClayOnWheels.Controllers
             catch (Exception ex)
             {
                 logger.Error("Exception in ConfirmEmail", ex);
+                Mailer.SendErrorEmail(ex);
                 return View("Error");
             }
             return View("Error");

@@ -51,7 +51,7 @@ namespace ClayOnWheels
                 "Default Page</a>\n");
 
             // Log the exception and notify system operators
-            Mailer.SendErrorMail(exc);
+            Mailer.SendErrorEmail(exc);
 
             // Clear the error from the server
             Server.ClearError();
