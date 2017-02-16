@@ -18,6 +18,7 @@ namespace ClayOnWheels
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             Database.SetInitializer<ApplicationDbContext>(new MigrateDatabaseToLatestVersion<ApplicationDbContext, Migrations.Configuration>());
+            DefaultModelBinder.ResourceClassKey = "Messages";
         }
 
         void Application_Error(object sender, EventArgs e)
