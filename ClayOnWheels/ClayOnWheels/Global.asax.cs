@@ -21,7 +21,7 @@ namespace ClayOnWheels
             Database.SetInitializer<ApplicationDbContext>(new MigrateDatabaseToLatestVersion<ApplicationDbContext, Migrations.Configuration>());
             DefaultModelBinder.ResourceClassKey = "Messages";
             GlobalFilters.Filters.Add(new RequireHttpsAttribute());
-            AntiForgeryConfig.RequireSsl = true;
+          //  AntiForgeryConfig.RequireSsl = true;
         }
 
         void Application_Error(object sender, EventArgs e)
