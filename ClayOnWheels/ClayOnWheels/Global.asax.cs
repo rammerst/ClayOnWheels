@@ -20,7 +20,7 @@ namespace ClayOnWheels
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             Database.SetInitializer<ApplicationDbContext>(new MigrateDatabaseToLatestVersion<ApplicationDbContext, Migrations.Configuration>());
             DefaultModelBinder.ResourceClassKey = "Messages";
-            GlobalFilters.Filters.Add(new RequireHttpsAttribute());
+           // GlobalFilters.Filters.Add(new RequireHttpsAttribute());
           //  AntiForgeryConfig.RequireSsl = true;
         }
 
