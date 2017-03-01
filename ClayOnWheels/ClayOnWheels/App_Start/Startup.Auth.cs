@@ -47,10 +47,10 @@ namespace ClayOnWheels
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
-                LoginPath = new PathString("Account/Login"),
+                LoginPath = new PathString("/Account/Login"),
                 Provider = cookieProvider
 
-            });            
+            });
             app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 
             // Enables the application to temporarily store user information when they are verifying the second factor in the two-factor authentication process.
