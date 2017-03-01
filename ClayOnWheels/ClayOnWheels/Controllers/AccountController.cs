@@ -165,7 +165,8 @@ namespace ClayOnWheels.Controllers
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     PostalCode = model.PostalCode,
-                    Active = totalActive < 70
+                    Active = totalActive < 70,
+                    PhoneNumber = model.PhoneNumber
                 };
                 // Add the Address properties:
                 var result = await UserManager.CreateAsync(user, model.Password);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
@@ -19,6 +20,8 @@ namespace ClayOnWheels
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             Database.SetInitializer<ApplicationDbContext>(new MigrateDatabaseToLatestVersion<ApplicationDbContext, Migrations.Configuration>());
             DefaultModelBinder.ResourceClassKey = "Messages";
+            GlobalFilters.Filters.Add(new RequireHttpsAttribute());
+            AntiForgeryConfig.RequireSsl = true;
         }
 
         void Application_Error(object sender, EventArgs e)
