@@ -146,8 +146,10 @@
                         slotMinutes: 30,
                         events: '/Home/GetDiaryEvents/',
                         eventClick: function(calEvent, jsEvent, view) {
+                            console.log(calEvent);
                             $('#bookDateStart').text($.fullCalendar.formatDate(calEvent.start, 'HH:mm'));
-                            $('#bookDateEnd').text($.fullCalendar.formatDate(calEvent.end, 'HH:mm'));
+                            var dateEnd = subMinutes(calEvent.end, 30);
+                            $('#bookDateEnd').text($.fullCalendar.formatDate(dateEnd, 'HH:mm'));
 
                             var weekDay = $.fullCalendar.formatDate(calEvent.start, 'dddd').toLowerCase();
                             weekDay += ' ' + $.fullCalendar.formatDate(calEvent.start, 'd').toLowerCase();
@@ -491,6 +493,9 @@
 
         function addMinutes(date, minutes) {
             return new Date(date.getTime() + minutes * 60000);
+        }
+        function subMinutes(date, minutes) {
+            return new Date(date.getTime() - minutes * 60000);
         }
 
         function UpdateEvent(EventID, EventStart, EventEnd) {
