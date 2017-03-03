@@ -16,6 +16,17 @@ namespace ClayOnWheels.Controllers
         {
             var list = db.AspNetUsers.ToList();
             ViewBag.TotalActive = list.Count(w => w.Active);
+            foreach (var item in list)
+            {
+                var creditsSum = 0;
+                creditsSum = (from u in db.Subscriptions where u.UserId == item.Id select (int?)u.Number).Sum() ?? 0;
+
+                //now substract all bookings
+                var bookedSum = db.UserSubscriptions.Count(u => u.UserId == item.Id && u.Pending != 1);
+                creditsSum -= bookedSum;
+
+                item.AccessFailedCount = creditsSum;
+            }
             return View(list);
         }
 
@@ -96,7 +107,7 @@ namespace ClayOnWheels.Controllers
                     db.SaveChanges();
                     return RedirectToAction("Index");
                 }
-                
+
             }
             return View(aspNetUser);
         }
