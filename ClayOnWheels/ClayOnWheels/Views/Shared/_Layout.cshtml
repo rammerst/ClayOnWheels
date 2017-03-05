@@ -51,7 +51,11 @@
                          <li>@Html.ActionLink("Beheer gebruikers", "Index", "User")</li>
                      </text>
                     }
-                   
+                    else
+                    {
+                        <li>@Html.ActionLink("Bekijk geboekte lessen", "UserSubscriptions", "UserSubscriptions")</li>
+                    }
+
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>

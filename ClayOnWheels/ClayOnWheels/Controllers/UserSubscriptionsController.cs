@@ -11,6 +11,7 @@ using ClayOnWheels.Models;
 
 namespace testdbfirst.Controllers
 {
+    [Authorize]
     public class UserSubscriptionsController : Controller
     {
         private readonly MyDbContext db = new MyDbContext();
@@ -19,6 +20,13 @@ namespace testdbfirst.Controllers
         public ActionResult Index()
         {
             var userSubscriptions = db.UserSubscriptions.Include(u => u.AspNetUser).Include(a => a.AppointmentDiary).Where(u => u.AspNetUser.Active).OrderBy(b => b.AppointmentDiary.DateTimeScheduled).ToList();
+            return View(userSubscriptions.ToList());
+        }
+
+        public ActionResult UserSubscriptions()
+        {
+            var userID = ClayOnWheels.Functions.User.GetUserId();
+            var userSubscriptions = db.UserSubscriptions.Include(u => u.AspNetUser).Include(a => a.AppointmentDiary).Where(u => u.AspNetUser.Active && u.UserId == userID).OrderBy(b => b.AppointmentDiary.DateTimeScheduled).ToList();
             return View(userSubscriptions.ToList());
         }
 
