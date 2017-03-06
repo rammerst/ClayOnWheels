@@ -9,7 +9,7 @@ using log4net;
 namespace ClayOnWheels.Controllers
 {
 
-
+    [Authorize]
     public class HomeController : Controller
     {
         private bool _isAdmin;
@@ -17,7 +17,6 @@ namespace ClayOnWheels.Controllers
         private static readonly ILog logger = LogManager.GetLogger(typeof(HomeController));
 
 
-        [Authorize]
         public ActionResult Index()
         {
             if (ClaimsPrincipal.Current != null)
@@ -67,7 +66,7 @@ namespace ClayOnWheels.Controllers
                 _db.UserSubscriptions.Add(new UserSubscription
                 {
                     AppointmentDairyId = id,
-                    UserId = GetUserId(),
+                    UserId = Functions.User.GetUserId(),
                     Created = DateTime.Now,
                     Pending = 1
                 });
@@ -88,12 +87,12 @@ namespace ClayOnWheels.Controllers
                     _db.UserSubscriptions.Add(new UserSubscription
                     {
                         AppointmentDairyId = id,
-                        UserId = GetUserId(),
+                        UserId = Functions.User.GetUserId(),
                         Created = DateTime.Now,
                         Pending = 0
                     });
                     _db.SaveChanges();
-                    var userId = GetUserId();
+                    var userId = Functions.User.GetUserId();
                     var user = _db.AspNetUsers.FirstOrDefault(w => w.Id == userId);
                     if (user != null && sendMail)
                     {
@@ -175,7 +174,7 @@ namespace ClayOnWheels.Controllers
             {
                 try
                 {
-                    var userId = GetUserId();
+                    var userId = Functions.User.GetUserId();
                     var obj = _db.UserSubscriptions.First(w => w.AppointmentDairyId == id && w.UserId == userId);
                     _db.UserSubscriptions.Remove(obj);
                     _db.SaveChanges();
@@ -212,7 +211,7 @@ namespace ClayOnWheels.Controllers
 
         public JsonResult GetDiaryEvents(double start, double end)
         {
-            var ApptListForDate = DiaryEvent.LoadAllAppointmentsInDateRange(start, end, GetUserId());
+            var ApptListForDate = DiaryEvent.LoadAllAppointmentsInDateRange(start, end, Functions.User.GetUserId());
             var eventList = from e in ApptListForDate
                             select new
                             {
@@ -259,7 +258,7 @@ namespace ClayOnWheels.Controllers
 
             if (_isAdmin == false && ClaimsPrincipal.Current != null)
             {
-                var userId = GetUserId();
+                var userId = Functions.User.GetUserId();
 
                 creditsSum = (from u in _db.Subscriptions where u.UserId == userId select (int?)u.Number).Sum() ?? 0;
 
@@ -270,12 +269,7 @@ namespace ClayOnWheels.Controllers
             return creditsSum;
         }
 
-        public static string GetUserId()
-        {
-            var id = ClaimsPrincipal.Current.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier)
-                    .Select(c => c.Value).SingleOrDefault();
-            return id;
-        }
+      
 
     }
 }

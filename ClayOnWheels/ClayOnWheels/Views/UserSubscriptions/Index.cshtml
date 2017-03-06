@@ -23,13 +23,25 @@
         </th>
         <th></th>
     </tr>
-
+    @{
+        var dateTime = DateTime.Now;
+    }
     @foreach (var item in Model)
     {
+        if (dateTime != item.AppointmentDiary.DateTimeScheduled.Date)
+        {
+            dateTime = item.AppointmentDiary.DateTimeScheduled.Date;
+            <tr>
+                <th colspan="5">
+                    @item.AppointmentDiary.DateTimeScheduled.Date.ToString("d/MM/yyyy")
+                </th>
+            </tr>
+        }
+
         <tr>
-            <th>
-                @Html.DisplayFor(modelItem => item.AppointmentDiary.DateTimeScheduled)
-            </th>
+            <td>
+                &nbsp;@Html.DisplayFor(modelItem => item.AppointmentDiary.DateTimeScheduled)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Created)
             </td>
@@ -38,9 +50,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.AspNetUser.LastName) @Html.DisplayFor(modelItem => item.AspNetUser.FirstName)
-            </td>            
+            </td>
             <td>
-               @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
             </td>
         </tr>
     }

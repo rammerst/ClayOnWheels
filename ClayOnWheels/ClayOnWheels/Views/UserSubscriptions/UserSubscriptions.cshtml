@@ -1,0 +1,41 @@
+﻿@model IEnumerable<ClayOnWheels.Models.EF.UserSubscription>
+
+@{
+    ViewBag.Title = "Lessen van cursisten";
+}
+
+<table class="table">
+    <tr>
+        <th>
+            Datum cursus
+        </th>
+        
+        <th>
+            Start op
+        </th>
+        <th>
+           Eindigt op
+        </th> 
+        <th>
+            Datum geboekt
+        </th>      
+    </tr>
+   
+    @foreach (var item in Model)
+    {
+       <tr>
+            <td>
+                @item.AppointmentDiary.DateTimeScheduled.ToString("d/MM/yyyy")
+            </td>
+           <td>
+               @item.AppointmentDiary.DateTimeScheduled.ToString("HH:mm")
+           </td>
+           <td>
+               @item.AppointmentDiary.DateTimeScheduled.AddHours(3).ToString("HH:mm")
+           </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Created)
+            </td>          
+        </tr>
+    }
+</table>
