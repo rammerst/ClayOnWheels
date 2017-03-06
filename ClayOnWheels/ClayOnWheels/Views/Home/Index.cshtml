@@ -146,7 +146,6 @@
                         slotMinutes: 30,
                         events: '/Home/GetDiaryEvents/',
                         eventClick: function(calEvent, jsEvent, view) {
-                            console.log(calEvent);
                             $('#bookDateStart').text($.fullCalendar.formatDate(calEvent.start, 'HH:mm'));
                             var dateEnd = subMinutes(calEvent.end, 30);
                             $('#bookDateEnd').text($.fullCalendar.formatDate(dateEnd, 'HH:mm'));
