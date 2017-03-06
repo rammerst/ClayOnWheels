@@ -40,8 +40,7 @@ namespace testdbfirst.Controllers
         // GET: UserSubscription/Create
         public ActionResult Create()
         {
-            var date = DateTime.Now.AddDays(-1);
-            var subscriptions = db.AppointmentDiaries.Where(w => w.DateTimeScheduled >= date && w.StatusEnum != 2 && w.StatusEnum !=3).ToList();
+            var subscriptions = db.AppointmentDiaries.Where(w => w.StatusEnum != 2 && w.StatusEnum !=3).ToList();
             var users = db.AspNetUsers.Where(w => w.Active).ToList();
             var userItems = from s in users
                        select new SelectListItem
