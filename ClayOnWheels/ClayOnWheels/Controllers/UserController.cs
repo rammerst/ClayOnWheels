@@ -27,6 +27,7 @@ namespace ClayOnWheels.Controllers
 
                 item.AccessFailedCount = creditsSum;
             }
+
             return View(list);
         }
 
