@@ -62,7 +62,7 @@
             @Html.DisplayFor(modelItem => item.AccessFailedCount)
         </td>
         <td>
-          @string.Format("{0:MM/dd/yyyy}", item.AccessFailedCount)
+          @string.Format("{0:MM/dd/yyyy}", item.LockoutEndDateUtc)
            
         </td>
    
