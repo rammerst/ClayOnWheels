@@ -62,7 +62,11 @@
             @Html.DisplayFor(modelItem => item.AccessFailedCount)
         </td>
         <td>
-            @item.LockoutEndDateUtc.Value.ToString("d/MM/yyyy")
+            @if (item.LockoutEndDateUtc.Value != null)
+            {
+                @item.LockoutEndDateUtc.Value.ToString("d/MM/yyyy")
+            }
+           
         </td>
    
     </tr>
