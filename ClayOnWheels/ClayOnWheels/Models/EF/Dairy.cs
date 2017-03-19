@@ -625,7 +625,7 @@ namespace ClayOnWheels.Models.EF
         public int Id { get; set; } // Id (Primary key)
         public string UserId { get; set; } // UserId (length: 128)
         public int AppointmentDairyId { get; set; } // AppointmentDairyId
-        public DateTime Created { get; set; } // DateCreated
+        public DateTime? Created { get; set; } // DateCreated
         public int Pending { get; set; } // Pending
                                          // Foreign keys
 

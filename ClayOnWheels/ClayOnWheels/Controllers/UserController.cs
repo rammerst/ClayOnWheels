@@ -4,6 +4,7 @@ using System.Net;
 using System.Web.Mvc;
 using ClayOnWheels.Models.EF;
 using System.Collections.Generic;
+using System;
 
 namespace ClayOnWheels.Controllers
 {
@@ -33,7 +34,7 @@ namespace ClayOnWheels.Controllers
 
         public ActionResult UsersWithNoSubscriptionsLeft()
         {
-            var list = db.AspNetUsers.ToList();
+            var list = db.AspNetUsers.Where(a => a.Active).ToList();
             var resultList = new List<AspNetUser>();
             ViewBag.TotalActive = list.Count(w => w.Active);
             foreach (var item in list)
@@ -50,10 +51,11 @@ namespace ClayOnWheels.Controllers
                 if (creditsSum <= 0)
                 {
                     var max = db.UserSubscriptions.Where(u => u.UserId == item.Id && u.Pending != 1).Max(m => m.Created);
-                    item.LockoutEndDateUtc = max;
+                    item.LockoutEndDateUtc = max == null ? null : (DateTime?)max;
                     resultList.Add(item);
                 }
             }
+            resultList = resultList.OrderBy(o => o.LockoutEndDateUtc).ToList();
             return View(resultList);
         }
 
