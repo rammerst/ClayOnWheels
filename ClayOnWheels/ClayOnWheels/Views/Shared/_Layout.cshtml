@@ -1,46 +1,48 @@
 ﻿@using System.Security.Claims
 <!DOCTYPE html>
 <html>
-<head>@{
-          bool IsAdmin = false;
-      }
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clay on wheels - workshops</title>
-    @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
-    @Scripts.Render("~/bundles/scripts")
-
-    <link href="~/Content/fullcalendar.css" rel="stylesheet" />
-    <script src="~/Scripts/fullcalendar.js"></script>
-    <style>
-        .navbar-inverse {
-  background-color:  #e94d0a !important;
-  border-color: #080808;
+<head>
+    @{
+    bool IsAdmin = false;
 }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clay on wheels - workshops</title>
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+@Scripts.Render("~/bundles/scripts")
+
+<link href="~/Content/fullcalendar.css" rel="stylesheet" />
+<script src="~/Scripts/fullcalendar.js"></script>
+<style>
+    .navbar-inverse {
+        background-color: #e94d0a !important;
+        border-color: #080808;
+    }
+
         .navbar-inverse .navbar-nav > li > a {
             color: white !important;
-}
+        }
+
         .navbar-inverse .navbar-brand {
-  color: white !important;
+            color: white !important;
+        }
+</style>
+@if (ClaimsPrincipal.Current != null)
+{
+    IsAdmin = ClaimsPrincipal.Current.IsInRole("Admin");
 }
-    </style>
-    @if (ClaimsPrincipal.Current != null)
-    {
-        IsAdmin = ClaimsPrincipal.Current.IsInRole("Admin");
-    }
-    <script type = 'text/javascript' >
-        var appInsights=window.appInsights||function(config)
-        {
-            function r(config){ t[config] = function(){ var i = arguments; t.queue.push(function(){ t[config].apply(t, i)})} }
-            var t = { config:config},u=document,e=window,o='script',s=u.createElement(o),i,f;for(s.src=config.url||'//az416426.vo.msecnd.net/scripts/a/ai.0.js',u.getElementsByTagName(o)[0].parentNode.appendChild(s),t.cookie=u.cookie,t.queue=[],i=['Event','Exception','Metric','PageView','Trace','Ajax'];i.length;)r('track'+i.pop());return r('setAuthenticatedUserContext'),r('clearAuthenticatedUserContext'),config.disableExceptionTracking||(i='onerror',r('_'+i),f=e[i],e[i]=function(config, r, u, e, o) { var s = f && f(config, r, u, e, o); return s !== !0 && t['_' + i](config, r, u, e, o),s}),t
-        }({
-            instrumentationKey:'fda7cbec-4a12-459f-9c26-a294facaf3c5'
-        });
-        
-        window.appInsights=appInsights;
-        appInsights.trackPageView();
-    </script>
+<script type='text/javascript'>
+    var appInsights = window.appInsights || function (config) {
+        function r(config) { t[config] = function () { var i = arguments; t.queue.push(function () { t[config].apply(t, i) }) } }
+        var t = { config: config }, u = document, e = window, o = 'script', s = u.createElement(o), i, f; for (s.src = config.url || '//az416426.vo.msecnd.net/scripts/a/ai.0.js', u.getElementsByTagName(o)[0].parentNode.appendChild(s), t.cookie = u.cookie, t.queue = [], i = ['Event', 'Exception', 'Metric', 'PageView', 'Trace', 'Ajax']; i.length;)r('track' + i.pop()); return r('setAuthenticatedUserContext'), r('clearAuthenticatedUserContext'), config.disableExceptionTracking || (i = 'onerror', r('_' + i), f = e[i], e[i] = function (config, r, u, e, o) { var s = f && f(config, r, u, e, o); return s !== !0 && t['_' + i](config, r, u, e, o), s }), t
+    }({
+        instrumentationKey: 'fda7cbec-4a12-459f-9c26-a294facaf3c5'
+    });
+
+    window.appInsights = appInsights;
+    appInsights.trackPageView();
+</script>
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -58,10 +60,11 @@
                     <li>@Html.ActionLink("Calendar", "Index", "Home")</li>
                     @if (IsAdmin)
                     {<text>
-                         <li>@Html.ActionLink("Beheer abonnementen", "Index", "Subscriptions")</li>
-                         <li>@Html.ActionLink("Beheer beurten", "Index", "UserSubscriptions")</li>
-                         <li>@Html.ActionLink("Beheer gebruikers", "Index", "User")</li>
-                     </text>
+                        <li>@Html.ActionLink("Beheer abonnementen", "Index", "Subscriptions")</li>
+                        <li>@Html.ActionLink("Beheer beurten", "Index", "UserSubscriptions")</li>
+                        <li>@Html.ActionLink("Beheer gebruikers", "Index", "User")</li>
+                        <li>@Html.ActionLink("Te betalen gebruikers", "UsersWithNoSubscriptionsLeft", "User")</li>
+                    </text>
                     }
                     else
                     {

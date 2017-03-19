@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Web.Mvc;
 using ClayOnWheels.Models.EF;
+using System.Collections.Generic;
 
 namespace ClayOnWheels.Controllers
 {
@@ -28,6 +29,32 @@ namespace ClayOnWheels.Controllers
                 item.AccessFailedCount = creditsSum;
             }
             return View(list);
+        }
+
+        public ActionResult UsersWithNoSubscriptionsLeft()
+        {
+            var list = db.AspNetUsers.ToList();
+            var resultList = new List<AspNetUser>();
+            ViewBag.TotalActive = list.Count(w => w.Active);
+            foreach (var item in list)
+            {
+                var creditsSum = 0;
+                creditsSum = (from u in db.Subscriptions where u.UserId == item.Id select (int?)u.Number).Sum() ?? 0;
+
+                //now substract all bookings
+                var bookedSum = db.UserSubscriptions.Count(u => u.UserId == item.Id && u.Pending != 1);
+                creditsSum -= bookedSum;
+
+                item.AccessFailedCount = creditsSum;
+
+                if (creditsSum <= 0)
+                {
+                    var max = db.UserSubscriptions.Where(u => u.UserId == item.Id && u.Pending != 1).Max(m => m.Created);
+                    item.LockoutEndDateUtc = max;
+                    resultList.Add(item);
+                }
+            }
+            return View(resultList);
         }
 
         // GET: User/Details/5
