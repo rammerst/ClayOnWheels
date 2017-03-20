@@ -30,9 +30,11 @@
             # beurten
         </th>
         <th>
-            Laaste les geboekt
+            Laatst geboekt
         </th>
-        <th></th>
+        <th>
+            Laatste les 
+        </th>
     </tr>
 
     @foreach (var item in Model)
@@ -63,9 +65,11 @@
                 @Html.DisplayFor(modelItem => item.AccessFailedCount)
             </td>
             <td>
-                @string.Format("{0:d/M/yyyy}", item.LockoutEndDateUtc)
+                @Html.DisplayFor(modelItem => item.SecurityStamp)
             </td>
-
+            <td>
+                @string.Format("{0:d/M/yyyy}", item.LockoutEndDateUtc)               
+            </td>
         </tr>
     }
 

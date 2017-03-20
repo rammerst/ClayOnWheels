@@ -50,8 +50,10 @@ namespace ClayOnWheels.Controllers
 
                 if (creditsSum <= 0)
                 {
-                    var max = db.UserSubscriptions.Where(u => u.UserId == item.Id && u.Pending != 1).Max(m => m.Created);
-                    item.LockoutEndDateUtc = max == null ? null : (DateTime?)max;
+                    var max = db.UserSubscriptions.Where(u => u.UserId == item.Id && u.Pending != 1).Max(m => m.Created);                   
+                    var maxLes = db.UserSubscriptions.Where(u => u.UserId == item.Id && u.Pending != 1).Max(m => m.AppointmentDiary.DateTimeScheduled);
+                    item.SecurityStamp = max.Value.ToString("d/M/yyyy");
+                    item.LockoutEndDateUtc = maxLes; 
                     resultList.Add(item);
                 }
             }
