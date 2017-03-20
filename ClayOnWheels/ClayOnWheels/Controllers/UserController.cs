@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using ClayOnWheels.Models.EF;
 using System.Collections.Generic;
 using System;
+using ClayOnWheels.Models;
 
 namespace ClayOnWheels.Controllers
 {
@@ -35,7 +36,7 @@ namespace ClayOnWheels.Controllers
         public ActionResult UsersWithNoSubscriptionsLeft()
         {
             var list = db.AspNetUsers.Where(a => a.Active).ToList();
-            var resultList = new List<AspNetUser>();
+            var resultList = new List<UserNotPaidViewModel>();
             ViewBag.TotalActive = list.Count(w => w.Active);
             foreach (var item in list)
             {
@@ -50,14 +51,33 @@ namespace ClayOnWheels.Controllers
 
                 if (creditsSum <= 0)
                 {
-                    var max = db.UserSubscriptions.Where(u => u.UserId == item.Id && u.Pending != 1).Max(m => m.Created);                   
-                    var maxLes = db.UserSubscriptions.Where(u => u.UserId == item.Id && u.Pending != 1).Max(m => m.AppointmentDiary.DateTimeScheduled);
-                    item.SecurityStamp = max.Value.ToString("d/M/yyyy");
-                    item.LockoutEndDateUtc = maxLes; 
-                    resultList.Add(item);
+                    var newItem = new UserNotPaidViewModel
+                    {
+                        AantalBeurten = 0,
+                        Address = item.Address,
+                        City = item.City,
+                        Email = item.Email,
+                        FirstName = item.FirstName,
+                        LastName = item.LastName,
+                        PhoneNumber = item.PhoneNumber,
+                        PostalCode = item.PostalCode
+                    };
+
+                    var usSub = db.UserSubscriptions.Where(u => u.UserId == item.Id && u.Pending != 1).ToList();
+                    var max = usSub.Max(m => m.Created);
+                    var maxDate = DateTime.MinValue;
+                    foreach(var it in usSub)
+                    {
+                        if (it.AppointmentDiary.DateTimeScheduled >= maxDate)
+                            maxDate = it.AppointmentDiary.DateTimeScheduled;
+                    }
+                    //var maxLes = Max(m => m.AppointmentDiary.DateTimeScheduled);
+                    newItem.LastBooked = max ?? DateTime.MinValue;
+                    newItem.LastLesson = maxDate;
+                    resultList.Add(newItem);
                 }
             }
-            resultList = resultList.OrderBy(o => o.LockoutEndDateUtc).ToList();
+            resultList = resultList.OrderBy(o => o.LastLesson).ToList();
             return View(resultList);
         }
 

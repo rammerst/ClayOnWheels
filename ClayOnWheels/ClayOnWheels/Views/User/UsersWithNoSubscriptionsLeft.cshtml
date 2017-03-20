@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ClayOnWheels.Models.EF.AspNetUser>
+﻿@model IEnumerable<ClayOnWheels.Models.UserNotPaidViewModel>
 
 @{
     ViewBag.Title = "Overzicht";
@@ -28,13 +28,14 @@
         </th>
         <th>
             # beurten
+        </th>        
+        <th>
+            Laatste les
         </th>
         <th>
             Laatst geboekt
         </th>
-        <th>
-            Laatste les 
-        </th>
+
     </tr>
 
     @foreach (var item in Model)
@@ -62,13 +63,23 @@
                 @Html.DisplayFor(modelItem => item.PostalCode)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.AccessFailedCount)
+                @Html.DisplayFor(modelItem => item.AantalBeurten)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.SecurityStamp)
+                @if (item.LastLesson != DateTime.MinValue)
+                {
+                    <text>
+                    @string.Format("{0:d/M/yyyy}", item.LastLesson)
+                    </text>
+                }
             </td>
             <td>
-                @string.Format("{0:d/M/yyyy}", item.LockoutEndDateUtc)               
+                @if (item.LastBooked != DateTime.MinValue)
+                {
+                    <text>
+                        @string.Format("{0:d/M/yyyy}", item.LastBooked)
+                    </text>
+}
             </td>
         </tr>
     }
