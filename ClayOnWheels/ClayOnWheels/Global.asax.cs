@@ -7,6 +7,7 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using ClayOnWheels.Functions;
 using ClayOnWheels.Models;
+using System.Web.Configuration;
 
 namespace ClayOnWheels
 {
@@ -20,6 +21,7 @@ namespace ClayOnWheels
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             Database.SetInitializer<ApplicationDbContext>(new MigrateDatabaseToLatestVersion<ApplicationDbContext, Migrations.Configuration>());
             DefaultModelBinder.ResourceClassKey = "Messages";
+            AppSettings.Initialize(WebConfigurationManager.AppSettings);
         }
 
         void Application_Error(object sender, EventArgs e)
@@ -40,7 +42,7 @@ namespace ClayOnWheels
                     return;
 
                 //Redirect HTTP errors to HttpError page
-                Server.Transfer("HttpErrorPage.aspx");
+                Server.Transfer("~");
             }
 
             // For other kinds of errors give the user some information
@@ -48,7 +50,7 @@ namespace ClayOnWheels
             Response.Write("<h2>Global Page Error</h2>\n");
             Response.Write(
                 "<p>" + exc.Message + "</p>\n");
-            Response.Write("Return to the <a href='Default.aspx'>" +
+            Response.Write("Return to the <a href='\'>" +
                 "Default Page</a>\n");
 
             // Log the exception and notify system operators

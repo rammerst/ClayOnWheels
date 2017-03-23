@@ -543,6 +543,8 @@ namespace ClayOnWheels.Models.EF
         public string City { get; set; }
         public string PostalCode { get; set; }
         public bool Active { get; set; }
+        public string UniquePaymentReference { get; set; }
+        public string PassThrougReference { get; set; }
 
         // Reverse navigation
         public virtual System.Collections.Generic.ICollection<AspNetRole> AspNetRoles { get; set; } // Many to many mapping
@@ -609,9 +611,12 @@ namespace ClayOnWheels.Models.EF
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
         public System.DateTime DatePurchased { get; set; } // DatePurchased
         public int Number { get; set; } // Number
+        public string PaymentReference { get; set; }
+        public string PaymentMethod { get; set; }
+
 
         // Reverse navigation
-       // public virtual Subscription Subscription1 { get; set; } // Subscriptions.FK_Subscriptions_Subscriptions
+        // public virtual Subscription Subscription1 { get; set; } // Subscriptions.FK_Subscriptions_Subscriptions
 
         // Foreign keys
         public virtual AspNetUser AspNetUser { get; set; } // FK_dbo.Subscriptions_dbo.AspNetUsers_UserId

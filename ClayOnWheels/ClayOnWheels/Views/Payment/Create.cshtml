@@ -1,0 +1,23 @@
+﻿@using ClayOnWheels.Models.Payment
+@{
+    ViewBag.Title = "Maak een betaling aan";
+}
+<h2>Koop een nieuwe beurtenkaart</h2>
+<div class="alert alert-info fade in">
+    
+    Dit scherm zal een betaling starten voor het verkrijgen van een nieuwe beurtenkaart. <br/>
+    Als alles goed verlopen is keert u terug naar deze website en kan u opnieuw lessen boeken.
+</div>
+@Html.ValidationSummary()
+@using (Html.BeginForm("Create", "Payment", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    <div class="form-group">
+        <b>&nbsp;&nbsp;&nbsp;&nbsp;Het te betalen bedrag is 250 &euro;<br/>&nbsp;&nbsp;&nbsp;&nbsp;Hiermee kan je 10 nieuwe lessen boeken.</b>
+    </div>
+
+    <div class="form-group">
+        <b>&nbsp;&nbsp;&nbsp;&nbsp;De omschrijving van de betaling is "Aankoop beurtenkaart"</b>
+    </div>
+    
+    <input type="submit" value="Start betaling" class="btn btn-primary" />
+}

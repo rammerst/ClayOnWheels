@@ -22,6 +22,12 @@
             @Html.DisplayNameFor(model => model.AspNetUser.Email)
         </th>
         <th>Achternaam Voornaam</th>
+        <th>
+            Betalingsreferentie
+        </th>
+        <th>
+            Betalingsmethode
+        </th>
         <th></th>
     </tr>
 
@@ -38,6 +44,12 @@
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.AspNetUser.LastName) @Html.DisplayFor(modelItem => item.AspNetUser.FirstName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PaymentReference)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PaymentMethod)
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |

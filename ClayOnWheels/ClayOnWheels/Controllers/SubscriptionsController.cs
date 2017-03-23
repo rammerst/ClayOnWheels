@@ -54,35 +54,26 @@ namespace ClayOnWheels.Controllers
             };
             return View(sub);
         }
-
+        
         // POST: Subscriptions/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,UserId,DatePurchased,Number")] Subscription subscriptions)
+        public ActionResult Create([Bind(Include = "Id,UserId,DatePurchased,Number")] Subscription subscription)
         {
             if (ModelState.IsValid)
             {
-                _db.Subscriptions.Add(subscriptions);
-                _db.SaveChanges();
-
-                var id = subscriptions.UserId;
-                var s = _db.AspNetUsers.FirstOrDefault(f => f.Id == id);
-                if (s != null)
-                {
-                    var email = s.Email;                  
-                    var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\BetalingOntvangen.html"));
-                    body = body.Replace("[NAME]", s.FirstName);
-                    Mailer.SendEmail(email, "Betaling gelukt bij Clay on Wheels", body);
-                }
+                subscription.PaymentReference = "";
+                subscription.PaymentMethod = "Manueel";
+                Subscriptions.AddSubscription(_db, subscription, Server.MapPath("~\\MailTemplates\\BetalingOntvangen.html"));
                 return RedirectToAction("Index");
             }
 
-            ViewBag.UserId = new SelectList(_db.AspNetUsers, "Id", "Email", subscriptions.UserId);
-            ViewBag.Id = new SelectList(_db.Subscriptions, "Id", "UserId", subscriptions.Id);
-            ViewBag.Id = new SelectList(_db.Subscriptions, "Id", "UserId", subscriptions.Id);
-            return View(subscriptions);
+            ViewBag.UserId = new SelectList(_db.AspNetUsers, "Id", "Email", subscription.UserId);
+            ViewBag.Id = new SelectList(_db.Subscriptions, "Id", "UserId", subscription.Id);
+            ViewBag.Id = new SelectList(_db.Subscriptions, "Id", "UserId", subscription.Id);
+            return View(subscription);
         }
 
         // GET: Subscriptions/Edit/5

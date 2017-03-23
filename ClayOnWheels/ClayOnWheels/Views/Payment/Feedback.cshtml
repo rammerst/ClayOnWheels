@@ -1,0 +1,38 @@
+﻿@using ClayOnWheels.Models.Payment
+@model PaymentResponseViewModel
+
+<h2>Betaling beurtenkaart</h2>
+@{
+    ViewBag.Title = "Betalingsresultaat";
+}
+
+@if (Model.PaymentSucceeded)
+{
+    <div class="alert alert-success fade in">
+        <strong>Betaling geslaagd!</strong> @Html.DisplayFor(x => x.SuccessMessage)
+    </div>   
+}
+else
+{
+    <div class="alert alert-warning fade in">
+        <strong>Betaling niet geslaagd.</strong> @Html.DisplayFor(x => x.ErrorMessage)
+    </div>
+    
+    using (Html.BeginForm("Create", "Payment", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+        <input type="submit" value="Start opnieuw een betaling" class="btn btn-primary" />
+    }
+}
+@*<div class="form-group">
+    <label class="col-sm-2 control-label" for="amount">Betaling gelukt?</label>
+    @Html.DisplayFor(x => x.PaymentSucceeded)
+</div>
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="amount">PassthroughId</label>
+    @Html.DisplayFor(x => x.PassThroughId)
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="amount">Betalingsreferentie</label>
+    @Html.DisplayFor(x => x.PaymentReference)
+</div>*@
