@@ -165,7 +165,7 @@ namespace ClayOnWheels.Controllers
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     PostalCode = model.PostalCode,
-                    Active = totalActive < 75,
+                    Active = totalActive < 80,
                     PhoneNumber = model.PhoneNumber
                 };
                 // Add the Address properties:
@@ -216,7 +216,7 @@ namespace ClayOnWheels.Controllers
                     user.EmailConfirmed = true;
                     _db.SaveChanges();
                     var usersRegistered = _db.AspNetUsers.Count(w => w.Active);
-                    if (usersRegistered > 75)
+                    if (usersRegistered > 80)
                     {
                         var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\AfterConfirmationFailed.html"));
                         body = body.Replace("[NAME]", user.FirstName);

@@ -16,7 +16,7 @@ namespace ClayOnWheels.Controllers
         // GET: Subscriptions
         public ActionResult Index()
         {
-            var subscriptions = _db.Subscriptions.Include(s => s.AspNetUser);//.Include(s => s.Subscription_Id);
+            var subscriptions = _db.Subscriptions.Include(s => s.AspNetUser).Where(w => w.DatePurchased.Year == 2018).OrderByDescending(w => w.DatePurchased);//.Include(s => s.Subscription_Id);
             return View(subscriptions);
         }
 
@@ -38,7 +38,7 @@ namespace ClayOnWheels.Controllers
         // GET: Subscriptions/Create
         public ActionResult Create()
         {
-            var users = _db.AspNetUsers.Where(w=>w.Active).ToList();
+            var users = _db.AspNetUsers.Where(w => w.Active).ToList();
             var item = from s in users
                        select new SelectListItem
                        {
@@ -54,7 +54,7 @@ namespace ClayOnWheels.Controllers
             };
             return View(sub);
         }
-        
+
         // POST: Subscriptions/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.

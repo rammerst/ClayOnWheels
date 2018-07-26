@@ -19,14 +19,14 @@ namespace testdbfirst.Controllers
         // GET: UserSubscription
         public ActionResult Index()
         {
-            var userSubscriptions = db.UserSubscriptions.Include(u => u.AspNetUser).Include(a => a.AppointmentDiary).Where(u => u.AspNetUser.Active).OrderBy(b => b.AppointmentDiary.DateTimeScheduled).ToList();
+            var userSubscriptions = db.UserSubscriptions.Include(u => u.AspNetUser).Include(a => a.AppointmentDiary).Where(u => u.AspNetUser.Active && u.AppointmentDiary.DateTimeScheduled.Year == 2018).OrderByDescending(b => b.AppointmentDiary.DateTimeScheduled).ToList();
             return View(userSubscriptions.ToList());
         }
 
         public ActionResult UserSubscriptions()
         {
             var userID = ClayOnWheels.Functions.User.GetUserId();
-            var userSubscriptions = db.UserSubscriptions.Include(u => u.AspNetUser).Include(a => a.AppointmentDiary).Where(u => u.AspNetUser.Active && u.UserId == userID).OrderBy(b => b.AppointmentDiary.DateTimeScheduled).ToList();
+            var userSubscriptions = db.UserSubscriptions.Include(u => u.AspNetUser).Include(a => a.AppointmentDiary).Where(u => u.AspNetUser.Active && u.UserId == userID && u.AppointmentDiary.DateTimeScheduled.Year == 2018).OrderByDescending(b => b.AppointmentDiary.DateTimeScheduled).ToList();
             return View(userSubscriptions.ToList());
         }
 
@@ -48,14 +48,14 @@ namespace testdbfirst.Controllers
         // GET: UserSubscription/Create
         public ActionResult Create()
         {
-            var subscriptions = db.AppointmentDiaries.Where(w => w.StatusEnum != 2 && w.StatusEnum !=3).ToList();
+            var subscriptions = db.AppointmentDiaries.Where(w => w.StatusEnum != 2 && w.StatusEnum != 3).ToList();
             var users = db.AspNetUsers.Where(w => w.Active).ToList();
             var userItems = from s in users
-                       select new SelectListItem
-                       {
-                           Text = s.FirstName + " - " + s.LastName + '(' + s.Email + ')',
-                           Value = s.Id
-                       };
+                            select new SelectListItem
+                            {
+                                Text = s.FirstName + " - " + s.LastName + '(' + s.Email + ')',
+                                Value = s.Id
+                            };
             ViewBag.UserId = userItems;
             var item = from s in subscriptions
                        select new SelectListItem

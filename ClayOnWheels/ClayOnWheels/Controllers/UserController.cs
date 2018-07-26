@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using ClayOnWheels.Models.EF;
 using System.Collections.Generic;
 using System;
+using System.Web.UI.WebControls;
 using ClayOnWheels.Models;
 
 namespace ClayOnWheels.Controllers
@@ -15,14 +16,14 @@ namespace ClayOnWheels.Controllers
         private MyDbContext db = new MyDbContext();
 
         // GET: User
-        public ActionResult Index()
+        public ActionResult Index(bool showNonActive = true)
         {
-            var list = db.AspNetUsers.ToList();
+            var list = showNonActive ? db.AspNetUsers.OrderByDescending(o => o.Active).ToList() : db.AspNetUsers.Where(w => w.Active).ToList();
+
             ViewBag.TotalActive = list.Count(w => w.Active);
             foreach (var item in list)
             {
-                var creditsSum = 0;
-                creditsSum = (from u in db.Subscriptions where u.UserId == item.Id select (int?)u.Number).Sum() ?? 0;
+                var creditsSum = (from u in db.Subscriptions where u.UserId == item.Id select (int?)u.Number).Sum() ?? 0;
 
                 //now substract all bookings
                 var bookedSum = db.UserSubscriptions.Count(u => u.UserId == item.Id && u.Pending != 1);
@@ -66,7 +67,7 @@ namespace ClayOnWheels.Controllers
                     var usSub = db.UserSubscriptions.Where(u => u.UserId == item.Id && u.Pending != 1).ToList();
                     var max = usSub.Max(m => m.Created);
                     var maxDate = DateTime.MinValue;
-                    foreach(var it in usSub)
+                    foreach (var it in usSub)
                     {
                         if (it.AppointmentDiary.DateTimeScheduled >= maxDate)
                             maxDate = it.AppointmentDiary.DateTimeScheduled;

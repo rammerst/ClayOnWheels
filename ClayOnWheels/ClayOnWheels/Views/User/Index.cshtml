@@ -3,9 +3,14 @@
 @{
     ViewBag.Title = "Overzicht";
 }
-<p>
-    Totaal aantal actieve gebruikers: @ViewBag.TotalActive
-</p>
+<div class="row">
+    <div class="col-md-5">
+        Totaal aantal actieve gebruikers: @ViewBag.TotalActive
+    </div>
+    <div class="col-md-5">
+        @*Toon actieve gebruikers:*@ 
+    </div>
+</div>
 <table class="table">
     <tr>
         <th>
