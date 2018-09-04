@@ -6,6 +6,7 @@ using ClayOnWheels.Models.EF;
 using System.Collections.Generic;
 using System;
 using System.Web.UI.WebControls;
+using ClayOnWheels.Functions;
 using ClayOnWheels.Models;
 
 namespace ClayOnWheels.Controllers
@@ -157,6 +158,13 @@ namespace ClayOnWheels.Controllers
                     joske.Active = aspNetUser.Active;
                     joske.City = aspNetUser.City;
                     db.SaveChanges();
+
+                    if (aspNetUser.Active)
+                    {
+                        var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\AfterConfirmationSuccess.html"));
+                        body = body.Replace("[NAME]", aspNetUser.FirstName);
+                        Mailer.SendEmail(aspNetUser.Email, "Registratie gelukt bij Clay on Wheels", body);
+                    }
                     return RedirectToAction("Index");
                 }
 

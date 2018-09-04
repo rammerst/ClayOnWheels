@@ -165,7 +165,7 @@ namespace ClayOnWheels.Controllers
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     PostalCode = model.PostalCode,
-                    Active = totalActive < 80,
+                    Active = false,
                     PhoneNumber = model.PhoneNumber
                 };
                 // Add the Address properties:
@@ -209,25 +209,25 @@ namespace ClayOnWheels.Controllers
             }
             try
             {
-                
+
                 var user = _db.AspNetUsers.FirstOrDefault(w => w.Id == userId);
                 if (user != null)
                 {
                     user.EmailConfirmed = true;
                     _db.SaveChanges();
-                    var usersRegistered = _db.AspNetUsers.Count(w => w.Active);
-                    if (usersRegistered > 80)
-                    {
-                        var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\AfterConfirmationFailed.html"));
-                        body = body.Replace("[NAME]", user.FirstName);
-                        Mailer.SendEmail(user.Email, "Registratie gelukt bij Clay on Wheels - wachtlijst", body);
-                    }
-                    else
-                    {
-                        var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\AfterConfirmationSuccess.html"));
-                        body = body.Replace("[NAME]", user.FirstName);
-                        Mailer.SendEmail(user.Email, "Registratie gelukt bij Clay on Wheels", body);
-                    }
+                    //var usersRegistered = _db.AspNetUsers.Count(w => w.Active);
+                    //if (usersRegistered > 80)
+                    //{
+                    var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\AfterConfirmationFailed.html"));
+                    body = body.Replace("[NAME]", user.FirstName);
+                    Mailer.SendEmail(user.Email, "Registratie gelukt bij Clay on Wheels", body);
+                    //}
+                    //else
+                    //{
+                    //    var body = System.IO.File.ReadAllText(Server.MapPath("~\\MailTemplates\\AfterConfirmationSuccess.html"));
+                    //    body = body.Replace("[NAME]", user.FirstName);
+                    //    Mailer.SendEmail(user.Email, "Registratie gelukt bij Clay on Wheels", body);
+                    //}
                     return View("ConfirmEmail");
                 }
             }
