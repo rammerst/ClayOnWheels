@@ -16,7 +16,7 @@ namespace ClayOnWheels.Controllers
         // GET: Subscriptions
         public ActionResult Index()
         {
-            var subscriptions = _db.Subscriptions.Include(s => s.AspNetUser).Where(w => w.DatePurchased.Year == 2018).OrderByDescending(w => w.DatePurchased);//.Include(s => s.Subscription_Id);
+            var subscriptions = _db.Subscriptions.Include(s => s.AspNetUser).Where(w => w.DatePurchased.Year >= 2018).OrderByDescending(w => w.DatePurchased);//.Include(s => s.Subscription_Id);
             return View(subscriptions);
         }
 
