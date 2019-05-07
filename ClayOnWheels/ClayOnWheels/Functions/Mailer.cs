@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
-using System.Linq;
 using System.Net.Mail;
-using System.Threading.Tasks;
-using System.Web;
 
 namespace ClayOnWheels.Functions
 {
@@ -53,7 +49,7 @@ namespace ClayOnWheels.Functions
             }
             catch (Exception exc)
             {
-                //eat exc
+                System.Diagnostics.Trace.TraceError("Error during error mailing: " + exc);
             }
         }
         public static void SendEmail(string sendTo, string subject, string body)
@@ -100,7 +96,7 @@ namespace ClayOnWheels.Functions
             }
             catch (Exception ex)
             {
-                var message = ex.Message;
+                System.Diagnostics.Trace.TraceError("Error during mailing: " + ex);
             }
         }
 
@@ -132,9 +128,9 @@ namespace ClayOnWheels.Functions
                 var result = appSettings[key] ?? "Not Found";
                 return result;
             }
-            catch (ConfigurationErrorsException)
+            catch (ConfigurationErrorsException ex)
             {
-                //Tracing.("Error reading app settings");
+                System.Diagnostics.Trace.TraceError("ConfigurationErrorsException: " + ex);
             }
             return "";
         }

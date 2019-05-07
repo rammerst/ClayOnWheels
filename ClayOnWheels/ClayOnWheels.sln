@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClayOnWheels", "ClayOnWheel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mollie.Api", "Mollie.Api\Mollie.Api.csproj", "{4E95380C-7B3B-4359-A2ED-E7EC1AF2C299}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClayOnWheels.Test", "ClayOnWheels.Test\ClayOnWheels.Test.csproj", "{3DEB9FB8-9123-4AE3-B3EE-FF4D191F2EBD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,8 +23,15 @@ Global
 		{4E95380C-7B3B-4359-A2ED-E7EC1AF2C299}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E95380C-7B3B-4359-A2ED-E7EC1AF2C299}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E95380C-7B3B-4359-A2ED-E7EC1AF2C299}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DEB9FB8-9123-4AE3-B3EE-FF4D191F2EBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DEB9FB8-9123-4AE3-B3EE-FF4D191F2EBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DEB9FB8-9123-4AE3-B3EE-FF4D191F2EBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DEB9FB8-9123-4AE3-B3EE-FF4D191F2EBD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D7156802-9812-4226-8510-BD13B1AB399A}
 	EndGlobalSection
 EndGlobal
