@@ -69,7 +69,7 @@ namespace ClayOnWheels.Models.EF
 
                             //check when cursus is fully booked & the current cursist has not booked yet, show in red:
                             var results = ent.UserSubscriptions.Count(w => w.AppointmentDairyId == item.Id && w.Pending != 1);
-                            if (results >= 12)
+                            if (results >= 7)
                             {
                                 rec.StatusString = Enums.GetName((AppointmentStatus)4);
                                 rec.SomeImportantKeyID = 4;
