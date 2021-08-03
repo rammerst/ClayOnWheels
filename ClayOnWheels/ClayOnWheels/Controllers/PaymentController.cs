@@ -102,7 +102,7 @@ namespace ClayOnWheels.Controllers
             {
                 PaymentRequest paymentRequest = new PaymentRequest()
                 {
-                    Amount = 250,
+                    Amount = 300,
                     Description = "Aankoop beurtenkaart"
                 };
                 var guidString = Guid.NewGuid().ToString();
